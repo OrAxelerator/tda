@@ -4,7 +4,7 @@
 
 Jeu de carte inventé par moi et 4 autres amis
 ici recodé en ligne acessible facilement depuis le navigateur, il suffit (*suffira) de se connecter avec google pour passer les sécurité de Firebase, le serveur ou seront stocké les parties jouée en temps réel en multijoueur
-
+but du jeu : ne plus avoir de carte, chacun son tour on pose une carte qui doit etre supérieur ou égal a celle poser avant par autrui, si on le veut (ou qu'on ne peut plus poser de carte égal ou sup) on prends toute les cartes posé sur la tour (le tas). Voir [regle.md](./regle.md) pour plus d'info
 ### Objectifs:
 
 * joueur en direct avec entre 2 et 6 joueur
