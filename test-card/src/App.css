@@ -1,0 +1,30 @@
+.cardContainer {
+    display: flex;
+    flex-direction: row;
+    width: 80%;
+    margin : 0 auto;
+    background-color: grey;
+    border: 2px solid black;
+
+    align-items: center;
+    justify-content: center;
+
+}
+
+.cardImg {
+  width: 100px;
+  transform: var(--card-transform, none);
+  transition: transform 0.2s;
+}
+
+.cardSelected {
+  /* transtranslateY(-10px); */
+  transform: translateY(-25px);
+  scale: 1.1;
+  z-index: 1;
+}
+
+/* affect only card without selected class */
+.cardImg:not(.cardSelected):hover {
+  transform: var(--card-transform, none) scale(1.05);
+}

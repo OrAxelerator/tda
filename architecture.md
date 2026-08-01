@@ -34,7 +34,7 @@ TDA
 │   └── Hosting
 │
 └── Firebase Prod
-    ├── Auth
+    ├── Auth@
     ├── Firestore
     └── Hosting
 
