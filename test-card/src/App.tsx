@@ -3,6 +3,8 @@ import { createGame } from "./game/createGame";
 
 import "./App.css";
 
+import Card from './components/Card' 
+
 function App() {
   const [engine, setEngine] = useState<any>(null);
   const [allCards, setAllCards] = useState<any[]>([]); //debug
@@ -20,8 +22,6 @@ function App() {
   useEffect(() => {
     async function start() {
       const response = await fetch("/cards.json");
-
-      // const aze = await fetch("/card/01_theme1.png");
 
       const cards = await response.json();
       const cardsCopy = cards.map((card: any) => ({ ...card }));
@@ -166,71 +166,12 @@ function App() {
         <h3>Cards of palyers : </h3>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div className="cardContainer">
-            {
-              // pair.map((el, index) => {
-              engine.state.players[0].hand.map((el: { id: any; name: string | undefined; }, index: number) => {
-                const id_string = el.id;
-                // console.log(id_string);
 
-                const id = String(id_string).padStart(2, "0");
-
-                const cardLink = `http://localhost:5173/card/${id}_theme1.png`;
-                // console.log(id);
-
-                const numberOfCards = engine.state.players[0].hand.length;
-
-                //param transslate y:
-                const weight = 2.9;
-
-                const translateY = () => {
-                  // console.log(index+1);
-                  if (Math.round(numberOfCards / 2) === index + 1) {
-                    return `translateY(${-weight * 1.2 * (numberOfCards - index - 1)}px)`;
-                  }
-                  if (index < Math.round(numberOfCards / 2)) {
-                    return `translateY(${-weight * (index + 1)}px)`;
-                  } else {
-                    //nb carte - index
-                    return `translateY(${-weight * (numberOfCards - index)}px)`;
-                  }
-                };
-
-                const rotate = () => {
-                  const center = (numberOfCards - 1) / 2;
-                  const angle = (index - center) * 1.5;
-
-                  return `rotate(${angle}deg)`;
-                };
-
-                return (
-                  <div key={index}>
-                    <img
-                      src={cardLink}
-                      alt={el.name}
-                      className={
-                        selectedCards.includes(el.id)
-                          ? "cardImg cardSelected"
-                          : "cardImg"
-                      }
-                      style={
-                        {
-                          "--card-transform": `${translateY()} ${rotate()}`,
-                        } as React.CSSProperties
-                      }
-                      onClick={() => {
-                        if (selectedCards.includes(el.id)) {
-                          setSelectedCard(
-                            selectedCards.filter((id) => id !== el.id),
-                          );
-                        } else {
-                          setSelectedCard([...selectedCards, el.id]);
-                        }
-                      }}
-                    />
-                  </div>
-                );
-              })
-            }
+            <Card
+              enginePlayerHand={engine.state.players[0].hand}
+              selectedCard={selectedCards}
+              setSelectedCard={setSelectedCard}
+            />
           </div>
 
           <div className="cardContainer">
