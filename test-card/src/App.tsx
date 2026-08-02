@@ -15,6 +15,8 @@ function App() {
   const [selectedCards, setSelectedCard] = useState(ListOfSelectedCard);
   const [selectedCards2, setSelectedCard2] = useState(ListOfSelectedCard2);
 
+  const [seeDiscardPile, setSeeDiscardPile] = useState(true)
+
   useEffect(() => {
     async function start() {
       const response = await fetch("/cards.json");
@@ -118,11 +120,13 @@ function App() {
   };
 
 
+  const showDiscardPile = () => {
+    setSeeDiscardPile(!seeDiscardPile)
+    refresh((x) => x+1)
+  }
 
       return (
       <>
-        <h1>Card Game</h1>
-
 
         <input
           value={debugInput}
@@ -197,8 +201,7 @@ function App() {
 
                   return `rotate(${angle}deg)`;
                 };
-                //  console.log("el.id", el.id);
-                //  console.log("selectedCards.includes(el.id)", selectedCards.includes(el.id));
+
                 return (
                   <div key={index}>
                     <img
@@ -302,6 +305,66 @@ function App() {
         </div>
 
 
+            
+          <div style={{ display: seeDiscardPile ? "none" : "grid" }}>
+            <div>
+              <div className="cardContainer pile">
+                {
+              // pair.map((el, index) => {
+              engine.state.discardPile.map((el: { id: any; name: string | undefined; }, index: number) => {
+                const id_string = el;
+                // console.log(id_string);
+
+                const id = String(id_string).padStart(2, "0");
+
+                const cardLink = `http://localhost:5173/card/${id}_theme1.png`;
+                // console.log(id);
+
+                const numberOfCards = engine.state.discardPile.length;
+
+                //param transslate y:
+                const weight = 2.9;
+
+                const translateY = () => {
+                  // console.log(index+1);
+                  if (Math.round(numberOfCards / 2) === index + 1) {
+                    return `translateY(${-weight * 1.2 * (numberOfCards - index - 1)}px)`;
+                  }
+                  if (index < Math.round(numberOfCards / 2)) {
+                    return `translateY(${-weight * (index + 1)}px)`;
+                  } else {
+                    //nb carte - index
+                    return `translateY(${-weight * (numberOfCards - index)}px)`;
+                  }
+                };
+
+                const rotate = () => {
+                  const center = (numberOfCards - 1) / 2;
+                  const angle = (index - center) * 1.5;
+
+                  return `rotate(${angle}deg)`;
+                };
+                //  console.log("el.id", el.id);
+                //  console.log("selectedCards.includes(el.id)", selectedCards.includes(el.id));
+                return (
+                  <div key={index}>
+                    <img
+                      src={cardLink}
+                      alt={el.name}
+                      style={
+                        {
+                          "--card-transform": `${translateY()} ${rotate()}`,
+                        } as React.CSSProperties
+                      }
+                    />
+                  </div>
+                );
+              })
+            }
+              </div>
+            </div>
+          </div>
+
 
         <button
           onClick={() => {play(selectedCards)}}
@@ -316,6 +379,9 @@ function App() {
 
         <button onClick={() => showInfo(engine.state)}>
           SHOW INFO GAMEENGINE
+        </button>
+        <button onClick={showDiscardPile}>
+          AFFicher PILE
         </button>
       </>
     );

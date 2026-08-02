@@ -28,3 +28,8 @@
 .cardImg:not(.cardSelected):hover {
   transform: var(--card-transform, none) scale(1.05);
 }
+
+
+.pile {
+  flex-direction: row-reverse;
+}

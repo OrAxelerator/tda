@@ -1,18 +1,27 @@
-import { GameState } from './GameState';
+import { GameState } from "./GameState";
+import { Card } from "./Card";
 import { Player } from "./Player";
-
 
 export class GameEngine {
 
-    state: GameState;
+    public state: GameState;
 
+    // Catalogue de toutes les cartes du jeu
+    private readonly cards: Map<number, Card>;
 
-    constructor(state: GameState) {
+    constructor(state: GameState, cards: Card[]) {
 
         this.state = state;
 
+        // Création de la Map une seule fois
+        this.cards = new Map(
+            cards.map(card => [card.id, card])
+        );
     }
 
+    public getCard(id: number): Card | undefined {
+        return this.cards.get(id);
+    }
 
     startGame() {
 
@@ -106,41 +115,63 @@ export class GameEngine {
         // 2. Check in each hand if card is duplicate
         // 3. Check if card present in deck
         // (TO ADD) 4. Check if card present in defausse
+        // 5. if multiples card, check if they all have the same values
         
         console.log("carte joué depuis gameEngine.ts");
         console.log(cards);
 
-        const count = (arr: any[], el: any) => arr.filter((x: any) => x?.id === el?.id).length;
+        const hasDuplicateId = (arr: any[]) => {
+
+            for (let i = 0; i < arr.length; i++) {
+                for (let j = i + 1; j < arr.length; j++) {
+                    if (arr[i] === arr[j]) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        };
 
 
         //1.
         if (cards.length > 4){
             console.log(cards);
             console.log(cards.length);
-            console.error(`TRICHE Player: ${playerId} joue avec plus de 4 carte .. `);
+            console.error(`TRICHE Player: ${playerId} joue avec plus de 4 carte .. (1)`);
         }
 
         // 2.
-        // check if if a player (currentPlayer count) have already one of the card he plays
+        // check if if a player (currentPlayer count) have already one of the card he plays (check by ID)
         this.state.players.forEach(player => { // for all players
             console.log(player);  
 
-            if (player.id != playerId){ // other player
-                player.hand.forEach(card => { // for all their cards 
-                    cards.forEach(cardPlay => { // pour toute les cartes joué par jouer
-                        if (card.id == cardPlay.id){ // si carte de autre jouer == carte joué : triche
-                            console.error(`TRIIIIIIICHE, joueur qui joue a une carte présent dans la main de ${playerId} `);
-                        }
-                        
-                    });
-                    
+            if (player.id != playerId) { // A CEHCK SEMBLE BOF ........
+              // other player
+              player.hand.forEach((card) => {
+                // for all their cards
+                cards.forEach((cardPlay) => {
+                  // pour toute les cartes joué par jouer
+                  if (card.id == cardPlay.id) {
+                    // si carte de autre jouer == carte joué : triche
+                    console.error(
+                      `TRIIIIIIICHE, joueur qui joue a une carte présent dans la main de ${player.id} (2)`,
+                    );
+                  }
                 });
-            }else { // player that play
-                cards.forEach(cardPlay => { // for each cards play (id)
-                    if (count(cards,cardPlay) > 1){ // if card play present more than 1 time in hand : ban
-                        console.error("TRICHE, joue 1 carte qui est déja présente dans sa main (impossible)");
-                    }
-                });
+              });
+            } else {
+              // player that play
+              console.log("cards");
+              console.log(cards);
+              console.log("----");
+              console.log("condition, ", hasDuplicateId(cards));
+
+              if (hasDuplicateId(cards)) {
+                // if card play present more than 1 time in hand : ban
+                console.error(
+                  "TRICHE, joue 1 carte qui est déja présente dans sa main (impossible) (2bis)",
+                );
+              }
             }
         });
 
@@ -149,9 +180,38 @@ export class GameEngine {
         // regard toute les cards joué si elles sont présentes dans le deck
         cards.forEach(card => {
             if (this.state.deck.cards.includes(card) == true ) {
-                console.error("TRICHE : player a joué une carte présente dans deck");
+                console.error("TRICHE : player a joué une carte présente dans deck (3)");
             }
         });
+
+
+        // 4.  TO ADD
+
+
+
+        // 5. 
+        if (cards.length > 1) {
+            const firstCard = this.getCard(cards[0]);
+
+            if (firstCard) {
+                for (const card of cards) {
+                    const currentCard = this.getCard(card);
+
+                    if (!currentCard || currentCard.value !== firstCard.value) {
+                        console.error("TRICHE : les cartes jouées n'ont pas la même valeur (5)");
+                        break;
+                    }
+                }
+            }
+        }
+
+
+
+
+
+
+
+
 
 
         cards.forEach(card => {

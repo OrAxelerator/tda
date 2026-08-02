@@ -2,10 +2,10 @@ import { Deck } from "../engine/Deck";
 import { GameState } from "../engine/GameState";
 import { GameEngine } from "../engine/GameEngine";
 import { Player } from "../engine/Player";
-
+import { Card } from "../engine/Card";
 
 export function 
-createGame(cards:any[]) {
+createGame(cards: Card[]) {
 
     const deck = new Deck(cards);
 
@@ -15,7 +15,7 @@ createGame(cards:any[]) {
     const state = new GameState(deck);
 
 
-    const engine = new GameEngine(state);
+    const engine = new GameEngine(state, cards);
 
 
     engine.addPlayer(
