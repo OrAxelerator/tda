@@ -71,7 +71,7 @@ export class GameEngine {
         }
     }
 
-    discardCards(playerId:string, card) { // card = ID:number
+    discardCards(playerId:string, card: number) { // card = ID:number
         console.log("discrdCards");
         console.log(this.state.players);
         for (let i = 0; i < this.state.players.length; i++) {
@@ -80,10 +80,6 @@ export class GameEngine {
                 this.state.discardPile.push(card) // Reverse pile, last element end
             }
         }
-
-
-        this.state.currentPlayerId
-        // this.state.players
 
     }
 
@@ -109,7 +105,7 @@ export class GameEngine {
         this.state.turn++;
     }
 
-    playCards(playerId: string, cards: any[]) {
+    playCards(playerId: string, cards: number[]) {
         // RECAP :
         // 1. Check if player play more than 4 cards
         // 2. Check in each hand if card is duplicate
@@ -121,7 +117,7 @@ export class GameEngine {
         console.log("carte joué depuis gameEngine.ts");
         console.log(cards);
 
-        const hasDuplicateId = (arr: any[]) => {
+        const hasDuplicateId = (arr: number[]) => {
 
             for (let i = 0; i < arr.length; i++) {
                 for (let j = i + 1; j < arr.length; j++) {
@@ -152,7 +148,7 @@ export class GameEngine {
                 // for all their cards
                 cards.forEach((cardPlay) => {
                   // pour toute les cartes joué par jouer
-                  if (card.id == cardPlay.id) {
+                  if (card.id == cardPlay) {
                     // si carte de autre jouer == carte joué : triche
                     console.error(
                       `TRIIIIIIICHE, joueur qui joue a une carte présent dans la main de ${player.id} (2)`,
@@ -180,7 +176,7 @@ export class GameEngine {
         // 3.
         // regard toute les cards joué si elles sont présentes dans le deck
         cards.forEach(card => {
-            if (this.state.deck.cards.includes(card) == true ) {
+            if (this.state.deck.cards.some(deckCard => deckCard.id === card)) {
                 console.error("TRICHE : player a joué une carte présente dans deck (3)");
             }
         });
@@ -208,7 +204,8 @@ export class GameEngine {
 
         // 6.
         console.log("6.");
-        console.log(this.getCard(cards[0]).value);
+        const firstPlayedCard = this.getCard(cards[0]);
+        console.log(firstPlayedCard?.value);
         if (this.state.discardPile.length === 0) {
             console.log("pas de problème 1er carte");
         }
