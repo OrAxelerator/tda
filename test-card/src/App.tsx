@@ -6,7 +6,7 @@ import {
   Routes,
 } from "react-router-dom";
 import { AuthProvider } from "./components/AuthProvider";
-import GameRoom from "./components/GameRoom";
+// import GameRoom from "./components/GameRoom";
 import Login from "./components/login.tsx";
 import Profile from "./components/profile";
 import SignUp from "./components/register";
@@ -14,7 +14,7 @@ import { useAuth } from "./components/useAuth";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import type { ReactNode } from "react";
-import { Game } from './components/Game.tsx'
+import Game  from './components/Game.tsx'
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
