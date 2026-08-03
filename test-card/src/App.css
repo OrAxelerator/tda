@@ -42,7 +42,7 @@
 }
 
 .auth-inner {
-  width: min(100%, 520px);
+  width: min(100%, 920px);
 }
 
 form,
@@ -105,4 +105,137 @@ form h3,
 
 .forgot-password {
   margin: 0;
+}
+
+.room-page {
+  display: grid;
+  gap: 16px;
+  width: 100%;
+}
+
+.room-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #d7d7d7;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.room-header h2,
+.players-panel h3 {
+  margin: 0;
+}
+
+.room-label {
+  margin: 0 0 4px;
+  color: #666666;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.room-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 16px;
+}
+
+.players-panel,
+.chat-panel {
+  border: 1px solid #d7d7d7;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.players-panel {
+  padding: 16px;
+}
+
+.players-panel ul {
+  display: grid;
+  gap: 10px;
+  padding: 0;
+  margin: 16px 0 0;
+  list-style: none;
+}
+
+.players-panel li {
+  display: grid;
+  gap: 2px;
+}
+
+.players-panel small {
+  color: #666666;
+}
+
+.chat-panel {
+  display: grid;
+  grid-template-rows: minmax(320px, 1fr) auto;
+  overflow: hidden;
+}
+
+.messages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.empty-chat {
+  margin: auto;
+  color: #666666;
+}
+
+.chat-message {
+  max-width: 78%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f0f0f0;
+}
+
+.own-message {
+  align-self: flex-end;
+  color: #ffffff;
+  background: #1769aa;
+}
+
+.chat-message div {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+}
+
+.chat-message p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.chat-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  padding: 12px;
+  border: 0;
+  border-top: 1px solid #d7d7d7;
+  border-radius: 0;
+}
+
+@media (max-width: 700px) {
+  .room-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .room-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .chat-form {
+    grid-template-columns: 1fr;
+  }
 }

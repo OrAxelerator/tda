@@ -6,7 +6,7 @@ import {
   Routes,
 } from "react-router-dom";
 import { AuthProvider } from "./components/AuthProvider";
-import Game from "./components/Game";
+import GameRoom from "./components/GameRoom";
 import Login from "./components/login.tsx";
 import Profile from "./components/profile";
 import SignUp from "./components/register";
@@ -71,9 +71,13 @@ function App() {
                 />
                 <Route
                   path="/game"
+                  element={<Navigate to="/user" replace />}
+                />
+                <Route
+                  path="/game/:roomCode"
                   element={
                     <ProtectedRoute>
-                      <Game />
+                      <GameRoom />
                     </ProtectedRoute>
                   }
                 />
