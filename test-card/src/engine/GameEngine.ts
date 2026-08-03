@@ -77,7 +77,7 @@ export class GameEngine {
         for (let i = 0; i < this.state.players.length; i++) {
             if (this.state.players[i].id == playerId) { // find current player
                 this.state.players[i].removeCard(card) // delete 1 by 1
-                this.state.discardPile.push(card)
+                this.state.discardPile.push(card) // Reverse pile, last element end
             }
         }
 
@@ -116,6 +116,7 @@ export class GameEngine {
         // 3. Check if card present in deck
         // (TO ADD) 4. Check if card present in defausse
         // 5. if multiples card, check if they all have the same values
+        // 6. compare to last card in discardPile
         
         console.log("carte joué depuis gameEngine.ts");
         console.log(cards);
@@ -202,6 +203,24 @@ export class GameEngine {
                         break;
                     }
                 }
+            }
+        }
+
+        // 6.
+        console.log("6.");
+        console.log(this.getCard(cards[0]).value);
+        if (this.state.discardPile.length === 0) {
+            console.log("pas de problème 1er carte");
+        }
+        else {
+            console.log("debug 6:");
+            // console.log("discard pile : ", this.state.discardPile);
+            const idLastCard = this.state.discardPile[this.state.discardPile.length -1]
+            const playedCard = this.getCard(cards[0]);
+            const lastCard = this.getCard(idLastCard);
+            // en partant principe que toute les cartes ont la même valeur:
+            if (playedCard && lastCard && playedCard.value < lastCard.value) {
+                console.error("TRICHE : la(les) cartes joué est plus petite que la dernière carte de la pioche (6)");
             }
         }
 
