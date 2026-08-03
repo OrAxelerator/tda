@@ -14,6 +14,8 @@ import {
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { createGame } from "../game/createGame";
+import type { Card as EngineCard } from "../engine/Card";
 import { db } from "./firebase";
 import { useAuth } from "./useAuth";
 
@@ -32,6 +34,15 @@ type RoomPlayer = {
   displayName: string;
 };
 
+type EngineTestResult = {
+  turn: number;
+  currentPlayerId: string | null;
+  deckSize: number;
+  axelHandCount: number;
+  bobHandCount: number;
+  axelLastCard?: string;
+};
+
 export default function GameRoom() {
   const { roomCode } = useParams<{ roomCode: string }>();
   const { user } = useAuth();
@@ -39,6 +50,8 @@ export default function GameRoom() {
   const [players, setPlayers] = useState<RoomPlayer[]>([]);
   const [messageText, setMessageText] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [isTestingEngine, setIsTestingEngine] = useState(false);
+  const [engineTest, setEngineTest] = useState<EngineTestResult | null>(null);
 
   const normalizedRoomCode = useMemo(
     () => roomCode?.trim().toUpperCase() ?? "",
@@ -154,6 +167,49 @@ export default function GameRoom() {
     }
   };
 
+  const handleTestGameEngine = async () => {
+    setIsTestingEngine(true);
+
+    try {
+      const response = await fetch("/cards.json");
+
+      if (!response.ok) {
+        throw new Error("Impossible de charger cards.json");
+      }
+
+      const cards = (await response.json()) as EngineCard[];
+      const engine = createGame(cards);
+
+      engine.drawCard("1");
+      engine.nextTurn();
+
+      const axel = engine.state.players.find((player) => player.id === "1");
+      const bob = engine.state.players.find((player) => player.id === "2");
+      const axelLastCard = axel?.hand.at(-1);
+
+      setEngineTest({
+        turn: engine.state.turn,
+        currentPlayerId: engine.state.currentPlayerId,
+        deckSize: engine.state.deck.size(),
+        axelHandCount: axel?.hand.length ?? 0,
+        bobHandCount: bob?.hand.length ?? 0,
+        axelLastCard: axelLastCard
+          ? `${axelLastCard.name} (#${axelLastCard.id})`
+          : undefined,
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Impossible de tester le GameEngine.";
+      toast.error(message, {
+        position: "bottom-center",
+      });
+    } finally {
+      setIsTestingEngine(false);
+    }
+  };
+
   if (!normalizedRoomCode) {
     return <Navigate to="/user" replace />;
   }
@@ -181,6 +237,48 @@ export default function GameRoom() {
               </li>
             ))}
           </ul>
+
+          <div className="engine-test-panel">
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={handleTestGameEngine}
+              disabled={isTestingEngine}
+            >
+              {isTestingEngine ? "Test..." : "Tester GameEngine"}
+            </button>
+
+            {engineTest && (
+              <dl>
+                <div>
+                  <dt>Tour</dt>
+                  <dd>{engineTest.turn}</dd>
+                </div>
+                <div>
+                  <dt>Joueur actuel</dt>
+                  <dd>{engineTest.currentPlayerId}</dd>
+                </div>
+                <div>
+                  <dt>Deck</dt>
+                  <dd>{engineTest.deckSize} cartes</dd>
+                </div>
+                <div>
+                  <dt>Axel</dt>
+                  <dd>{engineTest.axelHandCount} cartes</dd>
+                </div>
+                <div>
+                  <dt>Bob</dt>
+                  <dd>{engineTest.bobHandCount} cartes</dd>
+                </div>
+                {engineTest.axelLastCard && (
+                  <div>
+                    <dt>Dernière pioche Axel</dt>
+                    <dd>{engineTest.axelLastCard}</dd>
+                  </div>
+                )}
+              </dl>
+            )}
+          </div>
         </aside>
 
         <div className="chat-panel">

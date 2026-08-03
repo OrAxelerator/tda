@@ -170,6 +170,34 @@ form h3,
   color: #666666;
 }
 
+.engine-test-panel {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #d7d7d7;
+}
+
+.engine-test-panel dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.engine-test-panel dl div {
+  display: grid;
+  gap: 2px;
+}
+
+.engine-test-panel dt {
+  color: #666666;
+  font-size: 0.8rem;
+}
+
+.engine-test-panel dd {
+  margin: 0;
+}
+
 .chat-panel {
   display: grid;
   grid-template-rows: minmax(320px, 1fr) auto;
