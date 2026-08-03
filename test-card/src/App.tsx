@@ -14,6 +14,7 @@ import { useAuth } from "./components/useAuth";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import type { ReactNode } from "react";
+import { Game } from './components/Game.tsx'
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
@@ -77,7 +78,7 @@ function App() {
                   path="/game/:roomCode"
                   element={
                     <ProtectedRoute>
-                      <GameRoom />
+                      <Game />
                     </ProtectedRoute>
                   }
                 />
