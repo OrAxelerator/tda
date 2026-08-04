@@ -1,10 +1,14 @@
 import "./alert.css";
 
-export default function Alert({ msg, setAlertMsg }) {
+type AlertProps = {
+  msg: string;
+};
 
-    if (msg == "") {
+export default function Alert({ msg }: AlertProps) {
+
+    if (msg === "") {
         return null;
-    }else {
+    } else {
         
         return (
           <div className="alert">

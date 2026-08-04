@@ -10,6 +10,8 @@ export type GamePhase =
 
 export class GameState {
 
+    roomId: string | null | undefined;
+
     players: Player[];
 
     deck: Deck;

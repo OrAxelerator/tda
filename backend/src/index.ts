@@ -1,15 +1,24 @@
 import express from "express";
 import cors from "cors";
 import path from "node:path";
+import dotenv from "dotenv";
 import { readFile } from "node:fs/promises";
 
 import { GameEngine } from "./game/GameEngine";
 import { GameState } from "./game/GameState";
 import { Player } from "./game/Player";
 import { Deck } from "./game/Deck";
+import { Card } from "./game/Card";
 import type { Card as EngineCard } from "./game/Card";
+import admin from "./firebase";
+
+import { Server } from "socket.io";
+
 
 const app = express();
+
+// charger les variables d'environnement depuis /env/.env (le fichier n'est pas lu par moi)
+dotenv.config({ path: path.join(process.cwd(), "env", ".env") });
 
 app.use(cors());
 app.use(express.json());
@@ -21,6 +30,67 @@ const players = [
 ];
 
 let engine: GameEngine | null = null;
+const roomEngines = new Map<string, GameEngine>();
+let currentRoomId: string | null = null;
+let availableCards: EngineCard[] = [];
+
+function serializeCard(card: Card) {
+  return {
+    id: card.id,
+    suit: card.suit,
+    value: card.value,
+    name: card.name,
+    asset: card.asset,
+  };
+}
+
+function serializePlayer(player: Player) {
+  return {
+    id: player.id,
+    name: player.name,
+    hand: player.hand.map(serializeCard),
+  };
+}
+
+function serializeState(state: GameState) {
+  return {
+    players: state.players.map(serializePlayer),
+    deck: {
+      cards: state.deck.cards.map(serializeCard),
+    },
+    discardPile: state.discardPile,
+    currentPlayerId: state.currentPlayerId,
+    turn: state.turn,
+    phase: state.phase,
+  };
+}
+
+async function updateRoomState(roomId: string, state: GameState) {
+  const db = admin.firestore();
+  await db.collection("rooms").doc(roomId).update({
+    state: serializeState(state),
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
+}
+
+function getEngineForRoom(roomId: string | undefined) {
+  if (!roomId) {
+    console.warn("No roomId provided, returning current engine");
+    return engine;
+  }
+
+  if (roomEngines.has(roomId)) {
+    console.log(`Returning engine for roomId ${roomId}`);
+    return roomEngines.get(roomId) ?? null;
+  }
+
+  if (roomId === currentRoomId) {
+    return engine;
+  }
+  console.warn(`No engine found for roomId ${roomId}`);
+  console.log(roomEngines);
+  return null;
+}
 
 async function start() {
   try {
@@ -28,22 +98,94 @@ async function start() {
     const raw = await readFile(cardsPath, "utf8");
     const cards = JSON.parse(raw) as EngineCard[];
     const cardsCopy = cards.map((card) => ({ ...card }));
+    availableCards = cardsCopy.map((card) => ({ ...card }));
 
     const state = new GameState(new Deck(cardsCopy));
-    
 
-    state.players.push(...players);
+    // state.players.push(...players);
 
-    state.deck.shuffle()
+    state.deck.shuffle();
 
     engine = new GameEngine(state, cardsCopy);
-    engine.startGame();
+    // engine.startGame();
 
     console.log(`Loaded ${cards.length} cards`);
   } catch (error) {
     console.error("Failed to load cards.json", error);
   }
 }
+
+
+
+app.post("/api/createGame", async (req, res) => {
+  console.log("createGame request received");
+  if (!admin.apps.length) {
+    return res.status(500).json({ success: false, message: "Firebase admin not initialized" });
+  }
+
+  const authHeader = req.headers.authorization as string | undefined;
+  if (!authHeader?.startsWith("Bearer ")) {
+    return res.status(401).json({ success: false, message: "Missing or invalid Authorization header" });
+  }
+
+  const idToken = authHeader.split(" ")[1];
+
+  try {
+    const decoded = await admin.auth().verifyIdToken(idToken);
+    const uid = decoded.uid;
+
+    // create a new room doc in Firestore
+    const db = admin.firestore();
+    const roomRef = await db.collection("rooms").add({
+      hostUid: uid,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      state: null,
+    });
+
+    // initialize engine and persist initial state
+    const roomDeck = availableCards.map((card) => ({ ...card }));
+    const state = new GameState(new Deck(roomDeck));
+    // state.players.push(...players);
+    state.players.push(new Player(uid, "Host")); // Add the host player to the game
+    // marche pas ????
+    console.log("state.players : ", state.players);
+
+    state.phase = "waiting";
+
+    const roomEngine = new GameEngine(state, roomDeck);
+    roomEngines.set(roomRef.id, roomEngine);
+    currentRoomId = roomRef.id;
+
+    await db.collection("rooms").doc(roomRef.id).update({
+      state: serializeState(state),
+    });
+
+    res.json({ success: true, roomId: roomRef.id });
+  } catch (err: any) {
+    console.error("createGame error:", err);
+    res.status(400).json({ success: false, message: err.message || "Failed to create room" });
+  }
+});
+
+
+app.get("/api/firebaseConfig", (req, res) => {
+  const config = {
+    apiKey: process.env.FIREBASE_API_KEY,
+    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.FIREBASE_APP_ID,
+    measurementId: process.env.FIREBASE_MEASUREMENT_ID,
+  };
+
+  if (!config.apiKey || !config.projectId) {
+    return res.status(500).json({ success: false, message: "Missing Firebase client config in environment" });
+  }
+
+  res.json({ success: true, config });
+});
 
 
 app.get("/state", (req, res) => {
@@ -63,6 +205,19 @@ app.get("/players", (req, res) => { // get list of player
   }
     console.log("get player yees");
   res.json({ success: true, players: engine.getPlayers() });
+});
+
+
+app.get("/phase", (req, res) => { // get phase of the game
+  console.log(req.query.roomId);
+  const engine = getEngineForRoom(req.query.roomId as string | undefined);
+  console.log("engine : ", engine);
+  if (!engine) {
+    return res.status(500).json({ success: false, message: "Game engine is not ready yet" });
+  }
+    console.log("get phase yees");
+    console.log("phase : ", engine?.getPhase());
+  res.json({ success: true, phase: engine?.getPhase() });
 });
 
 
@@ -86,8 +241,11 @@ app.get("/discard-pile", (req, res) => {
   res.json({ success: true, discardPile: engine.getDiscardPile() });
 });
 
-app.post("/play", (req, res) => {
-  if (!engine) {
+app.post("/play", async (req, res) => {
+  const roomId = (req.body as any).roomId as string | undefined;
+  const game = getEngineForRoom(roomId);
+
+  if (!game) {
     return res.status(500).json({
       success: false,
       message: "Game engine is not ready yet",
@@ -98,15 +256,21 @@ app.post("/play", (req, res) => {
     const { playerId, cards } = req.body as {
       playerId: string;
       cards: number[];
-    };  
+      roomId?: string;
+    };
     console.log("player ", playerId, "joue");
     console.log("ses cartes : ", cards);
 
-    engine.playCards(playerId, cards);
+    game.playCards(playerId, cards);
+
+    const roomIdToUpdate = roomId ?? currentRoomId;
+    if (roomIdToUpdate) {
+      await updateRoomState(roomIdToUpdate, game.state);
+    }
 
     res.json({
       success: true,
-      state: engine.state,
+      state: game.state,
     });
     console.log("carte joué");
 
@@ -119,24 +283,94 @@ app.post("/play", (req, res) => {
 });
 
 
-app.post("/game/play", (req, res) => {
-  if (!engine) {
+app.post("/game/play", async (req, res) => {
+  const roomId = (req.body as any).roomId as string | undefined;
+  const game = getEngineForRoom(roomId);
+
+  if (!game) {
     return res.status(500).json({ success: false, message: "Game engine is not ready yet" });
   }
 
   const { playerId, cardId } = req.body as {
     playerId: string;
     cardId: number;
+    roomId?: string;
   };
 
-  engine.playCard(playerId, cardId);
+  try {
+    game.playCard(playerId, cardId);
 
-  res.json({ success: true, state: engine.getStateForFrontend() });
+    const roomIdToUpdate = roomId ?? currentRoomId;
+    if (roomIdToUpdate) {
+      await updateRoomState(roomIdToUpdate, game.state);
+    }
+
+    res.json({ success: true, state: game.getStateForFrontend() });
+  } catch (error: any) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+app.post("/api/joinGame", async (req, res) => {
+  const { roomId, playerId, playerName } = req.body as {
+    roomId: string;
+    playerId: string;
+    playerName: string;
+  };
+
+  if (!roomId || !playerId || !playerName) {
+    return res.status(400).json({ success: false, message: "Missing required parameters" });
+  }
+
+  const game = getEngineForRoom(roomId);
+  console.log("game : ", game);
+  if (!game) {
+    return res.status(404).json({ success: false, message: "Game not found" });
+  }
+
+  const existingPlayer = game.getPlayer(playerId);
+  console.log("existingPlayer : ", existingPlayer);
+  const playersList = game.getPlayers();
+  if (playersList.length >= 4) {
+    return res.status(400).json({ success: false, message: "The Room is full" });
+  }
+
+  if (!existingPlayer) {
+    const newPlayer = new Player(playerId, playerName);
+    game.addPlayer(newPlayer);
+    console.log("player ajouté : ", newPlayer);
+    console.log(game);
+
+    await updateRoomState(roomId, game.state);
+
+    return res.json({ success: true, state: game.getStateForFrontend() });
+  } else {
+    return res.status(400).json({ success: false, message: "Player already exists in the room" });
+  }
+
 });
 
 
+
+
+
 async function bootstrap() {
-  await start();
+  // await start();
+
+
+    const io = new Server(3001);
+
+    
+    io.on("connection", (socket) => {
+      socket.emit("hello", "world");
+    console.log("a user connected");
+    
+    socket.on("howdy", (arg) => {
+      console.log(arg);
+    });
+    });
+
+
 
   app.listen(3000, () => {
     console.log("Backend lancé sur http://localhost:3000");

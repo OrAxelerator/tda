@@ -25,6 +25,12 @@ export class GameEngine {
         return this.cards.get(id);
     }
 
+
+    getRoomId(): string | null {
+        // S'assurer de ne jamais retourner undefined ; normaliser en null
+        return this.state.roomId ?? null;
+    }
+
     startGame() {
 
         if(this.state.players.length < 2 || this.state.players.length > 6)
@@ -251,6 +257,10 @@ export class GameEngine {
 
     getState(){
         return this.state;
+    }
+
+    getPhase() {
+        return this.state.phase;
     }
 
     getStateForFrontend() {

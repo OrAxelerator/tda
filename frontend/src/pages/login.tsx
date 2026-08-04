@@ -2,7 +2,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { auth } from "./firebase";
+import { auth } from '../firebase';
 import { toast } from "react-toastify";
 
 function Login() {
