@@ -1,10 +1,10 @@
 import { type CSSProperties, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Card from "./Card";
-import Alert from "./Alert";
 import "../App.css";
 import { useAuth } from "../components/auth-context";
 import { io } from "socket.io-client";
+import { toast } from "react-toastify"
 
 type PlayerCard = {
   id: number;
@@ -18,12 +18,10 @@ function Game() {
   const [selectedCards, setSelectedCard] = useState<number[]>([]);
   const [, refresh] = useState(0);
   const [discardpileCard, setDiscardpileCard] = useState<number[]>([]);
-  const [alertMsg, setAlertMsg] = useState("");
 
   const [seeDiscardPile, setSeeDiscardPile] = useState(false);
 
   const { user, logout } = useAuth();
-  const [isWaitingRoom, setIsWaitingRoom] = useState(true);
 
   const [phase, setPhase] = useState("");
   const [ListUser, setListUser] = useState([]);
@@ -270,11 +268,9 @@ async function getPhase() {
       console.log("Réponse play :", data);
       if (data.success === false) {
         console.error(data);
-        setAlertMsg("BRUUUUUUUUUUUUH");
-        window.setTimeout(() => setAlertMsg(""), 3000);
-        console.log("erreur dans lors de play()");
+        toast.error("BRUUUUH"); // TO TEST
+
       } else {
-        setAlertMsg("");
         setPlayerHand((currentHand) =>
           currentHand.filter((card) => !selectedCards.includes(card.id)),
         );
@@ -423,7 +419,6 @@ async function getPhase() {
           )
         }
 
-      <Alert msg={alertMsg} />
     </>
   );
 }

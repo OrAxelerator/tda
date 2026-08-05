@@ -101,19 +101,19 @@ async function updateRoomState(roomId: string, state: GameState) {
 
 function getEngineForRoom(roomId: string | undefined) {
   if (!roomId) {
-    console.warn("No roomId provided, returning current engine");
+    console.warn("No roomId provided, returning current engine [getEngineForRoom]");
     return engine;
   }
 
   if (roomEngines.has(roomId)) {
-    console.log(`Returning engine for roomId ${roomId}`);
+    console.log(`Returning engine for roomId ${roomId} [getEngineForRoom]`);
     return roomEngines.get(roomId) ?? null;
   }
 
   if (roomId === currentRoomId) {
     return engine;
   }
-  console.warn(`No engine found for roomId ${roomId}`);
+  console.warn(`No engine found for roomId ${roomId} [getEngineForRoom]`);
   console.log(roomEngines);
   return null;
 }
@@ -144,7 +144,7 @@ async function start() {
 
 
 app.post("/api/createGame", async (req, res) => {
-  console.log("createGame request received");
+  console.log("----------- CREATE GAME ---------------");
   if (!admin.apps.length) {
     return res.status(500).json({ success: false, message: "Firebase admin not initialized" });
   }
@@ -194,6 +194,8 @@ app.post("/api/createGame", async (req, res) => {
     console.error("createGame error:", err);
     res.status(400).json({ success: false, message: err.message || "Failed to create room" });
   }
+
+  console.log("---------- END Create Game --");
 });
 
 
