@@ -21,7 +21,7 @@ async function joinGame() {
       body: JSON.stringify({
         roomId,
         playerId: user.uid,
-        playerName: user?.displayName,
+        playerName: user?.email,
       }),
     });
 

@@ -12,6 +12,8 @@ export class GameState {
 
     roomId: string | null | undefined;
 
+    
+
     players: Player[];
 
     deck: Deck;
@@ -25,7 +27,7 @@ export class GameState {
     phase: GamePhase;
 
 
-    constructor(deck: Deck) {
+    constructor(deck: Deck, roomId: string | null | undefined) {
 
         this.players = [];
 
@@ -38,5 +40,8 @@ export class GameState {
         this.turn = 0;
 
         this.phase = "waiting";
+
+        this.roomId = roomId;
     }
+
 }

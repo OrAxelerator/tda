@@ -4,7 +4,7 @@ import Card from "./Card";
 import Alert from "./Alert";
 import "../App.css";
 import { useAuth } from "../components/auth-context";
-// import { io } from 'socket.io-client';
+import { io } from "socket.io-client";
 
 type PlayerCard = {
   id: number;
@@ -40,24 +40,80 @@ function Game() {
     // getCard();
     // getDiscardPile();
     getPhase();
-    setListUser([{ uid: user.uid, displayName: user.displayName }]);
-  }, [roomId, user.uid, user.displayName]);
+    getListUser();
+  }, []);
+
+  async function getListUser() {
+    try {
+      const res = await fetch(`http://localhost:3000/players?roomId=${encodeURIComponent(roomId)}`);
+      const data = await res.json();
+      console.log("ListUser:", data.players);
+      setListUser(data.players);
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
 
-//   const stocket = io("ws://localhost:3001");
+  const [socket] = useState(() => io("http://localhost:3000"));
 
-//   stocket.on("hello", (data) => {
-//     console.log("Received hello event:", data);
-//   });
+  useEffect(() => {
 
-//   stocket.emit("howdy", "stranger");
+    socket.on("connect", () => {
+      console.log("Connecté :", socket.id);
+
+      socket.emit("howdy", "Bonjour depuis React !");
+    });
+
+    socket.on("hello", (msg) => {
+      console.log("Serveur :", msg);
+    });
+
+    return () => {
+      // socket.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+  socket.on("playerJoined", (data) => {
+    console.log("Nouveau joueur :", data);
+
+    // ici tu peux mettre à jour ton état React
+  });
+
+  return () => {
+    socket.off("playerJoined");
+  };
+}, []);
+
+// THis should work
+useEffect(() => {
+  // rejoindre la room côté serveur
+  socket.emit("joinRoom", roomId);
+
+  // recevoir les mises à jour du GameState
+  socket.on("gameState", (state) => {
+    console.log("État du jeu reçu :!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    console.log("Nouvel état du jeu :", state);
+
+    // exemple :
+    setListUser(state.players);
+    setPhase(state.phase);
+  });
+
+  return () => {
+    socket.off("gameState");
+  };
+}, [roomId]);
+
+
 
 
   async function getGameState() {
-    console.log("desde");
+    console.log("try getGameState");
 
     try {
-      const res = await fetch("http://localhost:3000/state");
+      const res = await fetch(`http://localhost:3000/state?roomId=${encodeURIComponent(roomId)}`);
       const data = await res.json();
       console.log(data);
     } catch (err) {
@@ -295,12 +351,12 @@ async function getPhase() {
         <h5>
             Player connecté :
             {
-            setListuser()
             ListUser.map((user, index) => (
-              <div key={index}>
-                {user.displayName} ({user.uid})
+              <div key={index} className={user.isHost ? "host" : "player"}> 
+                {user.name} 
               </div>
-            ))}
+            ))
+            }
           </h5>
 
           <h5>

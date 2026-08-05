@@ -12,6 +12,7 @@ import { Card } from "./game/Card";
 import type { Card as EngineCard } from "./game/Card";
 import admin from "./firebase";
 
+import { createServer } from "http";
 import { Server } from "socket.io";
 
 
@@ -24,15 +25,39 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(process.cwd(), "public")));
 
-const players = [
-  new Player("1", "bob"),
-  new Player("2", "alice"),
-];
 
 let engine: GameEngine | null = null;
+
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+  },
+});
+
 const roomEngines = new Map<string, GameEngine>();
 let currentRoomId: string | null = null;
 let availableCards: EngineCard[] = [];
+
+
+// --------
+
+io.on("connection", (socket) => {
+  console.log("Socket connecté :", socket.id);
+
+  socket.on("joinRoom", (roomId: string) => {
+    socket.join(roomId);
+    console.log(`${socket.id} rejoint ${roomId}`);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Socket déconnecté :", socket.id);
+  });
+
+
+
+});
 
 function serializeCard(card: Card) {
   return {
@@ -145,15 +170,17 @@ app.post("/api/createGame", async (req, res) => {
 
     // initialize engine and persist initial state
     const roomDeck = availableCards.map((card) => ({ ...card }));
-    const state = new GameState(new Deck(roomDeck));
+    const state = new GameState(new Deck(roomDeck), roomRef.id);
     // state.players.push(...players);
-    state.players.push(new Player(uid, "Host")); // Add the host player to the game
+    state.players.push(new Player(uid, "Host", true)); // Add the host player to the game
     // marche pas ????
     console.log("state.players : ", state.players);
 
     state.phase = "waiting";
 
     const roomEngine = new GameEngine(state, roomDeck);
+    console.log("roomEngine : ", roomEngine);
+    console.log("roomRef.id : ", roomRef.id);
     roomEngines.set(roomRef.id, roomEngine);
     currentRoomId = roomRef.id;
 
@@ -189,6 +216,12 @@ app.get("/api/firebaseConfig", (req, res) => {
 
 
 app.get("/state", (req, res) => {
+  console.log("-----------------------");
+  console.log("get state request received");
+  console.log("roomId : ", req.query.roomId);
+  const engine = getEngineForRoom(req.query.roomId as string | undefined);
+  console.log("engine : ", engine);
+
   if (!engine) {
     return res.status(500).json({ success: false, message: "Game engine is not ready yet" });
   }
@@ -200,6 +233,8 @@ app.get("/state", (req, res) => {
 
 
 app.get("/players", (req, res) => { // get list of player
+  const engine = getEngineForRoom(req.query.roomId as string | undefined);
+  console.log("engine : ", engine);
   if (!engine) {
     return res.status(500).json({ success: false, message: "Game engine is not ready yet" });
   }
@@ -312,6 +347,9 @@ app.post("/game/play", async (req, res) => {
 });
 
 app.post("/api/joinGame", async (req, res) => {
+  console.log("-------------------------------------")
+  console.log("joinGame request received");
+  console.log("req.body : ", req.body);
   const { roomId, playerId, playerName } = req.body as {
     roomId: string;
     playerId: string;
@@ -321,7 +359,7 @@ app.post("/api/joinGame", async (req, res) => {
   if (!roomId || !playerId || !playerName) {
     return res.status(400).json({ success: false, message: "Missing required parameters" });
   }
-
+  console.log("joinGame request received for roomId:", roomId, "playerId:", playerId, "playerName:", playerName);
   const game = getEngineForRoom(roomId);
   console.log("game : ", game);
   if (!game) {
@@ -336,8 +374,14 @@ app.post("/api/joinGame", async (req, res) => {
   }
 
   if (!existingPlayer) {
-    const newPlayer = new Player(playerId, playerName);
+    const newPlayer = new Player(playerId, playerName, false);
     game.addPlayer(newPlayer);
+    
+    
+    io.to(roomId).emit("gameState", game.state); // send INFO of room to all players in the room
+
+
+
     console.log("player ajouté : ", newPlayer);
     console.log(game);
 
@@ -355,26 +399,9 @@ app.post("/api/joinGame", async (req, res) => {
 
 
 async function bootstrap() {
-  // await start();
-
-
-    const io = new Server(3001);
-
-    
-    io.on("connection", (socket) => {
-      socket.emit("hello", "world");
-    console.log("a user connected");
-    
-    socket.on("howdy", (arg) => {
-      console.log(arg);
-    });
-    });
-
-
-
-  app.listen(3000, () => {
+  httpServer.listen(3000, () => {
     console.log("Backend lancé sur http://localhost:3000");
   });
 }
 
-bootstrap();  
+bootstrap();

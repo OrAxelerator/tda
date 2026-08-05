@@ -9,15 +9,20 @@ export class Player {
 
     hand: Card[];
 
+    isHost: boolean;
+
 
     constructor(
         id: string,
-        name: string
+        name: string,
+        isHost: boolean
     ) {
 
         this.id = id;
 
         this.name = name;
+
+        this.isHost = isHost;
 
         this.hand = [];
     }

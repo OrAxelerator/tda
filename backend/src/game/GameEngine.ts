@@ -290,6 +290,7 @@ export class GameEngine {
         return this.state.players.map((player) => ({
             id: player.id,
             name: player.name,
+            isHost: player.isHost,
         }));
     }
 
