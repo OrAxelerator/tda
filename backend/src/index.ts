@@ -48,6 +48,7 @@ io.on("connection", (socket) => {
 
   socket.on("joinRoom", (roomId: string) => {
     socket.join(roomId);
+
     console.log(`${socket.id} rejoint ${roomId}`);
   });
 
@@ -119,13 +120,13 @@ function getEngineForRoom(roomId: string | undefined) {
 
 async function start() {
   try {
-    const cardsPath = path.join(process.cwd(), "public", "cards.json");
-    const raw = await readFile(cardsPath, "utf8");
-    const cards = JSON.parse(raw) as EngineCard[];
-    const cardsCopy = cards.map((card) => ({ ...card }));
-    availableCards = cardsCopy.map((card) => ({ ...card }));
+    // const cardsPath = path.join(process.cwd(), "public", "cards.json");
+    // const raw = await readFile(cardsPath, "utf8");
+    // const cards = JSON.parse(raw) as EngineCard[];
+    // const cardsCopy = cards.map((card) => ({ ...card }));
+    // availableCards = cardsCopy.map((card) => ({ ...card }));
 
-    const state = new GameState(new Deck(cardsCopy));
+    // const state = new GameState(new Deck(cardsCopy));
 
     // state.players.push(...players);
 
@@ -259,12 +260,23 @@ app.get("/phase", (req, res) => { // get phase of the game
 
 
 app.get("/players/:playerId/cards", (req, res) => {
-  if (!engine) {
-    return res.status(500).json({ success: false, message: "Game engine is not ready yet" });
+const roomId = req.query.roomId as string | undefined;
+  console.log("--------------------------- GET CARD PLAYER 1 ---------------------------");
+  console.log("roomId : ", roomId);
+  if (!roomId) {
+    return res.status(400).json({ success: false, message: "Missing required parameters" });
   }
+
+  const game = getEngineForRoom(roomId);
+  if (!game) {
+    return res.status(404).json({ success: false, message: "Game not found" });
+  }
+  // if (!engine) {
+  //   return res.status(500).json({ success: false, message: "Game engine is not ready yet" });
+  // }
   console.log("try fetch caard");
   const { playerId } = req.params;
-  res.json({ success: true, cards: engine.getPlayerCards(playerId) });
+  res.json({ success: true, cards: game.getPlayerCards(playerId) });
 });
 
 
@@ -394,6 +406,44 @@ app.post("/api/joinGame", async (req, res) => {
 
 });
 
+
+app.post("/startGame", async (req, res) => {
+  // const roomId = (req.body as any).roomId as string | undefined;
+   const roomId = req.query.roomId as string | undefined;
+  console.log("--------------------------- START GAME ---------------------------");
+  console.log("roomId : ", roomId);
+  if (!roomId) {
+    return res.status(400).json({ success: false, message: "Missing required parameters" });
+  }
+
+  const game = getEngineForRoom(roomId);
+  if (!game) {
+    return res.status(404).json({ success: false, message: "Game not found" });
+  }
+
+  try {
+
+    const cardsPath = path.join(process.cwd(), "public", "cards.json");
+    const raw = await readFile(cardsPath, "utf8");
+    const cards = JSON.parse(raw) as EngineCard[];
+    const cardsCopy = cards.map((card) => ({ ...card }));
+    availableCards = cardsCopy.map((card) => ({ ...card }));
+    game.state.deck = new Deck(cardsCopy);
+
+    console.log("loaded cards : ", game.state.deck.cards.length);
+    // const state = new GameState(new Deck(cardsCopy));
+
+
+    game.startGame();
+    game.state.phase = "playing";
+    game.state.deck.shuffle();
+    await updateRoomState(roomId, game.state);
+    io.to(roomId).emit("gameState", game.state); // send INFO of room to all players in the room
+    return res.json({ success: true, state: game.getStateForFrontend() });
+  } catch (error: any) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+})
 
 
 

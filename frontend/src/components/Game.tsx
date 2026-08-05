@@ -28,6 +28,8 @@ function Game() {
   const [phase, setPhase] = useState("");
   const [ListUser, setListUser] = useState([]);
 
+  const [isHost, setIsHost] = useState(false);
+
   const showDiscardPile = () => {
     setSeeDiscardPile(!seeDiscardPile);
     refresh((x) => x + 1);
@@ -49,6 +51,13 @@ function Game() {
       const data = await res.json();
       console.log("ListUser:", data.players);
       setListUser(data.players);
+      data.players.forEach((player: any) => {
+        console.log("cjeck of host ----")
+        console.log("player.uid:", player.id, "user?.uid:", user?.uid);
+        if (player.id === user?.uid) {
+          setIsHost(player.isHost);
+        }});
+
     } catch (err) {
       console.error(err);
     }
@@ -121,6 +130,36 @@ useEffect(() => {
     }
   }
 
+async function startGame() {
+  try {
+    console.log("----------------------------------")
+    console.log("Starting game for roomId:", roomId);
+    const copiRoomId = String(roomId);
+    console.log("copiRoomId:", copiRoomId);
+    const res = await fetch(`http://localhost:3000/startGame?roomId=${encodeURIComponent(copiRoomId)}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await res.json();
+    console.log("startGame response:", data);
+
+    if (data.success) {
+      console.log("Game started successfully");
+      // Optionally, you can update the phase or other state here
+      getPhase(); // Refresh the phase after starting the game
+      getCard(); // Refresh the player's hand after starting the game
+      // getDiscardPile(); // Refresh the discard pile after starting the game
+      refresh((x) => x + 1); // Trigger a re-render if needed
+    } else {
+      console.error("Failed to start game:", data.message);
+    }
+  } catch (err) {
+    console.error("Error starting game:", err);
+  }
+}
 
 async function getPhase() {
   try {
@@ -162,10 +201,21 @@ async function getPhase() {
     console.log("get Czard");
 
     try {
-      const res = await fetch("http://localhost:3000/players/1/cards");
+      // const res = await fetch("http://localhost:3000/players/1/cards");
+    const res = await fetch(
+        `http://localhost:3000/players/${encodeURIComponent(user.uid)}/cards?roomId=${encodeURIComponent(roomId)}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log("getCard response status", res.status);
       const data = await res.json();
       console.log(data);
       setPlayerHand(data.cards);
+      refresh((x) => x + 1);
     } catch (err) {
       console.error(err);
     }
@@ -282,61 +332,52 @@ async function getPhase() {
 
       <div style={{ display: seeDiscardPile ? "none" : "grid" }}>
         <div>
-          <div className="cardContainer pile">
-            {
-              // pair.map((el, index) => {
-              discardpileCard.map((el, index) => {
-                const id_string = el;
-                // console.log(id_string);
+       <div className="cardContainer pile">
+  {discardpileCard.length === 0 ? (
+    <p>Pas de carte dans la pile</p>
+  ) : (
+    discardpileCard.map((el, index) => {
+      const id = String(el).padStart(2, "0");
+      const cardLink = `https://tda-1.onrender.com/card/${id}_theme1.png`;
 
-                const id = String(id_string).padStart(2, "0");
+      const numberOfCards = discardpileCard.length;
+      const weight = 2.9;
 
-                const cardLink = `https://tda-1.onrender.com/card/${id}_theme1.png`;
+      const translateY = () => {
+        if (Math.round(numberOfCards / 2) === index + 1) {
+          return `translateY(${-weight * 1.2 * (numberOfCards - index - 1)}px)`;
+        }
 
-                // console.log(id);
+        if (index < Math.round(numberOfCards / 2)) {
+          return `translateY(${-weight * (index + 1)}px)`;
+        }
 
-                const numberOfCards = discardpileCard.length;
+        return `translateY(${-weight * (numberOfCards - index)}px)`;
+      };
 
-                //param transslate y:
-                const weight = 2.9;
+      const rotate = () => {
+        const center = (numberOfCards - 1) / 2;
+        const angle = (index - center) * 1.5;
 
-                const translateY = () => {
-                  // console.log(index+1);
-                  if (Math.round(numberOfCards / 2) === index + 1) {
-                    return `translateY(${-weight * 1.2 * (numberOfCards - index - 1)}px)`;
-                  }
-                  if (index < Math.round(numberOfCards / 2)) {
-                    return `translateY(${-weight * (index + 1)}px)`;
-                  } else {
-                    //nb carte - index
-                    return `translateY(${-weight * (numberOfCards - index)}px)`;
-                  }
-                };
+        return `rotate(${angle}deg)`;
+      };
 
-                const rotate = () => {
-                  const center = (numberOfCards - 1) / 2;
-                  const angle = (index - center) * 1.5;
-
-                  return `rotate(${angle}deg)`;
-                };
-                //  console.log("el.id", el.id);
-                //  console.log("selectedCards.includes(el.id)", selectedCards.includes(el.id));
-                return (
-                  <div key={index}>
-                    <img
-                      src={cardLink}
-                      alt={`Carte ${id}`}
-                      style={
-                        {
-                          ["--card-transform" as string]: `${translateY()} ${rotate()}`,
-                        } as CSSProperties
-                      }
-                    />
-                  </div>
-                );
-              })
+      return (
+        <div key={index}>
+          <img
+            src={cardLink}
+            alt={`Carte ${id}`}
+            style={
+              {
+                ["--card-transform" as string]: `${translateY()} ${rotate()}`,
+              } as CSSProperties
             }
-          </div>
+          />
+        </div>
+      );
+    })
+  )}
+</div>
         </div>
       </div>
 
@@ -361,6 +402,26 @@ async function getPhase() {
 
           <h5>
         </h5>
+
+        
+        {
+          isHost ? (
+            <h5>Vous êtes l'hôte de la partie</h5>
+          ) : (
+            <h5>Vous êtes un joueur</h5>
+          )
+        }
+
+              
+        {
+          isHost ? (
+           <button
+           onClick={startGame}
+           >START GAME</button>
+          ) : (
+            <h5>Vous êtes un joueur</h5>
+          )
+        }
 
       <Alert msg={alertMsg} />
     </>
