@@ -407,10 +407,9 @@ app.post("/rooms/:roomId/joinGame", async (req, res) => {
 });
 
 
-app.post("/startGame", async (req, res) => {
-  // const roomId = (req.body as any).roomId as string | undefined;
-   const roomId = req.query.roomId as string | undefined;
+app.post("/rooms/:roomId/startGame", async (req, res) => {
   console.log("--------------------------- START GAME ---------------------------");
+  const { roomId } = req.params;
   console.log("roomId : ", roomId);
   if (!roomId) {
     return res.status(400).json({ success: false, message: "Missing required parameters" });

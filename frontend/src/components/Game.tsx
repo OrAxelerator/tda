@@ -132,14 +132,13 @@ async function startGame() {
   try {
     console.log("----------------------------------")
     console.log("Starting game for roomId:", roomId);
-    const copiRoomId = String(roomId);
-    console.log("copiRoomId:", copiRoomId);
-    const res = await fetch(`http://localhost:3000/startGame?roomId=${encodeURIComponent(copiRoomId)}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const res = await fetch(`http://localhost:3000/rooms/${roomId}/startGame`,
+  {
+    method: "POST",
+  });
+
+    console.log(res.status);
+console.log(res.ok);
 
     const data = await res.json();
     console.log("startGame response:", data);
