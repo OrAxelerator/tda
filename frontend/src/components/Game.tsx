@@ -7,6 +7,16 @@ import { io } from "socket.io-client";
 import { toast } from "react-toastify";
 import { LeaveRoomButton } from "./LeaveRoomButton";
 
+
+// socket.on(...)          // écouter un événement
+
+// socket.emit(...)        // envoyer un événement
+
+// socket.off(...)         // arrêter d'écouter
+
+// socket.disconnect()     // fermer complètement la connexion
+
+
 type PlayerCard = {
   id: number;
   name?: string;
@@ -65,34 +75,94 @@ function Game() {
 
   const [socket] = useState(() => io("http://localhost:3000"));
 
-  useEffect(() => {
+ // Dès que la page de la room est ouverte
+    useEffect(() => {
+        socket.emit("joinRoom", roomId);
+        console.log("conecté avec joinRoom !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
-    socket.on("connect", () => {
-      console.log("Connecté :", socket.id);
+        return () => {
+          console.log("déconnecté avec join roooooooom");
+            socket.disconnect();
+        };
+    }, []);
 
-      socket.emit("howdy", "Bonjour depuis React !");
-    });
 
-    socket.on("hello", (msg) => {
-      console.log("Serveur :", msg);
-    });
+    useEffect(() => {
+      socket.emit("test","HELLOWORLD")
 
-    return () => {
-      // socket.disconnect();
-    };
-  }, []);
+    })
+    // Écoute des événements du serveur
+    useEffect(() => {
+        function onGameUpdated(state: any) {
+          console.log("---------------- GAME UPDATE --------------------");
+          console.log(state);
+          console.log("---------------- GAME UPDATE ----");
+            // setGameState(state);
+        }
 
-  useEffect(() => {
-  socket.on("playerJoined", (data) => {
-    console.log("Nouveau joueur :", data);
+        socket.on("gameUpdated", onGameUpdated);
 
-    // ici tu peux mettre à jour ton état React
-  });
+        return () => {
+            socket.off("gameUpdated", onGameUpdated);
+        };
+    }, []);
 
-  return () => {
-    socket.off("playerJoined");
-  };
-}, []);
+
+    
+    function playCard(cardId: string, userId, roomId:string) {
+      console.log("play card from fakePlay");
+        socket.emit("playCard", {
+            roomId,
+            userId,
+            cardId,
+        });
+    }
+  
+    function faKePlayCard() {
+      console.log("fakePlay");
+      const cards = [12, 13]; // ud de cartes
+      const userID = "EOXPDe29eZSbM3dCUyGe31Xrg8L2"; // id de test@gmail.com
+      playCard(cards, userID, roomId)
+    }
+
+    const sayHello = () => {
+      console.log();
+      console.log("--------------------");
+      console.log("SAY HRLLOOOO :)))");
+      const txt = "HELLO from front";
+      socket.emit("sayHello", txt);
+    }
+
+
+
+//   useEffect(() => {
+
+//     socket.on("connect", () => {
+//       console.log("Connecté :", socket.id);
+
+//       socket.emit("howdy", "Bonjour depuis React !");
+//     });
+
+//     socket.on("hello", (msg) => {
+//       console.log("Serveur :", msg);
+//     });
+
+//     return () => {
+//       // socket.disconnect();
+//     };
+//   }, []);
+
+//   useEffect(() => {
+//   socket.on("playerJoined", (data) => {
+//     console.log("Nouveau joueur :", data);
+
+//     // ici tu peux mettre à jour ton état React
+//   });
+
+//   return () => {
+//     socket.off("playerJoined");
+//   };
+// }, []);
 
 // THis should work
 useEffect(() => {
@@ -107,10 +177,12 @@ useEffect(() => {
     // exemple :
     setListUser(state.players);
     setPhase(state.phase);
+    getCard()
   });
 
   return () => {
     socket.off("gameState");
+    socket.disconnect()
   };
 }, [roomId]);
 
@@ -121,7 +193,7 @@ useEffect(() => {
     console.log("try getGameState");
 
     try {
-      const res = await fetch(`http://localhost:3000/state?roomId=${encodeURIComponent(roomId)}`);
+      const res = await fetch(`http://localhost:3000/rooms/${roomId}/state`);
       const data = await res.json();
       console.log(data);
     } catch (err) {
@@ -324,7 +396,7 @@ async function getPhase() {
         </div>
       </div>
 
-      <button onClick={play}>PLAY</button>
+      <button onClick={faKePlayCard}>PLAY</button>
 
       <div style={{ display: seeDiscardPile ? "none" : "grid" }}>
         <div>
@@ -418,6 +490,10 @@ async function getPhase() {
             <h5>Vous êtes un joueur</h5>
           )
         }
+
+        <button
+        onClick={sayHello}
+        >Say Hello</button>
 
         <LeaveRoomButton roomId={roomId} playerId={user.uid} />
 
