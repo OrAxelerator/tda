@@ -13,13 +13,12 @@ function Profile() {
 
 async function joinGame() {
   try {
-    const res = await fetch("http://localhost:3000/api/joinGame", {
+    const res = await fetch(`http://localhost:3000/rooms/${roomId}/joinGame`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        roomId,
         playerId: user.uid,
         playerName: user?.email,
       }),

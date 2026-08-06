@@ -246,9 +246,12 @@ app.get("/players", (req, res) => { // get list of player
 });
 
 
-app.get("/phase", (req, res) => { // get phase of the game
-  console.log(req.query.roomId);
-  const engine = getEngineForRoom(req.query.roomId as string | undefined);
+app.get("/rooms/:roomId/phase", (req, res) => { // get phase of the game
+  console.log("GET PHASE ---------------------")
+   const { roomId } = req.params;
+   console.log("get roomId = ", roomId)
+
+  const engine = getEngineForRoom(roomId);
   console.log("engine : ", engine);
   if (!engine) {
     return res.status(500).json({ success: false, message: "Game engine is not ready yet" });
@@ -360,22 +363,21 @@ app.post("/game/play", async (req, res) => {
   }
 });
 
-app.post("/api/joinGame", async (req, res) => {
+app.post("/rooms/:roomId/joinGame", async (req, res) => {
+  const { roomId } = req.params;
   console.log("-------------------------------------")
   console.log("joinGame request received");
-  console.log("req.body : ", req.body);
-  const { roomId, playerId, playerName } = req.body as {
-    roomId: string;
+  console.log(roomId)
+  const { playerId, playerName } = req.body as {
     playerId: string;
     playerName: string;
   };
 
-  if (!roomId || !playerId || !playerName) {
+  if ( !roomId || !playerId || !playerName) {
     return res.status(400).json({ success: false, message: "Missing required parameters" });
   }
   console.log("joinGame request received for roomId:", roomId, "playerId:", playerId, "playerName:", playerName);
   const game = getEngineForRoom(roomId);
-  console.log("game : ", game);
   if (!game) {
     return res.status(404).json({ success: false, message: "Game not found" });
   }
@@ -383,7 +385,7 @@ app.post("/api/joinGame", async (req, res) => {
   const existingPlayer = game.getPlayer(playerId);
   console.log("existingPlayer : ", existingPlayer);
   const playersList = game.getPlayers();
-  if (playersList.length >= 4) {
+  if (playersList.length >= 6) {
     return res.status(400).json({ success: false, message: "The Room is full" });
   }
 
@@ -391,13 +393,9 @@ app.post("/api/joinGame", async (req, res) => {
     const newPlayer = new Player(playerId, playerName, false);
     game.addPlayer(newPlayer);
     
-    
     io.to(roomId).emit("gameState", game.state); // send INFO of room to all players in the room
 
-
-
     console.log("player ajouté : ", newPlayer);
-    console.log(game);
 
     await updateRoomState(roomId, game.state);
 

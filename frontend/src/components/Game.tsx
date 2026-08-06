@@ -168,7 +168,7 @@ async function getPhase() {
       return;
     }
 
-    const url = `http://localhost:3000/phase?roomId=${encodeURIComponent(roomId)}`;
+    const url = `http://localhost:3000/rooms/${roomId}/phase`;
     console.log("fetching phase from", url);
 
     const res = await fetch(url);
