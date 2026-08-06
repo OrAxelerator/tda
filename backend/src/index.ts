@@ -444,7 +444,18 @@ app.post("/rooms/:roomId/startGame", async (req, res) => {
   }
 })
 
+app.post("/rooms/:roomId/leave", (req, res) => {
 
+    const { roomId } = req.params;
+    const { playerId } = req.body;
+
+    const engine = getEngineForRoom(roomId);
+
+    engine.removePlayer(playerId);
+
+    res.json({ success: true });
+
+});
 
 
 async function bootstrap() {

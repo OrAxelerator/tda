@@ -4,7 +4,8 @@ import Card from "./Card";
 import "../App.css";
 import { useAuth } from "../components/auth-context";
 import { io } from "socket.io-client";
-import { toast } from "react-toastify"
+import { toast } from "react-toastify";
+import { LeaveRoomButton } from "./LeaveRoomButton";
 
 type PlayerCard = {
   id: number;
@@ -417,6 +418,8 @@ async function getPhase() {
             <h5>Vous êtes un joueur</h5>
           )
         }
+
+        <LeaveRoomButton roomId={roomId} playerId={user.uid} />
 
     </>
   );

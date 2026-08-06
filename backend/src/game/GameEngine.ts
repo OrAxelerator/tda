@@ -64,6 +64,44 @@ export class GameEngine {
     }
 
 
+    removePlayer(playerId:string) {
+
+        const removedIndex = this.state.players.findIndex(
+            player => player.id === playerId
+        );
+
+        if (removedIndex === -1) {
+            return;
+        }
+
+        const removedPlayer = this.state.players[removedIndex];
+        const remainingPlayers = this.state.players.filter(
+            player => player.id !== playerId
+        );
+
+        this.state.players = remainingPlayers;
+
+        if (this.state.currentPlayerId === playerId) {
+            if (remainingPlayers.length > 0) {
+                const nextIndex = removedIndex % remainingPlayers.length;
+                this.state.currentPlayerId = remainingPlayers[nextIndex].id;
+            } else {
+                this.state.currentPlayerId = null;
+            }
+        }
+
+        if (removedPlayer.isHost && remainingPlayers.length > 0) {
+            remainingPlayers[0].isHost = true;
+        }
+
+        if (remainingPlayers.length === 0) {
+            this.state.phase = "waiting";
+            this.state.turn = 0;
+        }
+    }
+
+
+
     drawCard(playerId:string) {
 
         const player =
