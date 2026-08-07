@@ -65,61 +65,68 @@ io.on("connection", (socket) => { // a chaque utilisateur qui se connect
   console.log("Socket connecté :", socket.id);
   console.log("👤 ------------------------------");
 
-  
-    socket.on("disconnect", () => {
+  socket.onAny((event, ...args) => {
+    console.log("socket event reçu :", event, args);
+  });
+
+    socket.on("disconnect", (reason) => {
       console.log("👤 ------------------------------");
       console.log("USER SE DISCONNECT");
-      console.log("Socket connecté :", socket.id);
-      socket.disconnect()
+      console.log("Socket déconnecté :", socket.id, "raison:", reason);
       console.log("👤 ------------------------------");
-    })
-      console.log(socket.connected);
-    socket.on("sayHello", (msg) => {
+    });
 
-      console.log("");
-      console.log(socket.connected);
-      console.log("----------------------");
-      console.log("sayHello : ", msg);
-     console.log("Socket connecté :", socket.id); 
-      console.log("----------------------");
-      console.log("");
-    })
+    console.log("Socket connecté :", socket.id);
+    console.log("----------------------");
+    console.log("");
 
-  
     socket.on("test", (arg) => {
       console.log("");
-            console.log("--------------------------------------------------------------------------------");
+      console.log("--------------------------------------------------------------------------------");
       console.log("CONNECT TO TEST");
       console.log("Socket connecté :", socket.id);
-            console.log("--------------------------------------------------------------------------------");
+      console.log("--------------------------------------------------------------------------------");
       console.log(arg);
-    })
+    });
 
-
-    socket.on("joinRoom", (roomId) => {
+    socket.on("joinRoom", async (roomId) => {
       console.log("");
       console.log("👤 ------------------------------");
       console.log("JoinRoom SOCKET !!!!!!!!!!!!!!!"); // marche quand user créer une game
       console.log("Socket connecté :", socket.id);
       console.log("👤 ------------------------------");
-        socket.join(roomId); // quézako exately
+      socket.join(roomId);
+
+      const engine = roomEngines.get(roomId);
+      if (engine) {
+        socket.emit("gameUpdated", {
+          roomId,
+          state: serializeState(engine.getState()),
+        });
+      }
     });
 
-    socket.on("playCard", ({ roomId, playerId, cardId }) => {
+    socket.on("sayHello", (msg) => {
+      console.log("");
+      console.log("----------------------");
+      console.log("sayHello :", msg);
+      console.log("Socket connecté :", socket.id);
+      console.log("----------------------");
+      console.log("");
+    });
+
+    socket.on("playCard", async ({ roomId, playerId, cardId }) => {
       console.log("");
       console.log("👤 ------------------------------");
       console.log("PLAYER CARD DECETETD !!");
       console.log("👤 ------------------------------");
 
-        const engine = roomEngines.get(roomId);
+      const engine = roomEngines.get(roomId);
+      if (!engine) return;
 
-        if (!engine) return;
-
-        engine.playCard(playerId, cardId);
-
-        io.to(roomId).emit("gameUpdated", {
-            state: engine.getState()
-        });
+      engine.playCard(playerId, cardId);
+      await updateRoomState(roomId, engine.getState());
+      broadcastRoomState(roomId, engine);
     });
 
 });
@@ -155,6 +162,19 @@ function serializeState(state: GameState) {
   };
 }
 
+function broadcastRoomState(roomId: string, game: GameEngine) {
+  if (!roomId || !game) {
+    return;
+  }
+
+  const payload = {
+    roomId,
+    state: serializeState(game.getState()),
+  };
+
+  io.to(roomId).emit("gameUpdated", payload);
+}
+
 async function updateRoomState(roomId: string, state: GameState) {
   const db = admin.firestore();
   await db.collection("rooms").doc(roomId).update({
@@ -184,24 +204,10 @@ function getEngineForRoom(roomId: string | undefined) {
 
 async function start() {
   try {
-    // const cardsPath = path.join(process.cwd(), "public", "cards.json");
-    // const raw = await readFile(cardsPath, "utf8");
-    // const cards = JSON.parse(raw) as EngineCard[];
-    // const cardsCopy = cards.map((card) => ({ ...card }));
-    // availableCards = cardsCopy.map((card) => ({ ...card }));
-
-    // const state = new GameState(new Deck(cardsCopy));
-
-    // state.players.push(...players);
-
-    state.deck.shuffle();
-
-    engine = new GameEngine(state, cardsCopy);
-    // engine.startGame();
-
-    console.log(`Loaded ${cards.length} cards`);
+    // Cette fonction n'est pas utilisée actuellement.
+    // Si nécessaire, réactiver la lecture et l'initialisation des cartes ici.
   } catch (error) {
-    console.error("Failed to load cards.json", error);
+    console.error("Failed to initialize game starter", error);
   }
 }
 
@@ -391,6 +397,7 @@ app.post("/play", async (req, res) => {
     const roomIdToUpdate = roomId ?? currentRoomId;
     if (roomIdToUpdate) {
       await updateRoomState(roomIdToUpdate, game.state);
+      broadcastRoomState(roomIdToUpdate, game);
     }
 
     res.json({
@@ -428,6 +435,7 @@ app.post("/game/play", async (req, res) => {
     const roomIdToUpdate = roomId ?? currentRoomId;
     if (roomIdToUpdate) {
       await updateRoomState(roomIdToUpdate, game.state);
+      broadcastRoomState(roomIdToUpdate, game);
     }
 
     res.json({ success: true, state: game.getStateForFrontend() });
@@ -470,6 +478,7 @@ app.post("/rooms/:roomId/joinGame", async (req, res) => {
     console.log("player ajouté : ", newPlayer);
 
     await updateRoomState(roomId, game.state);
+    broadcastRoomState(roomId, game);
     console.log("---------------");
     return res.json({ success: true, state: game.getStateForFrontend() });
   } else {
@@ -512,8 +521,7 @@ app.post("/rooms/:roomId/startGame", async (req, res) => {
     game.state.deck.shuffle();
     // game.nextTurn() // debug cause player 1 don't connect
     await updateRoomState(roomId, game.state);
-    io.to(roomId).emit("gameState", game.state); // send INFO of room to all players in the room
-
+    broadcastRoomState(roomId, game);
 
     console.log("End start game ----------------");
 
@@ -524,8 +532,7 @@ app.post("/rooms/:roomId/startGame", async (req, res) => {
   }
 })
 
-app.post("/rooms/:roomId/leave", (req, res) => {
-
+app.post("/rooms/:roomId/leave", async (req, res) => {
     const { roomId } = req.params;
     const { playerId } = req.body;
     console.log("");
@@ -533,8 +540,16 @@ app.post("/rooms/:roomId/leave", (req, res) => {
     console.log(`Player ${playerId} want to leave ${roomId}`);
     const engine = getEngineForRoom(roomId);
 
+    if (!engine) {
+      return res.status(404).json({ success: false, message: "Game not found" });
+    }
+
     engine.removePlayer(playerId);
-    console.log("Player succefuly leave !!");
+    console.log("Player successfully left !!");
+
+    await updateRoomState(roomId, engine.state);
+    broadcastRoomState(roomId, engine);
+
     console.log("--------------------");
     res.json({ success: true });
 

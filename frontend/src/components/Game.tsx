@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import Card from "./Card";
 import "../App.css";
 import { useAuth } from "../components/auth-context";
-import { io } from "socket.io-client";
+import { io, type Socket } from "socket.io-client";
 import { toast } from "react-toastify";
 import { LeaveRoomButton } from "./LeaveRoomButton";
 
@@ -72,120 +72,92 @@ function Game() {
     }
   }
 
+  const [socket, setSocket] = useState<Socket | null>(null);
 
-  const [socket] = useState(() => io("http://localhost:3000"));
+  useEffect(() => {
+    const newSocket = io("http://localhost:3000", {
+      transports: ["websocket"],
+    });
 
- // Dès que la page de la room est ouverte
-    useEffect(() => {
-        socket.emit("joinRoom", roomId);
-        console.log("conecté avec joinRoom !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    newSocket.on("connect", () => {
+      console.log("Socket connecté :", newSocket.id);
+      if (roomId) {
+        console.log("Emission joinRoom avec roomId=", roomId);
+        newSocket.emit("joinRoom", roomId);
+      }
+      newSocket.emit("test", "HELLOWORLD");
+    });
 
-        return () => {
-          console.log("déconnecté avec join roooooooom");
-            socket.disconnect();
-        };
-    }, []);
+    newSocket.on("disconnect", (reason) => {
+      console.log("Socket déconnecté :", reason);
+    });
 
+    newSocket.on("connect_error", (error) => {
+      console.error("Erreur de connexion socket :", error);
+    });
 
-    useEffect(() => {
-      socket.emit("test","HELLOWORLD")
+    newSocket.onAny((event, ...args) => {
+      console.log("Evenement socket reçu :", event, args);
+    });
 
-    })
-    // Écoute des événements du serveur
-    useEffect(() => {
-        function onGameUpdated(state: any) {
-          console.log("---------------- GAME UPDATE --------------------");
-          console.log(state);
-          console.log("---------------- GAME UPDATE ----");
-            // setGameState(state);
-        }
+    newSocket.on("gameUpdated", (state: any) => {
+      console.log("---------------- GAME UPDATE --------------------");
+      console.log(state);
+      console.log("---------------- GAME UPDATE ----");
+    });
 
-        socket.on("gameUpdated", onGameUpdated);
+    newSocket.on("gameState", (state: any) => {
+      console.log("État du jeu reçu :!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      console.log("Nouvel état du jeu :", state);
+      setListUser(state.players);
+      setPhase(state.phase);
+      getCard();
+    });
 
-        return () => {
-            socket.off("gameUpdated", onGameUpdated);
-        };
-    }, []);
+    setSocket(newSocket);
 
+    return () => {
+      newSocket.off("connect");
+      newSocket.off("disconnect");
+      newSocket.off("connect_error");
+      newSocket.offAny();
+      newSocket.off("gameUpdated");
+      newSocket.off("gameState");
+      newSocket.disconnect();
+    };
+  }, [roomId]);
 
-    
-    function playCard(cardId: string, userId, roomId:string) {
-      console.log("play card from fakePlay");
-        socket.emit("playCard", {
-            roomId,
-            userId,
-            cardId,
-        });
+  function playCard(cardId: string, userId, roomId:string) {
+    console.log("play card from fakePlay");
+    socket?.emit("playCard", {
+      roomId,
+      userId,
+      cardId,
+    });
+  }
+
+  function faKePlayCard() {
+    console.log("fakePlay");
+    const cards = [12, 13]; // ud de cartes
+    const userID = "EOXPDe29eZSbM3dCUyGe31Xrg8L2"; // id de test@gmail.com
+    playCard(cards, userID, roomId);
+  }
+
+  const sayHello = () => {
+    console.log();
+    console.log("--------------------");
+    console.log("SAY HRLLOOOO :)))");
+    const txt = "HELLO from front";
+    if (!socket) {
+      console.warn("Socket non initialisé, impossible d'émettre sayHello");
+      return;
     }
-  
-    function faKePlayCard() {
-      console.log("fakePlay");
-      const cards = [12, 13]; // ud de cartes
-      const userID = "EOXPDe29eZSbM3dCUyGe31Xrg8L2"; // id de test@gmail.com
-      playCard(cards, userID, roomId)
+    if (!socket.connected) {
+      console.warn("Socket non connecté, emission différée sayHello");
+      return;
     }
-
-    const sayHello = () => {
-      console.log();
-      console.log("--------------------");
-      console.log("SAY HRLLOOOO :)))");
-      const txt = "HELLO from front";
-      socket.emit("sayHello", txt);
-    }
-
-
-
-//   useEffect(() => {
-
-//     socket.on("connect", () => {
-//       console.log("Connecté :", socket.id);
-
-//       socket.emit("howdy", "Bonjour depuis React !");
-//     });
-
-//     socket.on("hello", (msg) => {
-//       console.log("Serveur :", msg);
-//     });
-
-//     return () => {
-//       // socket.disconnect();
-//     };
-//   }, []);
-
-//   useEffect(() => {
-//   socket.on("playerJoined", (data) => {
-//     console.log("Nouveau joueur :", data);
-
-//     // ici tu peux mettre à jour ton état React
-//   });
-
-//   return () => {
-//     socket.off("playerJoined");
-//   };
-// }, []);
-
-// THis should work
-useEffect(() => {
-  // rejoindre la room côté serveur
-  socket.emit("joinRoom", roomId);
-
-  // recevoir les mises à jour du GameState
-  socket.on("gameState", (state) => {
-    console.log("État du jeu reçu :!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    console.log("Nouvel état du jeu :", state);
-
-    // exemple :
-    setListUser(state.players);
-    setPhase(state.phase);
-    getCard()
-  });
-
-  return () => {
-    socket.off("gameState");
-    socket.disconnect()
-  };
-}, [roomId]);
-
+    socket.emit("sayHello", txt);
+  }
 
 
 
