@@ -105,6 +105,29 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("takePile", ({roomId, userId}) => {
+    const engine = getEngineForRoom(roomId);
+
+    if (!engine || !roomId || !userId ) { // ici a continier
+      socket.emit("gameError", { message: "Action playCard invalide" });
+      return;
+    }
+
+    try {
+      engine.takePile(userId)
+      // pas mettre next turn ici plutot ?
+      emitGameUpdate(roomId);
+    }
+    catch (error:any) {
+    console.warn("Coup refusé par GameEngine:", {
+        roomId,
+        userId,
+        message: error.message,
+      });
+      socket.emit("gameError", { message: error.message || "Problème avec la discardPile" });  
+    }
+  })
+
   socket.on("disconnect", () => {
     const roomId = socketRooms.get(socket.id);
     if (roomId) {

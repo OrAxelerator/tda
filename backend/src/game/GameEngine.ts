@@ -1,6 +1,7 @@
 import { GameState } from "./GameState";
 import { Card } from "./Card";
 import { Player } from "./Player";
+import { Deck } from "./Deck";
 
 export type PublicPlayer = Pick<Player, "id" | "name">;
 
@@ -146,6 +147,66 @@ export class GameEngine {
         this.state.discardPile.push(card); // Reverse pile, last element end
     }
 
+    takePile(playerId:string) {
+        const player = this.getPlayer(playerId);
+        if (!player) {
+            throw new Error("Joeur n'existe pas.")
+        }
+        const discardPile = this.state.discardPile;
+        if (this.state.discardPile.length >= 1) {
+            
+            this.state.discardPile.forEach(el => {
+                const card = this.getCard(el);
+                if (!card) {
+                    throw new Error("Null card from discard pile ..");
+                }
+                player.addCard(card);
+            });
+            this.state.discardPile = [] // vide totalement la discard pile
+
+            this.state.players.forEach(player => {
+                if (player.id != playerId ) {
+                    if (player.hand.length <= 2) {
+
+                    }
+                }
+            });
+
+            this.nextTurn() // le mettre ici ??
+        }else {
+            console.log("discardPile : ");
+            console.log(discardPile);
+            throw new Error("DIscardPile have no card ..")
+        }
+
+        
+    }
+
+    refullPlayer(playerId:string) {
+        if (!playerId) {
+            return
+        }
+        const player = this.getPlayer(playerId);
+        if (!player) {
+            throw new Error("Joeur n'existe pas.")
+        }
+        if (player.hand.length >= 3) {
+            throw new Error("Player a déja 3 ou + carte ..")
+        }
+        const cardToAdd = 3 - player.hand.length
+
+        if (this.state.deck.size() > 0) {
+            for (let i = 0; i < cardToAdd; i++) {
+                if (this.state.deck.cards.length >= 1){ // sup sa dcp ??
+                    const lastCardOfDeck = this.state.deck.draw();
+                    if (!lastCardOfDeck){ return } 
+                    player.addCard(lastCardOfDeck);
+                }
+            }
+        }else { // length = 0
+            return // player ne prends pas de carte de la discard :(
+        }
+    }
 
     nextTurn() {
 

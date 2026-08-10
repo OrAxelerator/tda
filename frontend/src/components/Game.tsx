@@ -160,6 +160,18 @@ function Game() {
     });
   }
 
+  function takePile() {
+    if (!socket?.connected) {
+      toast.error("Socket non connecté");
+      return;
+    }
+
+    socket.emit("takePile", {
+      roomId,
+      userId: currentUser.uid,
+    })
+  }
+
   function renderDiscardPile() {
     if (discardPileCard.length === 0) {
       return <p>Pas de carte dans la pile</p>;
@@ -253,6 +265,7 @@ function Game() {
       </div>
 
       <button onClick={playSelectedCards}>PLAY</button>
+      <button onClick={takePile}>Prendre la pile</button>
 
       <div style={{ display: seeDiscardPile ? "grid" : "none" }}>
         <div className="cardContainer pile">{renderDiscardPile()}</div>
