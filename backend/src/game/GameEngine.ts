@@ -191,7 +191,7 @@ export class GameEngine {
             throw new Error("Joeur n'existe pas.")
         }
         if (player.hand.length >= 3) {
-            throw new Error("Player a déja 3 ou + carte ..")
+            // throw new Error("Player a déja 3 ou + carte ..")
         }
         const cardToAdd = 3 - player.hand.length
 
