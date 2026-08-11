@@ -36,14 +36,16 @@
 }
 
 .auth-wrapper {
-  min-height: 100vh;
+  height: 100vh;
+  width: 100%;
   display: grid;
   place-items: center;
-  padding: 24px;
+  
 }
 
 .auth-inner {
-  width: min(100%, 920px);
+  width: 100%;
+  height:100dvh;
 }
 
 form,
@@ -276,4 +278,31 @@ form h3,
 
 .player {
   color: blue;
+}
+
+header {
+  background-color: rgb(194, 194, 194);
+  width: 100%;
+  color:black;
+  display: flex;
+}
+
+.gameInfo {
+  border: 2px solid black;
+  width: 20%;
+}
+
+.players {
+  display: flex;
+  width: 100%;
+  background-color: rgb(23, 81, 23);
+  justify-content: space-evenly;
+}
+
+.playerInfo {
+  border: 2px solid black;
+  width: 20%;
+  border-radius: 8px;
+  margin: 29px;
+  background-color: rgb(110, 110, 222);
 }

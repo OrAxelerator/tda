@@ -143,6 +143,7 @@ function Game() {
   }
 
   function playSelectedCards() {
+    console.log("ALL PLAYRES : ", allPlayers);
     if (selectedCards.length === 0) {
       toast.warn("Sélectionne au moins une carte");
       return;
@@ -206,9 +207,9 @@ function Game() {
 
   return (
     <>
-      <h1>TDA Prototype</h1>
 
-      <section>
+    <header>
+      <section className="gameInfo">
         <h4>Infos live socket</h4>
         <p>Socket : {socket?.connected ? "connecté" : "déconnecté"}</p>
         <p>Phase : {phase || "inconnue"}</p>
@@ -217,7 +218,39 @@ function Game() {
         <p>Joueur courant : {currentPlayerId ?? "aucun"}</p>
       </section>
 
-      <section>
+      <section className="players">
+        {allPlayers.length === 0 ? (
+        <p>il n'y a pas de player dans la room donc comment tu vois ce message ????</p>
+        ) : (
+          allPlayers.map((player, index) => (
+            <div className="playerInfo" key={player.id} id={player.id}>
+              <h3>{player.name}
+                {index === 0 && " [HOST]"}
+              </h3>
+              <h5> {player.hand.length ? player.hand.length + " cartes restantes" : ""}  </h5> 
+              {/* // tkt marche quand meme */}
+            </div>
+          )))}
+
+
+        {/* <div className="playerInfo">
+          <h3>Player 1</h3>
+          <h5>6 cartes restante</h5>
+        </div>
+        <div className="playerInfo">
+          <h3>Player 1</h3>
+          <h5>6 cartes restante</h5>
+        </div>
+      
+        <div className="playerInfo">
+          <h3>Player 1</h3>
+          <h5>6 cartes restante</h5>
+        </div> */}
+      </section>
+      
+    </header>
+
+      {/* <section>
         <h5>Joueurs connectés dans la salle :</h5>
         {connectedPlayers.length === 0 ? (
           <p>Aucun joueur connecté</p>
@@ -226,9 +259,9 @@ function Game() {
             <div key={player.id}>{player.name}</div>
           ))
         )}
-      </section>
+      </section> */}
 
-      <section>
+      {/* <section>
         <h5>Joueurs de la partie :</h5>
         {allPlayers.length === 0 ? (
           <p>Aucun joueur</p>
@@ -239,11 +272,11 @@ function Game() {
             </div>
           ))
         )}
-      </section>
+      </section> */}
 
-      <section>
+      {/* <section>
         <h5>Autres joueurs :</h5>
-        {otherPlayers.length === 0 ? (
+        {allPlayers.length === 0 ? (
           <p>Aucun autre joueur</p>
         ) : (
           otherPlayers.map((player) => (
@@ -252,7 +285,7 @@ function Game() {
             </div>
           ))
         )}
-      </section>
+      </section> */}
 
       <div style={{ display: "flex", flexDirection: "column", marginTop: "4rem" }}>
         <div className="cardContainer">

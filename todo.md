@@ -35,3 +35,7 @@ pour que tu vois exactement où ça cassait.
 - Faire 1 instance de gameEngineManager dans backend ?
 - Simplifier code/séparé en plusieur fichier
 - Organsez routes/sockets
+
+
+
+- ""Bug"" : le host est toujours le 1er joueur de la partie car tjrs le premier dans gameEngine, donc faut rajouter une var dans gameState comme 'order" qui décide aléatoirement l'ordre, donc avant le début peu affiché les players jsute dans l'odre d'arrivé (meme opti début : ordre = ordre j'arrivé des players et change que début de game donc replace tout les players)
