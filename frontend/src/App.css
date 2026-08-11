@@ -306,3 +306,11 @@ header {
   margin: 29px;
   background-color: rgb(110, 110, 222);
 }
+
+.selfPlayer {
+  border: 2px solid yellow;
+}
+
+.activePlayer {
+  background-color: rgb(220, 220, 140);
+}

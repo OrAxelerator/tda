@@ -223,7 +223,12 @@ function Game() {
         <p>il n'y a pas de player dans la room donc comment tu vois ce message ????</p>
         ) : (
           allPlayers.map((player, index) => (
-            <div className="playerInfo" key={player.id} id={player.id}>
+            <div className={`
+              playerInfo
+              ${user?.uid === player.id ? "selfPlayer" : ""}
+              ${currentPlayerId === player.id ? "activePlayer" : ""}
+            `}
+            key={player.id} id={player.id}>
               <h3>{player.name}
                 {index === 0 && " [HOST]"}
               </h3>
