@@ -329,3 +329,9 @@ header {
   object-fit: cover;
   object-position: bottom;
 }
+
+.game-container {
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+}

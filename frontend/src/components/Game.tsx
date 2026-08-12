@@ -6,6 +6,7 @@ import Card from "./Card";
 import { LeaveRoomButton } from "./LeaveRoomButton";
 import { useAuth } from "../components/auth-context";
 import "../App.css";
+import Wainting from "./Waiting";
 
 type PlayerCard = {
   id: number;
@@ -208,129 +209,102 @@ function Game() {
   return (
     <>
 
-    <header>
-      <section className="gameInfo">
-        <h4>Infos live socket</h4>
-        <p>Socket : {socket?.connected ? "connecté" : "déconnecté"}</p>
-        <p>Phase : {phase || "inconnue"}</p>
-        <p>Tour : {numberOfTurn}</p>
-        <p>Deck : {deckLength} cartes</p>
-        <p>Joueur courant : {currentPlayerId ?? "aucun"}</p>
-      </section>
+    <div className="game-container">
 
-      <section className="players">
-        {allPlayers.length === 0 ? (
-        <p>il n'y a pas de player dans la room donc comment tu vois ce message ????</p>
-        ) : (
-          allPlayers.map((player, index) => (
-            <div className={`
-              playerInfo
-              ${user?.uid === player.id ? "selfPlayer" : ""}
-              ${currentPlayerId === player.id ? "activePlayer" : ""}
-            `}
-            key={player.id} id={player.id}> 
-              <h3>{player.name}
-                {index === 0 && " [HOST]"}
-              </h3>
-              <h5> {player.hand.length ? player.hand.length + " cartes restantes" : ""}  </h5> 
-              {/* // tkt marche quand meme */}
-            </div>
-          )))}
+      <header>
+        <section className="gameInfo">
+          <h4>Infos live socket</h4>
+          <p>Socket : {socket?.connected ? "connecté" : "déconnecté"}</p>
+          <p>Phase : {phase || "inconnue"}</p>
+          <p>Tour : {numberOfTurn}</p>
+          <p>Deck : {deckLength} cartes</p>
+          <p>Joueur courant : {currentPlayerId ?? "aucun"}</p>
+        </section>
 
-
-        {/* <div className="playerInfo">
-          <h3>Player 1</h3>
-          <h5>6 cartes restante</h5>
-        </div>
-        <div className="playerInfo">
-          <h3>Player 1</h3>
-          <h5>6 cartes restante</h5>
-        </div>
-      
-        <div className="playerInfo">
-          <h3>Player 1</h3>
-          <h5>6 cartes restante</h5>
-        </div> */}
-      </section>
-      
-    </header>
-
-      {/* <section>
-        <h5>Joueurs connectés dans la salle :</h5>
-        {connectedPlayers.length === 0 ? (
-          <p>Aucun joueur connecté</p>
-        ) : (
-          connectedPlayers.map((player) => (
-            <div key={player.id}>{player.name}</div>
-          ))
-        )}
-      </section> */}
-
-      {/* <section>
-        <h5>Joueurs de la partie :</h5>
-        {allPlayers.length === 0 ? (
-          <p>Aucun joueur</p>
-        ) : (
-          allPlayers.map((player) => (
-            <div key={player.id} className={player.isHost ? "host" : "player"}>
-              {player.name} {player.isHost ? "(host)" : ""}
-            </div>
-          ))
-        )}
-      </section> */}
-
-      {/* <section>
-        <h5>Autres joueurs :</h5>
-        {allPlayers.length === 0 ? (
-          <p>Aucun autre joueur</p>
-        ) : (
-          otherPlayers.map((player) => (
-            <div key={player.id}>
-              {player.name} - {player.cardCount ?? 0} carte(s)
-            </div>
-          ))
-        )}
-      </section> */}
-
-      <div style={{ display: "flex", flexDirection: "column", marginTop: "4rem" }}>
-        <div className="cardContainer">
-          <Card
-            enginePlayerHand={playerHand}
-            selectedCard={selectedCards}
-            setSelectedCard={setSelectedCard}
+        <section className="players">
+          {allPlayers.length === 0 ? (
+          <p>il n'y a pas de player dans la room donc comment tu vois ce message ????</p>
+          ) : (
+            allPlayers.map((player, index) => (
+              <div className={`
+                playerInfo
+                ${user?.uid === player.id ? "selfPlayer" : ""}
+                ${currentPlayerId === player.id ? "activePlayer" : ""}
+              `}
+              key={player.id} id={player.id}> 
+                <h3>{player.name}
+                  {index === 0 && " [HOST]"}
+                </h3>
+                <h5> {player.hand.length ? player.hand.length + " cartes restantes" : ""}  </h5> 
+                {/* // tkt marche quand meme */}
+              </div>
+            )))}
+        </section>
+        
+      </header>
+          
+      {
+        phase === "waiting" ? (
+          <>
+          <Wainting 
+          currentUser={currentUser}
+          isHost={isHost}
+          startGame={startGame}
+          roomId={roomId}    
           />
+          
+        {/* <LeaveRoomButton roomId={roomId} playerId={currentUser.uid} /> */}
+          </>
+        
+        
+        ) : (
+
+            
+           
+      <>
+      <div style={{ display: "flex", flexDirection: "column", marginTop: "4rem" }}>
+          <div className="cardContainer">
+            <Card
+              enginePlayerHand={playerHand}
+              selectedCard={selectedCards}
+              setSelectedCard={setSelectedCard}
+            />
+          </div>
+      </div>
+
+        <button onClick={playSelectedCards}>PLAY</button>
+        <button onClick={takePile}>Prendre la pile</button>
+
+        <div style={{ display: seeDiscardPile ? "grid" : "none" }}>
+          <div className="cardContainer pile">{renderDiscardPile()}</div>
         </div>
-      </div>
 
-      <button onClick={playSelectedCards}>PLAY</button>
-      <button onClick={takePile}>Prendre la pile</button>
+        <button onClick={() => setSeeDiscardPile((value) => !value)}>
+          {seeDiscardPile ? "Masquer pile" : "Afficher pile"}
+        </button>
 
-      <div style={{ display: seeDiscardPile ? "grid" : "none" }}>
-        <div className="cardContainer pile">{renderDiscardPile()}</div>
-      </div>
+        <h5>
+          Bienvenue : {currentUser.uid} / {currentUser.displayName} / {currentUser.email}
+        </h5>
 
-      <button onClick={() => setSeeDiscardPile((value) => !value)}>
-        {seeDiscardPile ? "Masquer pile" : "Afficher pile"}
-      </button>
 
-      <h5>
-        Bienvenue : {currentUser.uid} / {currentUser.displayName} / {currentUser.email}
-      </h5>
 
-      {isHost ? (
-        <>
-          <h5>Vous êtes l'hôte de la partie</h5>
-          <button onClick={startGame}>START GAME</button>
-        </>
-      ) : (
-        <h5>Vous êtes un joueur</h5>
-      )}
+        <LeaveRoomButton roomId={roomId} playerId={currentUser.uid} />
 
-      <LeaveRoomButton roomId={roomId} playerId={currentUser.uid} />
+        <div className="backgroundImgContainer">
+        <img src="../../public/mc.jpg" className="backgroundImg"></img>
+        </div>
+      </>
+      
 
-      <div className="backgroundImgContainer">
-      <img src="../../public/mc.jpg" className="backgroundImg"></img>
-      </div>
+
+
+          )
+      }
+      
+
+    </div>
+
     </>
   );
 }
