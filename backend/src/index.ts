@@ -42,23 +42,6 @@ const connectedPlayersByRoom = new Map<string, Map<string, { id: string; name: s
 let currentRoomId: string | null = null;
 let availableCards: EngineCard[] = [];
 
-
-// --------
-
-// io.on("connection", (socket) => {
-//   console.log("Socket connecté :", socket.id);
-
-//   socket.on("joinRoom", (roomId: string) => {
-//     socket.join(roomId);
-
-//     console.log(`${socket.id} rejoint ${roomId}`);
-//   });
-
-//   socket.on("disconnect", () => {
-//     console.log("Socket déconnecté :", socket.id);
-//   });
-// });
-
 io.on("connection", (socket) => {
   console.log("Socket connecté :", socket.id);
 
@@ -136,7 +119,35 @@ io.on("connection", (socket) => {
     if (roomId) {
       removeConnectedPlayer(roomId, socket.id);
       socketRooms.delete(socket.id);
-      emitGameUpdate(roomId);
+      console.log("PLAYER LEFT")
+      engine = getEngineForRoom(roomId)
+      if (!engine) {
+        throw new Error("Not found gameEngine in socket:disconect")
+      }
+      console.log("FIND ENGINE");
+      if (engine.state.phase == "playing") {
+        if (engine.state.players.length <= 1) {
+          console.log("NOT ENOUGH PLAYER");
+          roomEngines.delete(roomId)
+
+          
+          // Supprimer les sockets associés à cette room
+          for (const [socketId, socketRoomId] of socketRooms) {
+            if (socketRoomId === roomId) {
+              socketRooms.delete(socketId);
+            }
+          }
+
+          // Faire quitter la room Socket.io
+          io.in(roomId).socketsLeave(roomId);
+
+          console.log(`GAME ${roomId} CLOSED`);
+          console.log("CIOAAAAAAAAAA");
+
+        }else {
+        emitGameUpdate(roomId);
+      }
+      }
     }
   });
 });
