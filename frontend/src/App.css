@@ -16,6 +16,7 @@
   width: 100px;
   transform: var(--card-transform, none);
   transition: transform 0.2s;
+  cursor: grab;
 }
 
 .cardSelected {
@@ -313,4 +314,18 @@ header {
 
 .activePlayer {
   background-color: rgb(220, 220, 140);
+}
+
+.backgroundImgContainer {
+  height: 25dvh;
+  overflow: hidden;
+}
+
+.backgroundImg {
+  width: 100%;
+  overflow: hidden;
+  /* transform: translateY(450px); */
+    height: 100%;
+  object-fit: cover;
+  object-position: bottom;
 }

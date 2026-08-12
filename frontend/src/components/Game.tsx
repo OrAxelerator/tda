@@ -228,7 +228,7 @@ function Game() {
               ${user?.uid === player.id ? "selfPlayer" : ""}
               ${currentPlayerId === player.id ? "activePlayer" : ""}
             `}
-            key={player.id} id={player.id}>
+            key={player.id} id={player.id}> 
               <h3>{player.name}
                 {index === 0 && " [HOST]"}
               </h3>
@@ -327,6 +327,10 @@ function Game() {
       )}
 
       <LeaveRoomButton roomId={roomId} playerId={currentUser.uid} />
+
+      <div className="backgroundImgContainer">
+      <img src="../../public/mc.jpg" className="backgroundImg"></img>
+      </div>
     </>
   );
 }
