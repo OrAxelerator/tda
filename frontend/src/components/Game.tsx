@@ -7,6 +7,8 @@ import { LeaveRoomButton } from "./LeaveRoomButton";
 import { useAuth } from "../components/auth-context";
 import "../App.css";
 import Wainting from "./Waiting";
+import { getDataConnect } from "firebase/data-connect";
+import Pile from "./Pile";
 
 type PlayerCard = {
   id: number;
@@ -178,32 +180,47 @@ function Game() {
     if (discardPileCard.length === 0) {
       return <p>Pas de carte dans la pile</p>;
     }
-
-    return discardPileCard.map((cardId, index) => {
-      const id = String(cardId).padStart(2, "0");
+    if (!seeDiscardPile) {
+      const topCardId = discardPileCard[discardPileCard.length - 1];
+      const id = String(topCardId).padStart(2, "0");
       const cardLink = `https://tda-1.onrender.com/card/${id}_theme1.png`;
-      const numberOfCards = discardPileCard.length;
-      const weight = 2.9;
-      const center = (numberOfCards - 1) / 2;
-      const angle = (index - center) * 1.5;
-      const offset = index < Math.round(numberOfCards / 2)
-        ? -weight * (index + 1)
-        : -weight * (numberOfCards - index);
 
       return (
-        <div key={`${cardId}-${index}`}>
-          <img
-            src={cardLink}
-            alt={`Carte ${id}`}
-            style={
-              {
-                ["--card-transform" as string]: `translateY(${offset}px) rotate(${angle}deg)`,
-              } as CSSProperties
-            }
-          />
+        <div key={`hidden-${topCardId}`}>
+          <img src={cardLink} alt={`Carte ${id}`} />
         </div>
       );
-    });
+    }
+
+    if (seeDiscardPile) {
+      console.log("what");
+      return discardPileCard.map((cardId, index) => {
+        const id = String(cardId).padStart(2, "0");
+        const cardLink = `https://tda-1.onrender.com/card/${id}_theme1.png`;
+        const numberOfCards = discardPileCard.length;
+        const weight = 2.9;
+        const center = (numberOfCards - 1) / 2;
+        const angle = (index - center) * 1.5;
+        const offset = index < Math.round(numberOfCards / 2)
+          ? -weight * (index + 1)
+          : -weight * (numberOfCards - index);
+  
+        return (
+          <div key={`${cardId}-${index}`}>
+            <img
+              src={cardLink}
+              alt={`Carte ${id}`}
+              style={
+                {
+                  ["--card-transform" as string]: `translateY(${offset}px) rotate(${angle}deg)`,
+                } as CSSProperties
+              }
+            />
+          </div>
+        );
+      });
+    }
+
   }
 
   function moveImg() {
@@ -212,6 +229,8 @@ function Game() {
     }
     return numberOfTurn * -20
   }
+
+
 
   return (
     <>
@@ -298,14 +317,17 @@ function Game() {
 
         <button onClick={playSelectedCards}>PLAY</button>
         <button onClick={takePile}>Prendre la pile</button>
-
-        <div style={{ display: seeDiscardPile ? "grid" : "none" }}>
-          <div className="cardContainer pile">{renderDiscardPile()}</div>
-        </div>
-
         <button onClick={() => setSeeDiscardPile((value) => !value)}>
           {seeDiscardPile ? "Masquer pile" : "Afficher pile"}
         </button>
+
+
+        <Pile 
+        discardPileLength={discardPileCard.length} 
+        isActive={seeDiscardPile} 
+        discardPileCard={discardPileCard} 
+        />
+
 
         <h5>
           Bienvenue : {currentUser.uid} / {currentUser.displayName} / {currentUser.email}

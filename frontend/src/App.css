@@ -11,6 +11,56 @@
     justify-content: center;
 
 }
+/* Pile */
+.pileContainer {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 80%;
+    height: 10em;
+    margin: 0 auto;
+
+    background-color: grey;
+    border: 2px solid black;
+}
+
+.pileContainer.is-active > div,
+.pileContainer.is-active > img {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+}
+
+.pileContainer.is-active > div {
+    width: fit-content;
+    height: fit-content;
+}
+
+.pileContainer.is-active > div {
+    z-index: 2;
+}
+
+.pileContainer.is-active > img {
+    z-index: 1;
+}
+.pileContainer.is-active > div img {
+    position: relative;
+    left: -39%;
+    
+}
+
+.pileHiddenCard {
+    width: clamp(55px, 7vw, 118px);
+    height: auto;
+}
+
+
 
 .cardImg {
   width: 100px;

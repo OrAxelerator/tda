@@ -10,61 +10,6 @@ type CardProps = {
 export default function Card({ enginePlayerHand, selectedCard, setSelectedCard }: CardProps) {
 
 
-  const [mousePosition, setMousePosition] = useState({
-    x: 0,
-    y: 0
-  });
-
-  useEffect(() => {
-    const handleMouseMove = (event) => {
-      setMousePosition({
-        x: event.clientX,
-        y: event.clientY
-      });
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-    };
-  }, []);
-
-  const [isMouseDown, setIsMouseDown] = useState(false);
-
-useEffect(() => {
-  const handleMouseDown = (event) => {
-    if (event.button === 0) {
-      setIsMouseDown(true);
-    }
-  };
-
-  const handleMouseUp = (event) => {
-    if (event.button === 0) {
-      setIsMouseDown(false);
-    }
-  };
-
-  window.addEventListener("mousedown", handleMouseDown);
-  window.addEventListener("mouseup", handleMouseUp);
-
-  return () => {
-    window.removeEventListener("mousedown", handleMouseDown);
-    window.removeEventListener("mouseup", handleMouseUp);
-  };
-}, []);
-
-  console.log(mousePosition);
-
-const [isDragging, setIsDragging] = useState(false);
-
-
-  function moveCard() {
-    if (!isMouseDown){
-      
-    }
-  }
-
 
 
   return (
