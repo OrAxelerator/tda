@@ -206,6 +206,13 @@ function Game() {
     });
   }
 
+  function moveImg() {
+    if (numberOfTurn * -20 > -150) {
+      console.log("IMAGE DEPASSE");
+    }
+    return numberOfTurn * -20
+  }
+
   return (
     <>
 
@@ -262,7 +269,24 @@ function Game() {
             
            
       <>
-      <div style={{ display: "flex", flexDirection: "column", marginTop: "4rem" }}>
+
+<div className="gameBackground">
+
+<div
+  className="backgroundWrapper"
+  style={{
+  transform: `translateY(${numberOfTurn * 14}px)`
+}}
+>
+  <img src="/mc.jpg" className="backgroundImg" />
+</div>
+
+  {/* reste de ton interface ici */}
+
+
+
+
+      <div style={{ display: "flex", flexDirection: "column"}}>
           <div className="cardContainer">
             <Card
               enginePlayerHand={playerHand}
@@ -292,8 +316,9 @@ function Game() {
         <LeaveRoomButton roomId={roomId} playerId={currentUser.uid} />
 
         <div className="backgroundImgContainer">
-        <img src="../../public/mc.jpg" className="backgroundImg"></img>
+        
         </div>
+      </div>
       </>
       
 

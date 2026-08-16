@@ -284,6 +284,7 @@ form h3,
 header {
   background-color: rgb(194, 194, 194);
   width: 100%;
+  height: 25dvh;
   color:black;
   display: flex;
 }
@@ -321,17 +322,29 @@ header {
   overflow: hidden;
 }
 
-.backgroundImg {
-  width: 100%;
-  overflow: hidden;
-  /* transform: translateY(450px); */
-    height: 100%;
-  object-fit: cover;
-  object-position: bottom;
-}
-
 .game-container {
   width: 100%;
   height: 100dvh;
   overflow: hidden;
+}
+.gameBackground {
+  width: 100%;
+  height: 75dvh;
+  overflow: hidden;
+  position: relative;
+}
+
+.backgroundWrapper {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  transition: transform 0.3s ease;
+  z-index: -1;
+}
+
+.backgroundImg {
+  display: block;
+  width: 100%;
+  height: auto;
 }
