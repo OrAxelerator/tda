@@ -299,7 +299,7 @@ function Game() {
   transform: `translateY(${numberOfTurn * 14}px)`
 }}
 >
-  <img src="/mc.jpg" className="backgroundImg" />
+  <img src="/mc.jpeg" className="backgroundImg" />
 </div>
 
   {/* reste de ton interface ici */}
