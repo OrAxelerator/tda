@@ -6,6 +6,8 @@ import Card from "./Card";
 import { LeaveRoomButton } from "./LeaveRoomButton";
 import { useAuth } from "../components/auth-context";
 import "../App.css";
+import "../game.css"
+
 import Wainting from "./Waiting";
 import { getDataConnect } from "firebase/data-connect";
 import Pile from "./Pile";
@@ -305,35 +307,34 @@ function Game() {
 
 
 
-      <div style={{ display: "flex", flexDirection: "column"}}>
           <div className="cardContainer">
-            <Card
-              enginePlayerHand={playerHand}
-              selectedCard={selectedCards}
-              setSelectedCard={setSelectedCard}
-            />
+            <div style={{ display: "flex", flexDirection: "column"}}>
+              <div style={{display:"flex", flexDirection: "row"}}>
+                <Card
+                  enginePlayerHand={playerHand}
+                  selectedCard={selectedCards}
+                  setSelectedCard={setSelectedCard}
+                />
+              </div>
+              <button onClick={playSelectedCards} style={{zIndex:"5"}}>PLAY</button>
+              <button onClick={takePile} style={{zIndex:"5"}}>Prendre la pile</button>
+              <button onClick={() => setSeeDiscardPile((value) => !value)} style={{zIndex:"5"}}>
+              {seeDiscardPile ? "Masquer pile" : "Afficher pile"}
+              </button>
+            </div>
           </div>
-      </div>
-
-        <button onClick={playSelectedCards}>PLAY</button>
-        <button onClick={takePile}>Prendre la pile</button>
-        <button onClick={() => setSeeDiscardPile((value) => !value)}>
-          {seeDiscardPile ? "Masquer pile" : "Afficher pile"}
-        </button>
 
 
-        <Pile 
+
+        <Pile
         discardPileLength={discardPileCard.length} 
         isActive={seeDiscardPile} 
         discardPileCard={discardPileCard} 
         />
 
-
-        <h5>
+        {/* <h5>
           Bienvenue : {currentUser.uid} / {currentUser.displayName} / {currentUser.email}
-        </h5>
-
-
+        </h5> */}
 
         <LeaveRoomButton roomId={roomId} playerId={currentUser.uid} />
 

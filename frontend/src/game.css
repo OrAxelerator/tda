@@ -1,0 +1,169 @@
+.cardContainer {
+    display: flex;
+    flex-direction: row;
+    width: 80%;
+
+    background-color: rgba(88, 199, 255, 0.596);
+    border: 4px solid rgb(0, 183, 255);
+    border-radius: 16px;
+    padding: 1.5em;
+    padding-top: 2.5em;
+
+    align-items: center;
+    justify-content: center;
+
+    position: fixed;
+    bottom: 2%;
+    transform: translateX(-50%);
+    left: 50%;
+    z-index: 1000;
+
+    overflow: hidden;
+    /* mettre en tout en bas centré mais quand mem un peu de padding */
+
+}
+.cardContainer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+
+  
+    background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(238, 240, 242, 0.5) 0px,
+    rgba(238, 239, 240, 0.5) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+
+  opacity: 0.75;
+}
+
+/* Pile */
+.pileContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80%;
+    height: 8em;
+    
+    background-color: rgba(187, 29, 29, 0.596);
+    border: 4px solid rgb(254, 76, 67);
+    border-radius: 16px;
+    padding: 1.5em;
+    
+
+    position: fixed;
+    top: 30%;
+    transform: translateX(-50%);
+    left:50%;
+
+    overflow: hidden;
+}
+
+.pileContainer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+
+  
+    background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(119, 120, 121, 0.5) 0px,
+    rgba(106, 107, 108, 0.5) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+
+  opacity: 0.75;
+}
+
+.pilePreview > div,
+.pilePreview > img {
+    position: absolute;
+
+    /* Position manuelle preview: change top, left et transform pour bouger le duo dans le container. */
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+}
+
+.pilePreview > div {
+    width: fit-content;
+    height: fit-content;
+}
+
+.pilePreview > div {
+    z-index: 2;
+}
+
+.pilePreview > img {
+    z-index: 1;
+}
+
+.pilePreview > div img {
+    position: relative;
+    /* Position manuelle derniere carte: change left pour la decaler par rapport au dos. */
+    left: -39%;
+}
+
+.pileHiddenCard {
+    width: clamp(90px, 8vw, 132px);
+    height: auto;
+}
+
+.pileDeckBack {
+    width: clamp(90px, 8vw, 132px);
+    height: auto;
+}
+
+.pileFull {
+    gap: 2px;
+}
+
+.pileFull .card {
+    flex: 0 1 auto;
+}
+
+.pileFull .card img {
+    display: block;
+    aspect-ratio: 56 / 80;
+    height: auto;
+    max-height: min(26vh, 132px);
+    object-fit: contain;
+}
+
+
+
+.cardImg {
+  width: 100px;
+  transform: var(--card-transform, none);
+  transition: transform 0.2s;
+  cursor: grab;
+}
+
+.cardSelected {
+  /* transtranslateY(-10px); */
+  transform: translateY(-25px);
+  scale: 1.1;
+  z-index: 1;
+}
+
+/* affect only card without selected class */
+.cardImg:not(.cardSelected):hover {
+  transform: var(--card-transform, none) scale(1.05);
+}
+
+
+.pile {
+  flex-direction: row-reverse;
+}
+
+/* marche seulement pour pile la */
+.card { 
+    cursor: grab;
+    z-index: 5;
+}

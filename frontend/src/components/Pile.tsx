@@ -1,4 +1,4 @@
-  function getStateCardImg(deckLength) {
+  function getStateCardImg(deckLength: number) {
 
 
     if (deckLength === 1) {
@@ -17,24 +17,31 @@
   }
 
 
-export default function Pile({ discardPileLength, isActive, discardPileCard}) {
+type PileProps = {
+    discardPileLength: number;
+    isActive: boolean;
+    discardPileCard: number[];
+};
+
+export default function Pile({ discardPileLength, isActive, discardPileCard}: PileProps) {
 
 
     if (discardPileLength === 0) {
-        return <p>Pas de carte dans la pile</p>;
+        return null;
     }
 
     if (isActive) {
         return (
             <div style={{ display: "grid" }}>
-                <div className="pileContainer pile ">
-                    {discardPileCard.map((cardId, index) => {
+                <div className="pileContainer pile pileFull">
+                    {discardPileCard.map((cardId, index) => { // affiche toute les cartes
                         const id = String(cardId).padStart(2, "0");
                         const cardLink = `https://tda-1.onrender.com/card/${id}_theme1.png`;
+                        const cardWidth = `min(clamp(60px, 8vw, 132px), calc((80vw - ${(discardPileLength - 1) * 2}px) / ${discardPileLength}))`;
 
                         return (
-                            <div key={`${cardId}-${index}`}>
-                                <img src={cardLink} alt={`Carte ${id}`} />
+                            <div key={`${cardId}-${index}`} className="card">
+                                <img src={cardLink} alt={`Carte ${id}`} style={{ width: cardWidth }} />
                             </div>
                         );
                     })}
@@ -49,11 +56,11 @@ export default function Pile({ discardPileLength, isActive, discardPileCard}) {
 
     return (
         <div style={{ display: "grid"}}>
-            <div className="pileContainer pile is-active">
-                <div key={`hidden-${topCardId}`} >
+            <div className="pileContainer pile pilePreview">
+                <div key={`hidden-${topCardId}`} className="card">
                     <img className="pileHiddenCard" src={cardLink} alt={`Carte ${id}`}  />
                 </div>
-                <img src={`/src/assets/deck/${getStateCardImg(discardPileLength)}.png`}  style={{width:"15%"}}/>
+                <img className="pileDeckBack" src={`/src/assets/deck/${getStateCardImg(discardPileLength)}.png`} alt="Dos de la defausse" />
             </div>
         </div>
     );
