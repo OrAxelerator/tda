@@ -7,7 +7,7 @@
     border: 4px solid rgb(0, 183, 255);
     border-radius: 16px;
     padding: 1.5em;
-    padding-top: 2.5em;
+    padding-top: 3.5em;
 
     align-items: center;
     justify-content: center;
@@ -80,8 +80,8 @@
   opacity: 0.75;
 }
 
-.pilePreview > div,
-.pilePreview > img {
+.pilePreviewCard,
+.pileDeckBackWrapper {
     position: absolute;
 
     /* Position manuelle preview: change top, left et transform pour bouger le duo dans le container. */
@@ -91,20 +91,21 @@
     transform: translate(-50%, -50%);
 }
 
-.pilePreview > div {
+.pilePreviewCard,
+.pileDeckBackWrapper {
     width: fit-content;
     height: fit-content;
 }
 
-.pilePreview > div {
+.pilePreviewCard {
     z-index: 2;
 }
 
-.pilePreview > img {
+.pileDeckBackWrapper {
     z-index: 1;
 }
 
-.pilePreview > div img {
+.pilePreviewCard img {
     position: relative;
     /* Position manuelle derniere carte: change left pour la decaler par rapport au dos. */
     left: -39%;
@@ -130,31 +131,122 @@
 
 .pileFull .card img {
     display: block;
+    width: 100%;
     aspect-ratio: 56 / 80;
     height: auto;
     max-height: min(26vh, 132px);
     object-fit: contain;
 }
 
-
-
-.cardImg {
-  width: 100px;
-  transform: var(--card-transform, none);
-  transition: transform 0.2s;
-  cursor: grab;
+.pileCard3d {
+    --pointer-rotate-x: 0deg;
+    --pointer-rotate-y: 0deg;
+    perspective: 900px;
+    transform-style: preserve-3d;
 }
 
-.cardSelected {
-  /* transtranslateY(-10px); */
-  transform: translateY(-25px);
-  scale: 1.1;
+.pileCard3d img {
+    border-radius: 6px;
+    transform:
+        rotateX(var(--pointer-rotate-x, 0deg))
+        rotateY(var(--pointer-rotate-y, 0deg))
+        translateZ(0);
+    transform-style: preserve-3d;
+    transition:
+        transform 95ms ease,
+        filter 95ms ease,
+        box-shadow 95ms ease;
+    will-change: transform;
+}
+
+.pileCard3d:hover img {
+    filter: saturate(1.12) contrast(1.04);
+    box-shadow:
+        0 10px 18px rgba(0, 0, 0, 0.34),
+        0 0 16px rgba(72, 202, 255, 0.3);
+    transform:
+        rotateX(var(--pointer-rotate-x, 0deg))
+        rotateY(var(--pointer-rotate-y, 0deg))
+        translateZ(24px)
+        scale(1.04);
+}
+
+
+
+.playerCardWrapper {
+  --balatro-wiggle: 1.2deg;
+  --balatro-lift: 12px;
+  --pointer-rotate-x: 0deg;
+  --pointer-rotate-y: 0deg;
+  perspective: 900px;
+  transform-style: preserve-3d;
+  animation: playerCardWiggle 3200ms ease-in-out infinite;
+  animation-delay: calc(-3200ms * var(--card-rand, 0));
+  transform: rotateZ(calc(var(--balatro-wiggle) * var(--card-ambient, 0)));
   z-index: 1;
 }
 
-/* affect only card without selected class */
-.cardImg:not(.cardSelected):hover {
-  transform: var(--card-transform, none) scale(1.05);
+.playerCardWrapper:not(.handHasSelection):hover {
+  z-index: 20;
+}
+
+.playerCardWrapper.cardIsSelected {
+  z-index: 30;
+}
+
+.cardImg {
+  width: 100px;
+  border-radius: 6px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.28);
+  cursor: grab;
+  transform: var(--card-transform, none) translateZ(0);
+  transform-style: preserve-3d;
+  transition:
+    transform 110ms ease,
+    filter 110ms ease,
+    box-shadow 110ms ease;
+  will-change: transform;
+}
+
+.playerCardWrapper:not(.handHasSelection):hover .cardImg {
+  filter: saturate(1.12) contrast(1.04);
+  box-shadow:
+    0 10px 18px rgba(0, 0, 0, 0.34),
+    0 0 18px rgba(72, 202, 255, 0.36);
+  transform:
+    var(--card-transform, none)
+    translateY(calc(var(--balatro-lift) * -1))
+    translateZ(28px)
+    rotateX(var(--pointer-rotate-x, 0deg))
+    rotateY(var(--pointer-rotate-y, 0deg))
+    scale(1.04);
+}
+
+.cardSelected {
+  z-index: 30;
+  transform:
+    var(--card-transform, none)
+    translateY(-34px)
+    translateZ(28px)
+    rotateX(var(--pointer-rotate-x, 0deg))
+    rotateY(var(--pointer-rotate-y, 0deg))
+    scale(1.1);
+}
+
+@property --card-ambient {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@keyframes playerCardWiggle {
+  0%, 100% {
+    --card-ambient: -1;
+  }
+
+  50% {
+    --card-ambient: 1;
+  }
 }
 
 

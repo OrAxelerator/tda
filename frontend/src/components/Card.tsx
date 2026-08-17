@@ -1,11 +1,25 @@
-import type { CSSProperties, Dispatch, SetStateAction } from "react";
-import { useEffect, useState } from "react";
+import type { CSSProperties, Dispatch, MouseEvent, SetStateAction } from "react";
 
 type CardProps = {
   enginePlayerHand: Array<{ id: number; name?: string }>;
   selectedCard: number[];
   setSelectedCard: Dispatch<SetStateAction<number[]>>;
 };
+
+function updateCardTilt(event: MouseEvent<HTMLElement>) {
+  const rect = event.currentTarget.getBoundingClientRect();
+  const x = (event.clientX - rect.left) / rect.width - 0.5;
+  const y = (event.clientY - rect.top) / rect.height - 0.5;
+  const bottomBoost = y > 0 ? 1.85 : 1;
+
+  event.currentTarget.style.setProperty("--pointer-rotate-x", `${y * -22 * bottomBoost}deg`);
+  event.currentTarget.style.setProperty("--pointer-rotate-y", `${x * 22}deg`);
+}
+
+function resetCardTilt(event: MouseEvent<HTMLElement>) {
+  event.currentTarget.style.setProperty("--pointer-rotate-x", "0deg");
+  event.currentTarget.style.setProperty("--pointer-rotate-y", "0deg");
+}
 
 export default function Card({ enginePlayerHand, selectedCard, setSelectedCard }: CardProps) {
 
@@ -38,25 +52,35 @@ export default function Card({ enginePlayerHand, selectedCard, setSelectedCard }
 
 
         
+        const cardStyle = {
+          "--card-transform": `${translateY()} ${rotate()}`,
+          "--card-rand": `${((index * 37) % 100) / 100}`,
+        } as CSSProperties;
+        const isSelected = selectedCard.includes(el.id);
+        const hasSelection = selectedCard.length > 0;
+
         return (
-          <div key={index}>
+          <div
+            key={`${el.id}-${index}`}
+            className={`
+              playerCardWrapper
+              ${hasSelection ? "handHasSelection" : ""}
+              ${isSelected ? "cardIsSelected" : ""}
+            `}
+            style={cardStyle}
+            onMouseMove={updateCardTilt}
+            onMouseLeave={resetCardTilt}
+          >
             <img
               src={cardLink}
               alt={el.name}
-              className={selectedCard.includes(el.id) ? "cardImg cardSelected" : "cardImg"}
-              style={{ "--card-transform": `${translateY()} ${rotate()}` } as CSSProperties}
+              className={isSelected ? "cardImg cardSelected" : "cardImg"}
               onClick={() => {
-                if (selectedCard.includes(el.id)) {
+                if (isSelected) {
                   setSelectedCard(selectedCard.filter((id) => id !== el.id));
                 } else {
                   setSelectedCard([...selectedCard, el.id]);
                 }
-              }}
-                onMouseDown={() => {
-                setIsDragging(true);
-              }}
-              onMouseUp={() => {
-                setIsDragging(false);
               }}
             />
           </div>
