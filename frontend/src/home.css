@@ -241,6 +241,13 @@ ul li
 
 }
 
+.menuInputBot {
+    width: 30%;
+    padding: 0.4em;
+    border-radius: 16px;
+
+}
+
 .playBtn {
     width: 30%;
     cursor: pointer;

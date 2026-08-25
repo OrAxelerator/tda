@@ -7,6 +7,7 @@ export default function CreateGameMenu() {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [botsNumber, setBotsNumber] = useState(0)
 
 
     const handleClick = async () => {
@@ -27,7 +28,7 @@ export default function CreateGameMenu() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${idToken}`,
         },
-        body: JSON.stringify({ uid: user.uid }),
+        body: JSON.stringify({ uid: user.uid, bots: botsNumber }),
       });
 
       if (!response.ok) {
@@ -57,6 +58,19 @@ export default function CreateGameMenu() {
 
         <>
            <h1 style={{color:"black"}}>Créer une partie : </h1>
+
+
+                <input
+                type="number"
+                placeholder="Nombre de bot"
+                value={botsNumber}
+                onChange={(e) => setBotsNumber(e.target.value)}
+                className="menuInputBot"
+                max={5}
+                min={0}
+                defaultValue={0}
+                
+                />
 
             <div style={{ marginTop: "1rem" }}>
                 <button onClick={handleClick} disabled={isLoading}>
