@@ -27,7 +27,7 @@ function Actions() {
       return;
     }
 
-    setActiveAction("play");
+    setActiveAction("create");
   };
 
   return (

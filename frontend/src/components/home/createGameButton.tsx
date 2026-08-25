@@ -1,15 +1,4 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../components/auth-context";
-
-export default function CreateGameMenu() {
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
-    const [isLoading, setIsLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-
-    const handleClick = async () => {
+ const handleClick = async () => {
     if (!user) {
       setErrorMessage("Utilisateur non connecté");
       return;
@@ -51,27 +40,3 @@ export default function CreateGameMenu() {
       setIsLoading(false);
     }
   };
-
-    return (
-
-
-        <>
-            <h4>Create Game : </h4>
-            <p> idk 2</p>
-
-
-                <div style={{ marginTop: "1rem" }}>
-        <button onClick={handleClick} disabled={isLoading}>
-          {isLoading ? "Création en cours..." : "Créer THE game"}
-        </button>
-      </div>
-
-            
-
-            {errorMessage ? (
-        <p style={{ color: "red", marginTop: "1rem" }}>{errorMessage}</p>
-      ) : null}
-        
-        </>
-    )
-}

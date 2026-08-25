@@ -12,15 +12,6 @@ export default function Home() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 
-    function handleClick() {
-        if (!user) {
-            console.log("UESR PAS CONNECT2 !!!!!!");
-        }else {
-            console.log(user);
-        }
-    }
-
-
     function handleClickParam() {
         if (!user) {
             console.log("user pas connecté peut pas aller dans param");
@@ -43,31 +34,31 @@ export default function Home() {
                     <ul className="header-actions">
                     <li>
                         <a href="/user">
-                            <img src="user.svg" alt="Profil" />
+                            <i className="header-icon nf nf-fa-user" aria-hidden="true"></i>
+                            <span className="sr-only">Profil</span>
                         </a>
                     </li>
                     <li>
                         <button onClick={handleClickParam}>
-                            <img src="settings.svg" alt="Paramètres" />
+                            <i className="header-icon nf nf-cod-settings_gear" aria-hidden="true"></i>
+                            <span className="sr-only">Paramètres</span>
                         </button>
                     </li>
                     <li>
                         <button>
-                            <img src="credit.svg" alt="Credit" />
+                            <i className="header-icon nf nf-fa-star" aria-hidden="true"></i>
+                            <span className="sr-only">Credit</span>
                         </button>
                     </li>
                     <li>
                         <a href="https://github.com/OrAxelerator/tda">
-                        <img src="github.svg" alt="GitHub" />
+                            <i className="header-icon nf nf-cod-github" aria-hidden="true"></i>
+                            <span className="sr-only">GitHub</span>
                         </a>
                     </li>
                     </ul>
                 </nav>
             </header>
-
-            <button onClick={handleClick}>
-                test
-                </button>
 
             <Actions />
             

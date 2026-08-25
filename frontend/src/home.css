@@ -1,3 +1,5 @@
+@import "https://www.nerdfonts.com/assets/css/webfont.css";
+
 .header-actions a,
 .header-actions a:visited,
 .header-actions a:hover,
@@ -73,6 +75,7 @@ ul li
     align-items: center;
     justify-content: space-between;
     padding: 0 1rem;
+    z-index: 11;
 }
 
 .header-actions {
@@ -86,6 +89,38 @@ ul li
     padding: 0;
     margin-top: 0;
     margin-bottom: 0;
+}
+
+.header-actions a,
+.header-actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.header-icon {
+    width: 1.15rem;
+    height: 1.15rem;
+    font-size: 1.15rem;
+    line-height: 1;
+    font-weight: 400;
+    color: #fcfbff;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
 .actionOverlay {
@@ -127,6 +162,18 @@ ul li
 
 .actionButtons {
     cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.actionButtons:active {
+    background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(238, 240, 242, 0.174) 0px,
+    rgba(238, 239, 240, 0.178) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+    transform: translateY(6px);
 }
 
 

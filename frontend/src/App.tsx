@@ -39,7 +39,7 @@ function App() {
           <div className="auth-wrapper">
             <div className="auth-inner">
               <Routes>
-                <Route path="/" element={<Navigate to="/user" replace />} />
+                <Route path="/" element={<Navigate to="/home" replace />} />
                 <Route path="/profile" element={<Navigate to="/user" replace />} />
                 <Route
                   path="/login"
