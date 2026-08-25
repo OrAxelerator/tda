@@ -56,15 +56,13 @@ export default function CreateGameMenu() {
 
 
         <>
-            <h4>Create Game : </h4>
-            <p> idk 2</p>
+           <h1 style={{color:"black"}}>Créer une partie : </h1>
 
-
-                <div style={{ marginTop: "1rem" }}>
-        <button onClick={handleClick} disabled={isLoading}>
-          {isLoading ? "Création en cours..." : "Créer THE game"}
-        </button>
-      </div>
+            <div style={{ marginTop: "1rem" }}>
+                <button onClick={handleClick} disabled={isLoading}>
+                    {isLoading ? "Création en cours..." : "Créer THE game"}
+                </button>
+            </div>
 
             
 

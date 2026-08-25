@@ -41,20 +41,21 @@ export default function PlayMenu() {
 
 
         <>
-            <h4>Play menu : </h4>
-            <p> idk</p>
-            
+            <h1 style={{color:"black"}}>Rejoindre une partie : </h1>
 
-            <input
-            type="text"
-            placeholder="Code de la room"
-            value={roomId}
-            onChange={(e) => setRoomId(e.target.value)}
-            />
+            <div className="playInput">
+                <input
+                type="text"
+                placeholder="Code de la room"
+                value={roomId}
+                onChange={(e) => setRoomId(e.target.value)}
+                className="playInputCode"
+                />
 
-            <button onClick={joinGame}>
-            Rejoindre
-            </button>
+                <button onClick={joinGame} className="playBtn">
+                <h3>Rejoindre</h3>
+                </button>
+            </div>
             
 
       {errorMessage ? (

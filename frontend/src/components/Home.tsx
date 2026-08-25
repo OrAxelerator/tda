@@ -34,6 +34,7 @@ export default function Home() {
                     <ul className="header-actions">
                     <li>
                         <a href="/user">
+                        { !user && <div className="warningIcon">!</div> }
                             <i className="header-icon nf nf-fa-user" aria-hidden="true"></i>
                             <span className="sr-only">Profil</span>
                         </a>
