@@ -152,6 +152,9 @@ export class GameEngine {
         if (!player) {
             throw new Error("Joeur n'existe pas.")
         }
+        if (this.state.currentPlayerId !== playerId) {
+            throw new Error("Player try to play during the turn of other");
+        }
         const discardPile = this.state.discardPile;
         if (this.state.discardPile.length >= 1) {
             
@@ -172,7 +175,7 @@ export class GameEngine {
                 }
             });
 
-            this.nextTurn() // le mettre ici ??
+            // this.nextTurn() // le mettre ici ??
         }else {
             console.log("discardPile : ");
             console.log(discardPile);

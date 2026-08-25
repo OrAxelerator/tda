@@ -98,10 +98,11 @@ io.on("connection", (socket) => {
 
     try {
       engine.takePile(userId)
-      // pas mettre next turn ici plutot ?
+      
       engine.state.players.forEach(player => {
         engine.refullPlayer(player.id)
       });
+      engine.nextTurn()
       emitGameUpdate(roomId);
     }
     catch (error:any) {
