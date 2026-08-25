@@ -2,7 +2,34 @@ import "../home.css"
 
 import Actions from "./home/Actions"
 
+import { useAuth } from "../components/auth-context";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
+
 export default function Home() {
+
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
+
+    function handleClick() {
+        if (!user) {
+            console.log("UESR PAS CONNECT2 !!!!!!");
+        }else {
+            console.log(user);
+        }
+    }
+
+
+    function handleClickParam() {
+        if (!user) {
+            console.log("user pas connecté peut pas aller dans param");
+            toast.error("connecté vous pour allez dans les parametre de votre compte .. ( a changer bruh)")
+        }
+        else {
+            navigate('/settings')
+        }
+    }
 
     return (
         <>
@@ -20,9 +47,9 @@ export default function Home() {
                         </a>
                     </li>
                     <li>
-                        <a href="/settings">
-                        <img src="settings.svg" alt="Paramètres" />
-                        </a>
+                        <button onClick={handleClickParam}>
+                            <img src="settings.svg" alt="Paramètres" />
+                        </button>
                     </li>
                     <li>
                         <button>
@@ -38,7 +65,12 @@ export default function Home() {
                 </nav>
             </header>
 
+            <button onClick={handleClick}>
+                test
+                </button>
+
             <Actions />
+            
         </div>
         </>
     )
