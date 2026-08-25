@@ -239,7 +239,7 @@ function Game() {
 
     <div className="game-container">
 
-      <header>
+      <header className="Appheader">
         <section className="gameInfo">
           <h4>Infos live socket</h4>
           <p>Socket : {socket?.connected ? "connecté" : "déconnecté"}</p>

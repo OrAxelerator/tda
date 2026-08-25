@@ -245,7 +245,7 @@ form h3,
   color: blue;
 }
 
-header {
+.Appheader {
   background-color: rgb(194, 194, 194);
   width: 100%;
   height: 25dvh;
