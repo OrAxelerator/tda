@@ -1,10 +1,8 @@
 import { useState } from "react";
 
-import ActionBtn from "./ActionButton";
-
-
+import ActionBtn from "./ActionMenuButton";
 import PlayMenu from "./PlayMenu";
-import CreateGameMenu from "./CreateMenu";
+import CreateGameMenu from "./CreateGameMenu";
 
 function Actions() {
   const [activeAction, setActiveAction] = useState<

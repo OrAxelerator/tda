@@ -1,6 +1,6 @@
 import "../home.css"
 
-import Actions from "./home/Action"
+import Actions from "./home/Actions"
 
 export default function Home() {
 
@@ -40,20 +40,6 @@ export default function Home() {
 
             <Actions />
         </div>
-
-
-            {/* <div className="actionBtn">
-                <ActionBtn buttonName="Play" buttonClass="playGameBtn" >
-                    <PlayMenu />
-                </ActionBtn>
-
-                <ActionBtn buttonName="Create Game" buttonClass="createGameBtn" >
-                    <CreateMenu />
-                </ActionBtn>
-                
-            </div> */}
-
-
         </>
     )
 }
