@@ -225,12 +225,6 @@ function Game() {
 
   }
 
-  function moveImg() {
-    if (numberOfTurn * -20 > -150) {
-      console.log("IMAGE DEPASSE");
-    }
-    return numberOfTurn * -20
-  }
 
 
 

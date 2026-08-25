@@ -109,6 +109,11 @@ ul li
     line-height: 1;
     font-weight: 400;
     color: #fcfbff;
+    transition: all 1s ease;
+}
+
+.header-icon:hover {
+    color: rgb(126, 255, 255);
 }
 
 .sr-only {

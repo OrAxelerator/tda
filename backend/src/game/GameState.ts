@@ -12,7 +12,7 @@ export class GameState {
 
     roomId: string | null | undefined;
 
-    
+    // bots: 
 
     players: Player[];
 
@@ -30,6 +30,8 @@ export class GameState {
     constructor(deck: Deck, roomId: string | null | undefined) {
 
         this.players = [];
+
+        // this.bots = [];
 
         this.deck = deck;
 

@@ -321,6 +321,7 @@ app.post("/api/createGame", async (req, res) => {
   try {
     const decoded = await admin.auth().verifyIdToken(idToken);
     const uid = decoded.uid;
+    const numberBot = decoded.botsNumber
 
     // create a new room doc in Firestore
     const db = admin.firestore();

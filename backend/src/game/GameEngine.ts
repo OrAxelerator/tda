@@ -175,14 +175,11 @@ export class GameEngine {
                 }
             });
 
-            // this.nextTurn() // le mettre ici ??
         }else {
             console.log("discardPile : ");
             console.log(discardPile);
             throw new Error("DIscardPile have no card ..")
         }
-
-        
     }
 
     refullPlayer(playerId:string) {
@@ -324,6 +321,10 @@ export class GameEngine {
         this.nextTurn();
     }
 
+
+    addBots(numberOfBot: number) {
+        
+    }
 
     getPlayer(id:string) {
 

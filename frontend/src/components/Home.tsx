@@ -39,12 +39,12 @@ export default function Home() {
                             <span className="sr-only">Profil</span>
                         </a>
                     </li>
-                    <li>
+                    {/* <li>
                         <button onClick={handleClickParam}>
                             <i className="header-icon nf nf-cod-settings_gear" aria-hidden="true"></i>
                             <span className="sr-only">Paramètres</span>
                         </button>
-                    </li>
+                    </li> */}
                     <li>
                         <button>
                             <i className="header-icon nf nf-fa-star" aria-hidden="true"></i>
