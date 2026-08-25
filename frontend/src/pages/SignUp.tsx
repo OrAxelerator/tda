@@ -35,8 +35,9 @@ function SignUp() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h3>Créer un compte</h3>
+    <main className="auth-page auth-page-register">
+      <form className="auth-form" onSubmit={handleSubmit}>
+        <h3>Créer un compte</h3>
 
       <div className="mb-3">
         <label htmlFor="register-email">Email</label>
@@ -64,16 +65,17 @@ function SignUp() {
         />
       </div>
 
-      <div className="d-grid">
-        <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-          {isSubmitting ? "Création..." : "Créer un compte"}
-        </button>
-      </div>
+        <div className="d-grid">
+          <button type="submit" className="auth-action-btn auth-action-btn-register" disabled={isSubmitting}>
+            {isSubmitting ? "Création..." : "Créer un compte"}
+          </button>
+        </div>
 
-      <p className="forgot-password text-right">
-        Déjà inscrit ? <Link to="/login">Se connecter</Link>
-      </p>
-    </form>
+        <p className="forgot-password text-right">
+          Déjà inscrit ? <Link to="/login">Se connecter</Link>
+        </p>
+      </form>
+    </main>
   );
 }
 

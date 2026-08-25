@@ -35,8 +35,9 @@ function Login() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h3>Connexion</h3>
+    <main className="auth-page auth-page-login">
+      <form className="auth-form" onSubmit={handleSubmit}>
+        <h3>Connexion</h3>
 
       <div className="mb-3">
         <label htmlFor="login-email">Email</label>
@@ -64,15 +65,16 @@ function Login() {
         />
       </div>
 
-      <div className="d-grid">
-        <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-          {isSubmitting ? "Connexion..." : "Se connecter"}
-        </button>
-      </div>
-      <p className="forgot-password text-right">
-        Nouveau joueur ? <Link to="/register">Créer un compte</Link>
-      </p>
-    </form>
+        <div className="d-grid">
+          <button type="submit" className="auth-action-btn auth-action-btn-login" disabled={isSubmitting}>
+            {isSubmitting ? "Connexion..." : "Se connecter"}
+          </button>
+        </div>
+        <p className="forgot-password text-right">
+          Nouveau joueur ? <Link to="/register">Créer un compte</Link>
+        </p>
+      </form>
+    </main>
   );
 }
 

@@ -1,31 +1,45 @@
 
-
 .auth-wrapper {
-  height: 100vh;
+  min-height: 100dvh;
   width: 100%;
-  display: grid;
-  place-items: center;
-  
+  display: block;
 }
 
 .auth-inner {
+  min-height: 100dvh;
   width: 100%;
-  height:100dvh;
 }
 
-form,
-.user-page {
+.auth-page {
+  min-height: 100dvh;
+  width: 100%;
   display: grid;
-  gap: 16px;
-  padding: 24px;
-  border: 1px solid #d7d7d7;
-  border-radius: 8px;
-  background: #ffffff;
+  place-items: center;
+  padding: 2rem 1.25rem;
+  box-sizing: border-box;
+  background: #16171d;
 }
 
-form h3,
-.user-page h2 {
-  margin: 0;
+.auth-form {
+  width: min(100%, 520px);
+  display: grid;
+  gap: 1rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.auth-form h3 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  letter-spacing: -0.04em;
+}
+
+.auth-form label {
+  font-size: 0.95rem;
+  color: #f6f3f2;
 }
 
 .mb-3 {
@@ -36,16 +50,52 @@ form h3,
 .form-control {
   width: 100%;
   box-sizing: border-box;
-  padding: 10px 12px;
-  border: 1px solid #cfcfcf;
-  border-radius: 6px;
+  padding: 0.95rem 1rem;
+  border: 1px solid rgba(8, 6, 13, 0.12);
+  border-radius: 16px;
   font: inherit;
+  background: rgba(161, 160, 160, 0.609);
 }
 
 .d-grid,
 .user-actions {
   display: grid;
   gap: 10px;
+}
+
+.auth-action-btn {
+  padding: 1.1rem 1.4rem;
+  border: 4px solid;
+  border-radius: 16px;
+  font: inherit;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  color: #f1f0f2;
+  background: rgba(11, 236, 225, 0.468);
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
+.auth-action-btn:hover {
+  transform: translateY(-1px);
+}
+
+.auth-action-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+  transform: none;
+}
+
+
+
+.auth-action-btn-login {
+  background-color: rgba(245, 245, 245, 0.18);
+  border-color: rgb(0, 183, 255);
+}
+
+.auth-action-btn-register {
+  background-color: rgba(255, 88, 88, 0.14);
+  border-color: rgb(255, 0, 0);
 }
 
 .btn {
@@ -73,6 +123,11 @@ form h3,
 
 .forgot-password {
   margin: 0;
+  color: #9ca3af;
+}
+
+.forgot-password a {
+  color: #f0ebfb;
 }
 
 .room-page {
