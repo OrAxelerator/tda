@@ -65,6 +65,14 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path="/user/:uid"
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route path="/game" element={<Navigate to="/user" replace />} />
                 <Route
                   path="/game/:roomCode"

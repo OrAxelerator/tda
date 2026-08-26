@@ -4,12 +4,22 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { auth } from "../firebase";
 import { toast } from "react-toastify";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "./firebase";
+import { ensureUserProfile } from "../utils/userProfile";
+
+export interface UserProfile {
+  uid: string;
+  displayName: string;
+  cardStyle: string;
+  gamesPlayed: number;
+  gamesWon: number;
+  profileBanner: string;
+  profileImageUrl: string | null;
+}
 
 function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
@@ -18,7 +28,8 @@ function SignUp() {
     setIsSubmitting(true);
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const { user } = await createUserWithEmailAndPassword(auth, email, password);
+      await ensureUserProfile(user, name);
       toast.success("Compte créé avec succès", {
         position: "top-center",
       });
@@ -63,6 +74,19 @@ function SignUp() {
           placeholder="Mot de passe"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+      </div>
+
+      <div className="mb-3">
+        <label htmlFor="register-name">Pseudo in game</label>
+        <input
+          id="register-name"
+          type="text"
+          className="form-control"
+          placeholder="Pseudo in game"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           required
         />
       </div>
