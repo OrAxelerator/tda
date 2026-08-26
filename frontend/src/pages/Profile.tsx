@@ -3,22 +3,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { useAuth } from "../components/auth-context";
 import { db } from "../firebase";
-
-export type UserProfileData = {
-  uid: string;
-  displayName: string;
-  cardStyle: string;
-  gamesPlayed: number;
-  gamesWon: number;
-  profileBanner: string;
-  profileImageUrl: string | null;
-};
+import type { UserProfile } from "../types/userProfile";
 
 function Profile() {
   const { uid } = useParams<{ uid: string }>();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<UserProfileData | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,7 +32,7 @@ function Profile() {
           return;
         }
 
-        setProfile(snapshot.data() as UserProfileData);
+        setProfile(snapshot.data() as UserProfile);
       } catch {
         setError("Impossible de charger le profil.");
       } finally {

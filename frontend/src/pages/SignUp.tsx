@@ -1,26 +1,17 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { auth } from "../firebase";
 import { toast } from "react-toastify";
 import { ensureUserProfile } from "../utils/userProfile";
-
-export interface UserProfile {
-  uid: string;
-  displayName: string;
-  cardStyle: string;
-  gamesPlayed: number;
-  gamesWon: number;
-  profileBanner: string;
-  profileImageUrl: string | null;
-}
 
 function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -44,6 +35,30 @@ function SignUp() {
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleGoogleSignUp = async () => {
+    setIsGoogleSubmitting(true);
+
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      await ensureUserProfile(result.user, name);
+      toast.success("Compte Google créé avec succès", {
+        position: "top-center",
+      });
+      navigate("/user");
+    } catch (error) {
+      const message =
+        error instanceof FirebaseError
+          ? error.message
+          : "Impossible de créer le compte avec Google.";
+      toast.error(message, {
+        position: "bottom-center",
+      });
+    } finally {
+      setIsGoogleSubmitting(false);
     }
   };
 
@@ -94,6 +109,16 @@ function SignUp() {
         <div className="d-grid">
           <button type="submit" className="auth-action-btn auth-action-btn-register" disabled={isSubmitting}>
             {isSubmitting ? "Création..." : "Créer un compte"}
+          </button>
+        </div>
+        <div className="d-grid mt-2">
+          <button
+            type="button"
+            className="auth-action-btn auth-action-btn-register"
+            onClick={handleGoogleSignUp}
+            disabled={isGoogleSubmitting}
+          >
+            {isGoogleSubmitting ? "Création Google..." : "Créer avec Google"}
           </button>
         </div>
 

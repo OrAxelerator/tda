@@ -1,7 +1,7 @@
 import type { User } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
-import type { UserProfile } from "../pages/SignUp";
+import type { UserProfile } from "../types/userProfile";
 
 export async function ensureUserProfile(user: User, fallbackName?: string) {
   const profileRef = doc(db, "user", user.uid);

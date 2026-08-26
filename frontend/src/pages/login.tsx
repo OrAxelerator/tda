@@ -1,15 +1,17 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth } from '../firebase';
 import { toast } from "react-toastify";
+import { ensureUserProfile } from "../utils/userProfile";
 
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -32,6 +34,30 @@ function Login() {
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setIsGoogleSubmitting(true);
+
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      await ensureUserProfile(result.user);
+      toast.success("Connexion Google réussie", {
+        position: "top-center",
+      });
+      navigate("/user");
+    } catch (error) {
+      const message =
+        error instanceof FirebaseError
+          ? error.message
+          : "Impossible de se connecter avec Google.";
+      toast.error(message, {
+        position: "bottom-center",
+      });
+    } finally {
+      setIsGoogleSubmitting(false);
     }
   };
 
@@ -69,6 +95,16 @@ function Login() {
         <div className="d-grid">
           <button type="submit" className="auth-action-btn auth-action-btn-login" disabled={isSubmitting}>
             {isSubmitting ? "Connexion..." : "Se connecter"}
+          </button>
+        </div>
+        <div className="d-grid mt-2">
+          <button
+            type="button"
+            className="auth-action-btn auth-action-btn-login"
+            onClick={handleGoogleSignIn}
+            disabled={isGoogleSubmitting}
+          >
+            {isGoogleSubmitting ? "Connexion Google..." : "Continuer avec Google"}
           </button>
         </div>
         <p className="forgot-password text-right">
