@@ -178,53 +178,6 @@ function Game() {
     })
   }
 
-  function renderDiscardPile() {
-    if (discardPileCard.length === 0) {
-      return <p>Pas de carte dans la pile</p>;
-    }
-    if (!seeDiscardPile) {
-      const topCardId = discardPileCard[discardPileCard.length - 1];
-      const id = String(topCardId).padStart(2, "0");
-      const cardLink = `https://tda-1.onrender.com/card/${id}_theme1.png`;
-
-      return (
-        <div key={`hidden-${topCardId}`}>
-          <img src={cardLink} alt={`Carte ${id}`} />
-        </div>
-      );
-    }
-
-    if (seeDiscardPile) {
-      console.log("what");
-      return discardPileCard.map((cardId, index) => {
-        const id = String(cardId).padStart(2, "0");
-        const cardLink = `https://tda-1.onrender.com/card/${id}_theme1.png`;
-        const numberOfCards = discardPileCard.length;
-        const weight = 2.9;
-        const center = (numberOfCards - 1) / 2;
-        const angle = (index - center) * 1.5;
-        const offset = index < Math.round(numberOfCards / 2)
-          ? -weight * (index + 1)
-          : -weight * (numberOfCards - index);
-  
-        return (
-          <div key={`${cardId}-${index}`}>
-            <img
-              src={cardLink}
-              alt={`Carte ${id}`}
-              style={
-                {
-                  ["--card-transform" as string]: `translateY(${offset}px) rotate(${angle}deg)`,
-                } as CSSProperties
-              }
-            />
-          </div>
-        );
-      });
-    }
-
-  }
-
 
 
 
@@ -285,18 +238,17 @@ function Game() {
            
       <>
 
-<div className="gameBackground">
+            <div className="gameBackground">
 
-<div
-  className="backgroundWrapper"
-  style={{
-  transform: `translateY(${numberOfTurn * 14}px)`
-}}
->
-  <img src="/mc.jpeg" className="backgroundImg" />
-</div>
+            <div
+              className="backgroundWrapper"
+              style={{
+              transform: `translateY(${numberOfTurn * 14}px)`
+            }}
+            >
+              <img src="/mc.jpeg" className="backgroundImg" />
+            </div>
 
-  {/* reste de ton interface ici */}
 
 
 
@@ -326,9 +278,6 @@ function Game() {
         discardPileCard={discardPileCard} 
         />
 
-        {/* <h5>
-          Bienvenue : {currentUser.uid} / {currentUser.displayName} / {currentUser.email}
-        </h5> */}
 
         <LeaveRoomButton roomId={roomId} playerId={currentUser.uid} />
 
@@ -338,8 +287,6 @@ function Game() {
       </div>
       </>
       
-
-
 
           )
       }
