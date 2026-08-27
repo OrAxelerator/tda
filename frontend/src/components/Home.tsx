@@ -3,7 +3,7 @@ import "../home.css"
 import Actions from "./home/Actions"
 
 import { useAuth } from "../components/auth-context";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 
@@ -33,11 +33,11 @@ export default function Home() {
                 <nav>
                     <ul className="header-actions">
                     <li>
-                        <a href="/user">
+                        <Link to="/user">
                         { !user && <div className="warningIcon">!</div> }
                             <i className="header-icon nf nf-fa-user" aria-hidden="true"></i>
                             <span className="sr-only">Profil</span>
-                        </a>
+                        </Link>
                     </li>
                     {/* <li>
                         <button onClick={handleClickParam}>

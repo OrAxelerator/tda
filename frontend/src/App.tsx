@@ -41,6 +41,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Navigate to="/home" replace />} />
                 <Route path="/Home" element={<Navigate to="/home" replace />} />
+                <Route path="/home" element={<Home />} />
                 <Route path="/profile" element={<Navigate to="/user" replace />} />
                 <Route
                   path="/login"
@@ -83,7 +84,7 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
-                <Route path="/home" element={<Home />} />
+                <Route path="*" element={<Navigate to="/home" replace />} />
               </Routes>
               <ToastContainer />
             </div>
