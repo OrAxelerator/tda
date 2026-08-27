@@ -24,11 +24,13 @@ dotenv.config({ path: path.join(process.cwd(), "env", ".env") });
 const allowedOrigins = [
     "http://localhost:5173",
     process.env.FRONTEND_URL
-];
+].filter(Boolean);
 
-app.use(cors(
-   origin: allowedOrigins
-));
+
+app.use(cors({
+    origin: allowedOrigins
+}));
+
 app.use(express.json());
 app.use(express.static(path.join(process.cwd(), "public")));
 
@@ -38,7 +40,7 @@ let engine: GameEngine | null = null;
 const httpServer = createServer(app);
 const io = new Server(httpServer, { // seulement 1 instance
   cors: {
-    origin: "http://localhost:5173",
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
   },
 });
