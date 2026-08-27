@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: test-card-front
+    runtime: static
+    rootDir: .
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  - type: web
+    name: test-card-api
+    runtime: node
+    rootDir: .
+    buildCommand: npm ci
+    startCommand: npm start

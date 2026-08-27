@@ -1,0 +1,369 @@
+[
+    {
+        "id": 1,
+        "name": "2 of Spades",
+        "suit": "Spades",
+        "value": 2,
+        "asset": "01_theme1.png"
+    },
+    {
+        "id": 2,
+        "name": "3 of Spades",
+        "suit": "Spades",
+        "value": 3,
+        "asset": "02_theme1.png"
+    },
+    {
+        "id": 3,
+        "name": "4 of Spades",
+        "suit": "Spades",
+        "value": 4,
+        "asset": "03_theme1.png"
+    },
+    {
+        "id": 4,
+        "name": "5 of Spades",
+        "suit": "Spades",
+        "value": 5,
+        "asset": "04_theme1.png"
+    },
+    {
+        "id": 5,
+        "name": "6 of Spades",
+        "suit": "Spades",
+        "value": 6,
+        "asset": "05_theme1.png"
+    },
+    {
+        "id": 6,
+        "name": "7 of Spades",
+        "suit": "Spades",
+        "value": 7,
+        "asset": "06_theme1.png"
+    },
+    {
+        "id": 7,
+        "name": "8 of Spades",
+        "suit": "Spades",
+        "value": 8,
+        "asset": "07_theme1.png"
+    },
+    {
+        "id": 8,
+        "name": "9 of Spades",
+        "suit": "Spades",
+        "value": 9,
+        "asset": "08_theme1.png"
+    },
+    {
+        "id": 9,
+        "name": "10 of Spades",
+        "suit": "Spades",
+        "value": 10,
+        "asset": "09_theme1.png"
+    },
+    {
+        "id": 10,
+        "name": "Jack of Spades",
+        "suit": "Spades",
+        "value": 11,
+        "asset": "10_theme1.png"
+    },
+    {
+        "id": 11,
+        "name": "Queen of Spades",
+        "suit": "Spades",
+        "value": 12,
+        "asset": "11_theme1.png"
+    },
+    {
+        "id": 12,
+        "name": "King of Spades",
+        "suit": "Spades",
+        "value": 13,
+        "asset": "12_theme1.png"
+    },
+    {
+        "id": 13,
+        "name": "Ace of Spades",
+        "suit": "Spades",
+        "value": 14,
+        "asset": "13_theme1.png"
+    },
+    {
+        "id": 14,
+        "name": "2 of Hearts",
+        "suit": "Hearts",
+        "value": 2,
+        "asset": "14_theme1.png"
+    },
+    {
+        "id": 15,
+        "name": "3 of Hearts",
+        "suit": "Hearts",
+        "value": 3,
+        "asset": "15_theme1.png"
+    },
+    {
+        "id": 16,
+        "name": "4 of Hearts",
+        "suit": "Hearts",
+        "value": 4,
+        "asset": "16_theme1.png"
+    },
+    {
+        "id": 17,
+        "name": "5 of Hearts",
+        "suit": "Hearts",
+        "value": 5,
+        "asset": "17_theme1.png"
+    },
+    {
+        "id": 18,
+        "name": "6 of Hearts",
+        "suit": "Hearts",
+        "value": 6,
+        "asset": "18_theme1.png"
+    },
+    {
+        "id": 19,
+        "name": "7 of Hearts",
+        "suit": "Hearts",
+        "value": 7,
+        "asset": "19_theme1.png"
+    },
+    {
+        "id": 20,
+        "name": "8 of Hearts",
+        "suit": "Hearts",
+        "value": 8,
+        "asset": "20_theme1.png"
+    },
+    {
+        "id": 21,
+        "name": "9 of Hearts",
+        "suit": "Hearts",
+        "value": 9,
+        "asset": "21_theme1.png"
+    },
+    {
+        "id": 22,
+        "name": "10 of Hearts",
+        "suit": "Hearts",
+        "value": 10,
+        "asset": "22_theme1.png"
+    },
+    {
+        "id": 23,
+        "name": "Jack of Hearts",
+        "suit": "Hearts",
+        "value": 11,
+        "asset": "23_theme1.png"
+    },
+    {
+        "id": 24,
+        "name": "Queen of Hearts",
+        "suit": "Hearts",
+        "value": 12,
+        "asset": "24_theme1.png"
+    },
+    {
+        "id": 25,
+        "name": "King of Hearts",
+        "suit": "Hearts",
+        "value": 13,
+        "asset": "25_theme1.png"
+    },
+    {
+        "id": 26,
+        "name": "Ace of Hearts",
+        "suit": "Hearts",
+        "value": 14,
+        "asset": "26_theme1.png"
+    },
+    {
+        "id": 27,
+        "name": "2 of Diamonds",
+        "suit": "Diamonds",
+        "value": 2,
+        "asset": "27_theme1.png"
+    },
+    {
+        "id": 28,
+        "name": "3 of Diamonds",
+        "suit": "Diamonds",
+        "value": 3,
+        "asset": "28_theme1.png"
+    },
+    {
+        "id": 29,
+        "name": "4 of Diamonds",
+        "suit": "Diamonds",
+        "value": 4,
+        "asset": "29_theme1.png"
+    },
+    {
+        "id": 30,
+        "name": "5 of Diamonds",
+        "suit": "Diamonds",
+        "value": 5,
+        "asset": "30_theme1.png"
+    },
+    {
+        "id": 31,
+        "name": "6 of Diamonds",
+        "suit": "Diamonds",
+        "value": 6,
+        "asset": "31_theme1.png"
+    },
+    {
+        "id": 32,
+        "name": "7 of Diamonds",
+        "suit": "Diamonds",
+        "value": 7,
+        "asset": "32_theme1.png"
+    },
+    {
+        "id": 33,
+        "name": "8 of Diamonds",
+        "suit": "Diamonds",
+        "value": 8,
+        "asset": "33_theme1.png"
+    },
+    {
+        "id": 34,
+        "name": "9 of Diamonds",
+        "suit": "Diamonds",
+        "value": 9,
+        "asset": "34_theme1.png"
+    },
+    {
+        "id": 35,
+        "name": "10 of Diamonds",
+        "suit": "Diamonds",
+        "value": 10,
+        "asset": "35_theme1.png"
+    },
+    {
+        "id": 36,
+        "name": "Jack of Diamonds",
+        "suit": "Diamonds",
+        "value": 11,
+        "asset": "36_theme1.png"
+    },
+    {
+        "id": 37,
+        "name": "Queen of Diamonds",
+        "suit": "Diamonds",
+        "value": 12,
+        "asset": "37_theme1.png"
+    },
+    {
+        "id": 38,
+        "name": "King of Diamonds",
+        "suit": "Diamonds",
+        "value": 13,
+        "asset": "38_theme1.png"
+    },
+    {
+        "id": 39,
+        "name": "Ace of Diamonds",
+        "suit": "Diamonds",
+        "value": 14,
+        "asset": "39_theme1.png"
+    },
+    {
+        "id": 40,
+        "name": "2 of Clubs",
+        "suit": "Clubs",
+        "value": 2,
+        "asset": "40_theme1.png"
+    },
+    {
+        "id": 41,
+        "name": "3 of Clubs",
+        "suit": "Clubs",
+        "value": 3,
+        "asset": "41_theme1.png"
+    },
+    {
+        "id": 42,
+        "name": "4 of Clubs",
+        "suit": "Clubs",
+        "value": 4,
+        "asset": "42_theme1.png"
+    },
+    {
+        "id": 43,
+        "name": "5 of Clubs",
+        "suit": "Clubs",
+        "value": 5,
+        "asset": "43_theme1.png"
+    },
+    {
+        "id": 44,
+        "name": "6 of Clubs",
+        "suit": "Clubs",
+        "value": 6,
+        "asset": "44_theme1.png"
+    },
+    {
+        "id": 45,
+        "name": "7 of Clubs",
+        "suit": "Clubs",
+        "value": 7,
+        "asset": "45_theme1.png"
+    },
+    {
+        "id": 46,
+        "name": "8 of Clubs",
+        "suit": "Clubs",
+        "value": 8,
+        "asset": "46_theme1.png"
+    },
+    {
+        "id": 47,
+        "name": "9 of Clubs",
+        "suit": "Clubs",
+        "value": 9,
+        "asset": "47_theme1.png"
+    },
+    {
+        "id": 48,
+        "name": "10 of Clubs",
+        "suit": "Clubs",
+        "value": 10,
+        "asset": "48_theme1.png"
+    },
+    {
+        "id": 49,
+        "name": "Jack of Clubs",
+        "suit": "Clubs",
+        "value": 11,
+        "asset": "49_theme1.png"
+    },
+    {
+        "id": 50,
+        "name": "Queen of Clubs",
+        "suit": "Clubs",
+        "value": 12,
+        "asset": "50_theme1.png"
+    },
+    {
+        "id": 51,
+        "name": "King of Clubs",
+        "suit": "Clubs",
+        "value": 13,
+        "asset": "51_theme1.png"
+    },
+    {
+        "id": 52,
+        "name": "Ace of Clubs",
+        "suit": "Clubs",
+        "value": 14,
+        "asset": "52_theme1.png"
+    }
+    
+
+
+]

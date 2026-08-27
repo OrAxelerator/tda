@@ -14,7 +14,7 @@ export class GameState {
 
     deck: Deck;
 
-    discardPile: any[];
+    discardPile: number[];
 
     currentPlayerId: string | null;
 

@@ -22,3 +22,20 @@ Si tu veux, je peux aussi te faire un mini schéma simple de la chaîne :
 App → Card → sélection → affichage
 pour que tu vois exactement où ça cassait.
 		
+
+
+---
+
+- Fermer socket apres fin game
+- Rajoutez btn quittez la partie
+- Faire 2 "layout" dans game (wait/playing)
+    - layout wait : liste de joueur, host option pour degager player
+    - option des paramètres de la partie (variantes .. jsp)
+    - Layout play : truc de jeu quoi
+- Faire 1 instance de gameEngineManager dans backend ?
+- Simplifier code/séparé en plusieur fichier
+- Organsez routes/sockets
+
+
+
+- ""Bug"" : le host est toujours le 1er joueur de la partie car tjrs le premier dans gameEngine, donc faut rajouter une var dans gameState comme 'order" qui décide aléatoirement l'ordre, donc avant le début peu affiché les players jsute dans l'odre d'arrivé (meme opti début : ordre = ordre j'arrivé des players et change que début de game donc replace tout les players)

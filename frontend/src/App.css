@@ -1,0 +1,412 @@
+
+.auth-wrapper {
+  min-height: 100dvh;
+  width: 100%;
+  display: block;
+}
+
+.auth-inner {
+  min-height: 100dvh;
+  width: 100%;
+}
+
+.auth-page {
+  min-height: 100dvh;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  padding: 2rem 1.25rem;
+  box-sizing: border-box;
+  background: #16171d;
+}
+
+.auth-form {
+  width: min(100%, 520px);
+  display: grid;
+  gap: 1rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.auth-form h3 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  letter-spacing: -0.04em;
+}
+
+.auth-form label {
+  font-size: 0.95rem;
+  color: #f6f3f2;
+}
+
+.mb-3 {
+  display: grid;
+  gap: 6px;
+}
+
+.form-control {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.95rem 1rem;
+  border: 1px solid rgba(8, 6, 13, 0.12);
+  border-radius: 16px;
+  font: inherit;
+  background: rgba(161, 160, 160, 0.609);
+}
+
+.d-grid,
+.user-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.auth-action-btn {
+  padding: 1.1rem 1.4rem;
+  border: 4px solid;
+  border-radius: 16px;
+  font: inherit;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  color: #f1f0f2;
+  background: rgba(11, 236, 225, 0.468);
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
+.auth-action-btn:hover {
+  transform: translateY(-1px);
+}
+
+.auth-action-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+  transform: none;
+}
+
+.auth-google-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 0.95rem 1rem;
+  border: 1px solid #dadce0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #3c4043;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.auth-google-btn:hover {
+  background: #f8f9fa;
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.15), 0 4px 8px rgba(60, 64, 67, 0.08);
+  transform: translateY(-1px);
+}
+
+.auth-google-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+  transform: none;
+  box-shadow: none;
+}
+
+.auth-google-btn-icon {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+}
+
+.auth-google-btn-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+
+
+.auth-action-btn-login {
+  background-color: rgba(245, 245, 245, 0.18);
+  border-color: rgb(0, 183, 255);
+}
+
+.auth-action-btn-register {
+  background-color: rgba(255, 88, 88, 0.14);
+  border-color: rgb(255, 0, 0);
+}
+
+.btn {
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 6px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.btn-primary {
+  color: #ffffff;
+  background: #1769aa;
+}
+
+.btn-secondary {
+  color: #1b1b1b;
+  background: #e8e8e8;
+}
+
+.forgot-password {
+  margin: 0;
+  color: #9ca3af;
+}
+
+.forgot-password a {
+  color: #f0ebfb;
+}
+
+.room-page {
+  display: grid;
+  gap: 16px;
+  width: 100%;
+}
+
+.room-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #d7d7d7;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.room-header h2,
+.players-panel h3 {
+  margin: 0;
+}
+
+.room-label {
+  margin: 0 0 4px;
+  color: #666666;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.room-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 16px;
+}
+
+.players-panel,
+.chat-panel {
+  border: 1px solid #d7d7d7;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.players-panel {
+  padding: 16px;
+}
+
+.players-panel ul {
+  display: grid;
+  gap: 10px;
+  padding: 0;
+  margin: 16px 0 0;
+  list-style: none;
+}
+
+.players-panel li {
+  display: grid;
+  gap: 2px;
+}
+
+.players-panel small {
+  color: #666666;
+}
+
+.engine-test-panel {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #d7d7d7;
+}
+
+.engine-test-panel dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.engine-test-panel dl div {
+  display: grid;
+  gap: 2px;
+}
+
+.engine-test-panel dt {
+  color: #666666;
+  font-size: 0.8rem;
+}
+
+.engine-test-panel dd {
+  margin: 0;
+}
+
+.chat-panel {
+  display: grid;
+  grid-template-rows: minmax(320px, 1fr) auto;
+  overflow: hidden;
+}
+
+.messages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.empty-chat {
+  margin: auto;
+  color: #666666;
+}
+
+.chat-message {
+  max-width: 78%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f0f0f0;
+}
+
+.own-message {
+  align-self: flex-end;
+  color: #ffffff;
+  background: #1769aa;
+}
+
+.chat-message div {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+}
+
+.chat-message p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.chat-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  padding: 12px;
+  border: 0;
+  border-top: 1px solid #d7d7d7;
+  border-radius: 0;
+}
+
+@media (max-width: 700px) {
+  .room-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .room-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .chat-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.host {
+  color: red;
+}
+
+.player {
+  color: blue;
+}
+
+.Appheader {
+  background-color: rgb(194, 194, 194);
+  width: 100%;
+  height: 25dvh;
+  color:black;
+  display: flex;
+}
+
+.gameInfo {
+  border: 2px solid black;
+  width: 20%;
+}
+
+.players {
+  display: flex;
+  width: 100%;
+  background-color: rgb(23, 81, 23);
+  justify-content: space-evenly;
+}
+
+.playerInfo {
+  border: 2px solid black;
+  width: 20%;
+  border-radius: 8px;
+  margin: 29px;
+  background-color: rgb(110, 110, 222);
+}
+
+.selfPlayer {
+  border: 2px solid yellow;
+}
+
+.activePlayer {
+  background-color: rgb(220, 220, 140);
+}
+
+.backgroundImgContainer {
+  height: 25dvh;
+  overflow: hidden;
+}
+
+.game-container {
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+}
+.gameBackground {
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  position: relative;
+}
+
+.backgroundWrapper {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  transition: transform 0.3s ease;
+  z-index: -1;
+}
+
+.backgroundImg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
