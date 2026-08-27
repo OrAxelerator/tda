@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../components/auth-context";
+import { apiUrl, readJsonResponse } from "../../config";
 
 export default function CreateGameMenu() {
     const { user, logout } = useAuth();
@@ -22,7 +23,7 @@ export default function CreateGameMenu() {
     try {
       const idToken = await user.getIdToken();
 
-      const response = await fetch("/api/createGame", {
+      const response = await fetch(apiUrl("/api/createGame"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -31,13 +32,14 @@ export default function CreateGameMenu() {
         body: JSON.stringify({ uid: user.uid, bots: botsNumber }),
       });
 
+      const data = await readJsonResponse(response);
+
       if (!response.ok) {
-        const errorBody = await response.json().catch(() => ({}));
+        const errorBody = data ?? {};
         const message = errorBody.message || "Impossible de créer la room";
         throw new Error(`${response.status} ${response.statusText}: ${message}`);
       }
 
-      const data = await response.json();
       console.log("Room créée côté backend :", data);
 
       if (data?.roomId) {

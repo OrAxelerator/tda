@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../components/auth-context";
+import { apiUrl, readJsonResponse } from "../../config";
 
 
 
@@ -15,8 +16,16 @@ export default function PlayMenu() {
 
 
     async function joinGame() {
+  if (!user) {
+    setErrorMessage("Utilisateur non connecté");
+    return;
+  }
+
+  setIsLoading(true);
+  setErrorMessage(null);
+
   try {
-    const res = await fetch(`http://localhost:3000/rooms/${roomId}/joinGame`, {
+    const res = await fetch(apiUrl(`/rooms/${roomId}/joinGame`), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -27,11 +36,19 @@ export default function PlayMenu() {
       }),
     });
 
-    const data = await res.json();
+    const data = await readJsonResponse(res);
     console.log(data);
+
+    if (!res.ok || !data?.success) {
+      throw new Error(data?.message || "Impossible de rejoindre la partie");
+    }
+
     navigate(`/game/${roomId}`);
-  } catch (err) {
+  } catch (err: any) {
     console.error(err);
+    setErrorMessage(err?.message ?? "Erreur inconnue lors de la connexion à la room.");
+  } finally {
+    setIsLoading(false);
   }
 }
 
@@ -52,8 +69,8 @@ export default function PlayMenu() {
                 className="playInputCode"
                 />
 
-                <button onClick={joinGame} className="playBtn">
-                <h3>Rejoindre</h3>
+                <button onClick={joinGame} className="playBtn" disabled={isLoading}>
+                <h3>{isLoading ? "Connexion..." : "Rejoindre"}</h3>
                 </button>
             </div>
             

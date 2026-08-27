@@ -1,6 +1,8 @@
+import { apiUrl, readJsonResponse } from "../config";
+
 export async function leaveRoom(roomId: string, playerId: string) {
     const res = await fetch(
-        `http://localhost:3000/rooms/${roomId}/leave`,
+        apiUrl(`/rooms/${roomId}/leave`),
         {
             method: "POST",
             headers: {
@@ -12,5 +14,5 @@ export async function leaveRoom(roomId: string, playerId: string) {
         }
     );
 
-    return await res.json();
+    return await readJsonResponse(res);
 }

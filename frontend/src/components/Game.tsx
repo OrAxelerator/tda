@@ -13,7 +13,7 @@ import { getDataConnect } from "firebase/data-connect";
 import Pile from "./Pile";
 
 
-import { API_URL } from "../config";
+import { API_URL, apiUrl, readJsonResponse } from "../config";
 
 
 type PlayerCard = {
@@ -137,12 +137,12 @@ function Game() {
 
   async function startGame() {
     try {
-      const res = await fetch(`http://localhost:3000/rooms/${roomId}/startGame`, {
+      const res = await fetch(apiUrl(`/rooms/${roomId}/startGame`), {
         method: "POST",
       });
-      const data = await res.json();
+      const data = await readJsonResponse(res);
 
-      if (!data.success) {
+      if (!res.ok || !data?.success) {
         toast.error(data.message || "Impossible de lancer la partie");
       }
     } catch (err) {
