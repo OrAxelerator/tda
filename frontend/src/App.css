@@ -391,7 +391,7 @@
 }
 .gameBackground {
   width: 100%;
-  height: 75dvh;
+  height: 100dvh;
   overflow: hidden;
   position: relative;
 }
