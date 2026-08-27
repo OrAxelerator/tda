@@ -53,7 +53,7 @@ export default function Pile({ discardPileLength, isActive, discardPileCard}: Pi
                 <div className="pileContainer pile pileFull">
                     {discardPileCard.map((cardId, index) => { // affiche toute les cartes
                         const id = String(cardId).padStart(2, "0");
-                        const cardLink = `https://tda-1.onrender.com/card/${id}_theme1.png`;
+                        const cardLink = `https://tda-back.onrender.com/cards/${id}_theme1.png`;
                         const cardWidth = `min(clamp(60px, 8vw, 132px), calc((80vw - ${(discardPileLength - 1) * 2}px) / ${discardPileLength}))`;
 
                         const cardStyle = {
