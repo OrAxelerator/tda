@@ -12,6 +12,10 @@ import Wainting from "./Waiting";
 import { getDataConnect } from "firebase/data-connect";
 import Pile from "./Pile";
 
+
+import { API_URL } from "../config";
+
+
 type PlayerCard = {
   id: number;
   name?: string;
@@ -68,7 +72,7 @@ function Game() {
       return;
     }
 
-    const newSocket = io("http://localhost:3000", {
+    const newSocket = io(API_URL, {
       transports: ["websocket"],
     });
 

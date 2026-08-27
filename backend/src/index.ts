@@ -21,7 +21,14 @@ const app = express();
 // charger les variables d'environnement depuis /env/.env (le fichier n'est pas lu par moi)
 dotenv.config({ path: path.join(process.cwd(), "env", ".env") });
 
-app.use(cors());
+const allowedOrigins = [
+    "http://localhost:5173",
+    process.env.FRONTEND_URL
+];
+
+app.use(cors(
+   origin: allowedOrigins
+));
 app.use(express.json());
 app.use(express.static(path.join(process.cwd(), "public")));
 
@@ -651,9 +658,9 @@ app.post("/rooms/:roomId/leave", async (req, res) => {
 
 });
 
-
+const PORT = process.env.PORT || 3000;
 async function bootstrap() {
-  httpServer.listen(3000, () => {
+  httpServer.listen(PORT, () => {
     console.log("Backend lancé sur http://localhost:3000");
   });
 }
