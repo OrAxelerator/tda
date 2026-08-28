@@ -3,71 +3,85 @@ import dotenv from "dotenv";
 import path from "node:path";
 import { readFileSync } from "node:fs";
 
-// Charger les variables d'environnement depuis /env/.env
-dotenv.config({ path: path.join(process.cwd(), "env", ".env") });
+const isRender = process.env.RENDER === "true";
 
-function parseServiceAccountFromEnvFile() {
-  const envFile = path.join(process.cwd(), "env", ".env");
-  try {
-    const raw = readFileSync(envFile, "utf8");
-    const match = raw.match(/^FIREBASE_SERVICE_ACCOUNT\s*=\s*(\{[\s\S]*?\})/m);
-    if (match?.[1]) {
-      return JSON.parse(match[1]);
-    }
-  } catch (error) {
-    console.error("Impossible de parser FIREBASE_SERVICE_ACCOUNT depuis env/.env:", error);
-  }
+console.log("is Render :", isRender);
 
-  return undefined;
+const envPath = path.join(process.cwd(), "env", "env");
+
+if (!isRender) {
+  const result = dotenv.config({
+    path: envPath,
+  });
+
+  console.log("Fichier env :", envPath);
+  console.log("Erreur dotenv :", result.error ?? "aucune");
 }
 
-function loadServiceAccount() {
-  const serviceAccountString = process.env.FIREBASE_SERVICE_ACCOUNT;
-  if (!serviceAccountString) {
-    return undefined;
+function loadServiceAccount(): admin.ServiceAccount {
+  // =========================
+  // LOCAL
+  // =========================
+  if (!isRender) {
+    try {
+      const rawFile = readFileSync(envPath, "utf8");
+
+      // Récupère tout ce qui se trouve après :
+      // FIREBASE_SERVICE_ACCOUNT=
+      const match = rawFile.match(
+        /^FIREBASE_SERVICE_ACCOUNT\s*=\s*(\{[\s\S]*\})\s*$/m
+      );
+
+      if (!match) {
+        throw new Error(
+          "FIREBASE_SERVICE_ACCOUNT introuvable dans env/env"
+        );
+      }
+
+      return JSON.parse(match[1]);
+    } catch (error) {
+      throw new Error(
+        `Impossible de charger FIREBASE_SERVICE_ACCOUNT depuis ${envPath}: ${error}`
+      );
+    }
+  }
+
+  // =========================
+  // RENDER
+  // =========================
+  const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
+
+  if (!raw) {
+    throw new Error(
+      "FIREBASE_SERVICE_ACCOUNT introuvable dans les variables Render."
+    );
   }
 
   try {
-    return JSON.parse(serviceAccountString);
-  } catch {
-    // support JSON with escaped newlines
-    try {
-      return JSON.parse(serviceAccountString.replace(/\\n/g, "\n"));
-    } catch {
-      return parseServiceAccountFromEnvFile();
-    }
+    return JSON.parse(raw);
+  } catch (error) {
+    throw new Error(
+      `FIREBASE_SERVICE_ACCOUNT n'est pas un JSON valide sur Render: ${error}`
+    );
   }
 }
 
 function initFirebase() {
-  if (admin.apps.length) return admin;
-
-  try {
-    const serviceAccount = loadServiceAccount();
-    const credPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
-
-    if (serviceAccount) {
-      admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-      });
-    } else if (credPath) {
-      const fullPath = path.isAbsolute(credPath) ? credPath : path.join(process.cwd(), credPath);
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const serviceAccountFromFile = require(fullPath);
-      admin.initializeApp({
-        credential: admin.credential.cert(serviceAccountFromFile),
-      });
-    } else {
-      console.warn("Aucun service account Firebase renseigné, tentative d'authentification par défaut");
-      admin.initializeApp({
-        credential: admin.credential.applicationDefault(),
-      });
-    }
-
-    console.log("firebase-admin initialisé (helper)");
-  } catch (err) {
-    console.error("Erreur initialisation firebase-admin (helper):", err);
+  if (admin.apps.length) {
+    return admin;
   }
+
+  const serviceAccount = loadServiceAccount();
+
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+
+  console.log(
+    "Firebase Admin initialisé avec le projet :",
+    serviceAccount.projectId || serviceAccount.project_id // (dif entre fichier api local est render var env sur render)
+  );
+
 
   return admin;
 }
