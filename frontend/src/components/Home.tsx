@@ -5,13 +5,36 @@ import Actions from "./home/Actions"
 import { useAuth } from "../components/auth-context";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import {  useEffect, useState } from "react";
+
 
 
 export default function Home() {
 
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const [version, setVersion] = useState<string | null>(null);
 
+
+    useEffect(() => {
+  const fetchLastCommit = async () => {
+    try {
+      const response = await fetch("https://api.github.com/repos/OrAxelerator/tda/commits");
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de la récupération du dernier commit");
+      }
+
+      const data = await response.json();
+
+      setVersion(data["0"]["sha"]);
+    } catch (error) {
+      console.error("Erreur fetch last commit :", error);
+    }
+  };
+
+  fetchLastCommit();
+}, []);
 
     return (
         <>
@@ -53,8 +76,8 @@ export default function Home() {
             </header>
 
 
-            <button onClick={() => {
-                
+            <button onClick={async () => {
+
             }}> TEST</button>
 
             <div style={{ maxWidth: "900px", margin: "0 auto", textAlign: "center", padding: "20px" }}>
@@ -83,9 +106,10 @@ export default function Home() {
     Site maintenu par OrAxelerator
   </h4>
 
-  <p style={{ margin: "0 auto", marginBottom: "0" }}>
+  <p style={{ margin: "0 auto", marginBottom: "10px" }}>
     📧 Contact : tda.game.support@gmail.com
   </p>
+  <p>versions : {version}</p>
 </div>
 
             <Actions />
