@@ -80,7 +80,7 @@ export default function Pile({ discardPileLength, isActive, discardPileCard}: Pi
 
     const topCardId = discardPileCard[discardPileCard.length - 1];
     const id = String(topCardId).padStart(2, "0");
-    const cardLink = `https://tda-1.onrender.com/card/${id}_theme1.png`;
+    const cardLink = `https://tda-back.onrender.com/cards/${id}_theme1.png`;
 
     return (
         <div style={{ display: "grid"}}>

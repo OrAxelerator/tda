@@ -66,7 +66,7 @@ export default function Home() {
                         </button>
                     </li>
                     <li>
-                        <a href="https://github.com/OrAxelerator/tda">
+                        <a href="https://github.com/OrAxelerator/tda" target="_blank">
                             <i className="header-icon nf nf-cod-github" aria-hidden="true"></i>
                             <span className="sr-only">GitHub</span>
                         </a>
