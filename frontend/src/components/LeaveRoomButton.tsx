@@ -1,8 +1,7 @@
 import { leaveRoom } from '../api/room';
 import { useNavigate } from "react-router-dom";
-import { io } from "socket.io-client";
 
-export   function LeaveRoomButton({ roomId, playerId } )  { // : {string, string} todo
+export function LeaveRoomButton({ roomId, playerId } : { roomId:string, playerId: string } )  { // : {string, string} todo
     
     const navigate = useNavigate();
 

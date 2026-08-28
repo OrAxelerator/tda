@@ -12,15 +12,6 @@ export default function Home() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 
-    function handleClickParam() {
-        if (!user) {
-            console.log("user pas connecté peut pas aller dans param");
-            toast.error("connecté vous pour allez dans les parametre de votre compte .. ( a changer bruh)")
-        }
-        else {
-            navigate('/settings')
-        }
-    }
 
     return (
         <>

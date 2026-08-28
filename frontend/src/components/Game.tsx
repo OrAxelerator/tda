@@ -1,4 +1,4 @@
-import { type CSSProperties, useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { io, type Socket } from "socket.io-client";
 import { toast } from "react-toastify";
@@ -7,9 +7,8 @@ import { LeaveRoomButton } from "./LeaveRoomButton";
 import { useAuth } from "../components/auth-context";
 import "../App.css";
 import "../game.css"
-
-import Wainting from "./Waiting";
-import { getDataConnect } from "firebase/data-connect";
+import Waiting from "./Waiting";
+// import { getDataConnect } from "firebase/data-connect";
 import Pile from "./Pile";
 
 
@@ -62,10 +61,10 @@ function Game() {
   const [deckLength, setDeckLength] = useState(0);
   const [numberOfTurn, setNumberOfTurn] = useState(0);
   const [currentPlayerId, setCurrentPlayerId] = useState<string | null>(null);
-  const [otherPlayers, setOtherPlayers] = useState<RoomPlayer[]>([]);
-  const [connectedPlayers, setConnectedPlayers] = useState<ConnectedPlayer[]>([]);
+  const [otherPlayers, setOtherPlayers] = useState<RoomPlayer[]>([]); //useless ?
+  const [connectedPlayers, setConnectedPlayers] = useState<ConnectedPlayer[]>([]); //useless ?
   const [allPlayers, setAllPlayers] = useState<RoomPlayer[]>([]);
-  const [isHost, setIsHost] = useState(false);
+  const [isHost, setIsHost] = useState<boolean>(false);
 
   useEffect(() => {
     if (!user || !roomId) {
@@ -225,7 +224,7 @@ function Game() {
       {
         phase === "waiting" ? (
           <>
-          <Wainting 
+          <Waiting 
           currentUser={currentUser}
           isHost={isHost}
           startGame={startGame}

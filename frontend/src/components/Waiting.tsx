@@ -1,9 +1,14 @@
 import { toast } from "react-toastify";
 import { LeaveRoomButton } from "./LeaveRoomButton"
 
+interface waitingProps {
+  isHost:boolean;
+  roomId:string;
+  currentUser:any;
+  startGame:any;
+}
 
-
-export default function Wainting({ currentUser, isHost, startGame, roomId}) {
+export default function Waiting({ currentUser, isHost, startGame, roomId} : waitingProps) {
 
 
   const handleClick = (param:string) => {
@@ -45,7 +50,7 @@ export default function Wainting({ currentUser, isHost, startGame, roomId}) {
           <div className="icon">
             <i className="nf nf-fa-copy"></i>
           </div>
-          <p className="roomdId">{"https://tda/game/"+roomId}</p>
+          <p className="roomdId">{"https://tda-1.onrender.com/game/"+roomId}</p>
         </div>
 
 
