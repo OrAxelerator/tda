@@ -66,6 +66,37 @@ export default function Home() {
                 
             }}> TEST</button>
 
+            <div style={{ maxWidth: "900px", margin: "0 auto", textAlign: "center", padding: "20px" }}>
+  <h3 style={{ margin: "0 auto", marginBottom: "20px" }}>
+    ⚠️ LE JEU N'EST PAS ENCORE TOTALEMENT TERMINÉ
+  </h3>
+
+  <p style={{ margin: "0 auto", marginBottom: "25px", lineHeight: "1.6" }}>
+    Le jeu est actuellement disponible en ligne, mais certaines fonctionnalités
+    sont encore en cours de développement et peuvent être amenées à évoluer,
+    être modifiées ou ne pas fonctionner comme prévu.
+  </p>
+
+  <h3 style={{ margin: "0 auto", marginBottom: "15px" }}>
+    📜 Conditions générales
+  </h3>
+
+  <p style={{ margin: "0 auto", marginBottom: "25px", lineHeight: "1.6" }}>
+    Merci de ne pas créer de compte avec un nom, un profil ou tout autre contenu
+    inapproprié. Les adresses e-mail collectées lors de l'utilisation du jeu
+    ne sont en aucun cas vendues ou transmises à des services tiers à des fins
+    commerciales.
+  </p>
+
+  <h4 style={{ margin: "0 auto", marginBottom: "10px" }}>
+    Site maintenu par OrAxelerator
+  </h4>
+
+  <p style={{ margin: "0 auto", marginBottom: "0" }}>
+    📧 Contact : tda.game.support@gmail.com
+  </p>
+</div>
+
             <Actions />
             
         </div>
