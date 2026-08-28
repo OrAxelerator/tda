@@ -13,6 +13,7 @@ import Pile from "./Pile";
 
 
 import { API_URL, apiUrl, readJsonResponse } from "../config";
+import type { Key } from "readline";
 
 
 type PlayerCard = {
@@ -151,6 +152,9 @@ function Game() {
   }
 
   function playSelectedCards() {
+    console.log("play card : ");
+    console.log(selectedCards.length);
+    console.log(selectedCards);
     console.log("ALL PLAYRES : ", allPlayers);
     if (selectedCards.length === 0) {
       toast.warn("Sélectionne au moins une carte");
@@ -182,6 +186,20 @@ function Game() {
   }
 
 
+      useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.key === "Enter") {
+              console.log("ENTER");
+                playSelectedCards();
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [selectedCards]);
 
 
   return (

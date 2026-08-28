@@ -66,7 +66,7 @@ export class GameEngine {
 
         // get 5 cards for each player
         for (const player of this.state.players) {
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 7; i++) {
                 this.drawCard(player.id);
             }
         }
