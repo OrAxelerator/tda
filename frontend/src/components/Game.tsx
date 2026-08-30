@@ -66,6 +66,8 @@ function Game() {
   ); //useless ?
   const [allPlayers, setAllPlayers] = useState<RoomPlayer[]>([]);
   const [isHost, setIsHost] = useState<boolean>(false);
+  const [debugFonc, setDebug] = useState("")
+  const [isWinPlayer, setIsWinPlayer] = useState<boolean>()
 
   useEffect(() => {
     if (!user || !roomId) {
@@ -105,6 +107,7 @@ function Game() {
       setPhase(payload.phase ?? "");
       setConnectedPlayers(payload.connectedPlayers ?? []);
       setAllPlayers(payload.state?.players ?? []);
+      setDebug(payload.state)
 
       const currentUser = payload.state?.players?.find(
         (player) => player.id === user.uid,
@@ -185,6 +188,24 @@ function Game() {
       roomId,
       userId: currentUser.uid,
     });
+  }
+
+  function debug() {
+
+    console.log("------debug ---------");
+    console.log("other player");
+    console.log(otherPlayers);
+
+    console.log("connectedPlayers");
+    console.log(connectedPlayers);
+
+    console.log("debug");
+    console.log(debugFonc);
+
+
+
+
+    console.log("----------");
   }
 
   useEffect(() => {
@@ -287,6 +308,9 @@ function Game() {
               </div>
               <button onClick={playSelectedCards} style={{zIndex:"5"}}>PLAY</button>
               <button onClick={takePile} style={{zIndex:"5"}}>Prendre la pile</button>
+              {
+                isHost ? <button onClick={debug} style={{zIndex:"5"}}>GET STATE ROOT</button> : null
+              }
               <button onClick={() => setSeeDiscardPile((value) => !value)} style={{zIndex:"5"}}>
               {seeDiscardPile ? "Masquer pile" : "Afficher pile"}
               </button>
@@ -303,6 +327,11 @@ function Game() {
 
 
         <LeaveRoomButton roomId={roomId} playerId={currentUser.uid} />
+
+        {
+          (phase === "finished" && isHost ) ? <button onClick={startGame}> RELANCER PARTIE</button> : null
+        }
+        
 
         <div className="backgroundImgContainer">
         
