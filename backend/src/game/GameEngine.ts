@@ -150,11 +150,13 @@ export class GameEngine {
     takePile(playerId:string) {
         const player = this.getPlayer(playerId);
         if (!player ) {
-            if (this.state.winPlayers.includes(playerId)) {
-                throw new Error("Vous avez gagnez pq prendre la pile ..")
-            }
             throw new Error("Joueur n'existe pas.")
+            return;
         }
+        if (player.isWinner) {
+            throw new Error("Vous avez gagnez pq prendre la pile ..")
+        }
+            
         if (this.state.currentPlayerId !== playerId) {
             throw new Error("Player try to play during the turn of other");
         }
@@ -211,27 +213,23 @@ export class GameEngine {
         }
     }
 
-nextTurn() {
-    const currentIndex = this.state.players.findIndex(
-        p => p.id === this.state.currentPlayerId
-    );
+    nextTurn() {
+        const currentIndex = this.state.players.findIndex(
+            p => p.id === this.state.currentPlayerId
+        );
 
-    let nextIndex = (currentIndex + 1) % this.state.players.length;
+        let nextIndex = (currentIndex + 1) % this.state.players.length;
 
-    // On cherche le prochain joueur qui n'a pas encore gagné
-    while (
-        this.state.winPlayers.includes(
-            this.state.players[nextIndex].id
-        )
-    ) {
-        nextIndex = (nextIndex + 1) % this.state.players.length;
+        // On cherche le prochain joueur qui n'a pas encore gagné
+        while (this.state.players[nextIndex].isWinner) {
+            nextIndex = (nextIndex + 1) % this.state.players.length;
+        }
+
+        this.state.currentPlayerId =
+            this.state.players[nextIndex].id;
+
+        this.state.turn++;
     }
-
-    this.state.currentPlayerId =
-        this.state.players[nextIndex].id;
-
-    this.state.turn++;
-}
 
     playCards(playerId: string, cards: number[]) {
         if (this.state.phase !== "playing") {
@@ -317,12 +315,14 @@ nextTurn() {
         }
 
         if (player.hand.length === 0) {
-            this.state.winPlayers.push(playerId)
-            this.state.players = this.state.players.filter(
-                p => p.id !== playerId // supr player de gameState mais pas de backend/socket
-            );  
-
-            if (this.state.winPlayers.length - 1 == this.state.players.length) {
+            player.isWinner = true;
+            // this.state.players = this.state.players.filter(
+            //     p => p.id !== playerId // supr player de gameState mais pas de backend/socket
+            // );  
+            const Winners = this.state.players.filter(
+                p => p.isWinner === true
+            )
+            if (Winners.length == this.state.players.length - 1) {
                 this.state.phase = "finished"; // end of game
                 //next turn ?
                 return;

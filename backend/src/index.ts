@@ -209,14 +209,14 @@ function serializePlayer(player: Player) {
 
 function serializeState(state: GameState) {
   return {
-    players: state.players.map(serializePlayer),
+    players: state.players.map(serializePlayer), // here there are all player info ?
     deck: {
       cards: state.deck.cards.map(serializeCard),
     },
     discardPile: state.discardPile,
     currentPlayerId: state.currentPlayerId,
     turn: state.turn,
-    phase: state.phase,
+    phase: state.phase, // everything, bad ...
   };
 }
 
@@ -282,11 +282,13 @@ function createGameUpdatePayload(
         name: player.name,
         isHost: player.isHost,
         cardCount: player.hand.length,
+        isWinner: player.isWinner
       })),
     yourCard: currentPlayer?.hand.map(serializeCard) ?? [],
     numberOfTurn: state.turn,
     currentPlayerId: state.currentPlayerId,
     phase: state.phase,
+    winPlayers: state.winPlayers,
     connectedPlayers: getConnectedPlayers(roomId),
     state: serializeState(state),
   };
@@ -654,7 +656,7 @@ app.post("/rooms/:roomId/joinGame", async (req, res) => {
   }
 
   if (!existingPlayer) {
-    const newPlayer = new Player(playerId, playerName, false);
+    const newPlayer = new Player(playerId, playerName, false, false);
     game.addPlayer(newPlayer);
 
     // io.to(roomId).emit("gameState", game.state); // send INFO of room to all players in the room

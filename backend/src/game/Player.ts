@@ -11,11 +11,14 @@ export class Player {
 
     isHost: boolean;
 
+    isWinner: boolean;
+
 
     constructor(
         id: string,
         name: string,
-        isHost: boolean
+        isHost: boolean,
+        isWinner: boolean,
     ) {
 
         this.id = id;
@@ -25,6 +28,8 @@ export class Player {
         this.isHost = isHost;
 
         this.hand = [];
+
+        this.isWinner = false;
     }
 
 
