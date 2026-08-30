@@ -1,4 +1,4 @@
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { io, type Socket } from "socket.io-client";
 import { toast } from "react-toastify";
@@ -6,15 +6,13 @@ import Card from "./Card";
 import { LeaveRoomButton } from "./LeaveRoomButton";
 import { useAuth } from "../components/auth-context";
 import "../App.css";
-import "../game.css"
+import "../game.css";
 import Waiting from "./Waiting";
 // import { getDataConnect } from "firebase/data-connect";
 import Pile from "./Pile";
 
-
 import { API_URL, apiUrl, readJsonResponse } from "../config";
 import type { Key } from "readline";
-
 
 type PlayerCard = {
   id: number;
@@ -63,7 +61,9 @@ function Game() {
   const [numberOfTurn, setNumberOfTurn] = useState(0);
   const [currentPlayerId, setCurrentPlayerId] = useState<string | null>(null);
   const [otherPlayers, setOtherPlayers] = useState<RoomPlayer[]>([]); //useless ?
-  const [connectedPlayers, setConnectedPlayers] = useState<ConnectedPlayer[]>([]); //useless ?
+  const [connectedPlayers, setConnectedPlayers] = useState<ConnectedPlayer[]>(
+    [],
+  ); //useless ?
   const [allPlayers, setAllPlayers] = useState<RoomPlayer[]>([]);
   const [isHost, setIsHost] = useState<boolean>(false);
 
@@ -106,7 +106,9 @@ function Game() {
       setConnectedPlayers(payload.connectedPlayers ?? []);
       setAllPlayers(payload.state?.players ?? []);
 
-      const currentUser = payload.state?.players?.find((player) => player.id === user.uid);
+      const currentUser = payload.state?.players?.find(
+        (player) => player.id === user.uid,
+      );
       setIsHost(Boolean(currentUser?.isHost));
     });
 
@@ -182,47 +184,47 @@ function Game() {
     socket.emit("takePile", {
       roomId,
       userId: currentUser.uid,
-    })
+    });
   }
 
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Enter") {
+        console.log("ENTER");
+        playSelectedCards();
+      }
+    };
 
-      useEffect(() => {
-        const handleKeyDown = (event) => {
-            if (event.key === "Enter") {
-              console.log("ENTER");
-                playSelectedCards();
-            }
-        };
+    window.addEventListener("keydown", handleKeyDown);
 
-        window.addEventListener("keydown", handleKeyDown);
-
-        return () => {
-            window.removeEventListener("keydown", handleKeyDown);
-        };
-    }, [selectedCards]);
-
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedCards]);
 
   return (
     <>
+      <div className="game-container">
+        <header className="Appheader">
+          <section className="gameInfo">
+            <h4>Infos live socket</h4>
+            <p>Socket : {socket?.connected ? "connecté" : "déconnecté"}</p>
+            <p>Phase : {phase || "inconnue"}</p>
+            <p>Tour : {numberOfTurn}</p>
+            <p>Deck : {deckLength} cartes</p>
+            <p>Joueur courant : {currentPlayerId ?? "aucun"}</p>
+          </section>
 
-    <div className="game-container">
-
-      <header className="Appheader">
-        <section className="gameInfo">
-          <h4>Infos live socket</h4>
-          <p>Socket : {socket?.connected ? "connecté" : "déconnecté"}</p>
-          <p>Phase : {phase || "inconnue"}</p>
-          <p>Tour : {numberOfTurn}</p>
-          <p>Deck : {deckLength} cartes</p>
-          <p>Joueur courant : {currentPlayerId ?? "aucun"}</p>
-        </section>
-
-        <section className="players">
-          {allPlayers.length === 0 ? (
-          <p>il n'y a pas de player dans la room donc comment tu vois ce message ????</p>
-          ) : (
-            allPlayers.map((player, index) => (
-              <div className={`
+          <section className="players">
+            {allPlayers.length === 0 ? (
+              <p>
+                il n'y a pas de player dans la room donc comment tu vois ce
+                message ????
+              </p>
+            ) : (
+              allPlayers.map((player, index) => (
+                <div
+                  className={`
                 playerInfo
                 ${user?.uid === player.id ? "selfPlayer" : ""}
                 ${currentPlayerId === player.id ? "activePlayer" : ""}
@@ -275,7 +277,7 @@ function Game() {
 
 
           <div className="cardContainer">
-            <div style={{ display: "flex", flexDirection: "column"}}>
+            <div style={{ display: "", flexDirection: "column"}}>
               <div style={{display:"flex", flexDirection: "row"}}>
                 <Card
                   enginePlayerHand={playerHand}
