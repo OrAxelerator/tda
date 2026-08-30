@@ -40,6 +40,16 @@ export class GameEngine {
         return this.state.roomId ?? null;
     }
 
+    private shuffle<T>(array: T[]): T[] {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+
+        return array;
+    }
+
     startGame() {
 
         if(this.state.players.length < 2 || this.state.players.length > 6)
@@ -52,6 +62,8 @@ export class GameEngine {
         this.state.phase = "playing";
 
         this.state.turn = 1;
+
+        this.state.players = this.shuffle(this.state.players);
 
         this.state.currentPlayerId =
             this.state.players[0].id;
