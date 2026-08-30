@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../components/auth-context";
 import { apiUrl, readJsonResponse } from "../../config";
@@ -53,7 +53,6 @@ export default function PlayMenu() {
 }
 
 
-
     return (
 
 
@@ -61,13 +60,19 @@ export default function PlayMenu() {
             <h1 style={{color:"black"}}>Rejoindre une partie : </h1>
 
             <div className="playInput">
-                <input
-                type="text"
-                placeholder="Code de la room"
-                value={roomId}
-                onChange={(e) => setRoomId(e.target.value)}
-                className="playInputCode"
-                />
+              <input
+                  type="text"
+                  autoFocus
+                  placeholder="Code de la room"
+                  value={roomId}
+                  onChange={(e) => setRoomId(e.target.value)}
+                  onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                          joinGame();
+                      }
+                  }}
+                  className="playInputCode"
+              />
 
                 <button onClick={joinGame} className="playBtn" disabled={isLoading}>
                 <h3>{isLoading ? "Connexion..." : "Rejoindre"}</h3>
