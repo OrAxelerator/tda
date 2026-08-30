@@ -46,13 +46,13 @@ export default function Waiting({ currentUser, isHost, startGame, roomId} : wait
           <p className="roomdId">{roomId}</p>
         </div>
 
-        <div className="roomIdContainer" onClick={() => handleClick("roomLink ")}>
+        {/* // Don't work ... */}
+        {/* <div className="roomIdContainer" onClick={() => handleClick("roomLink ")}>
           <div className="icon">
             <i className="nf nf-fa-copy"></i>
           </div>
           <p className="roomdId">{"https://tda-1.onrender.com/game/"+roomId}</p>
-        </div>
-
+        </div> */}
 
         {isHost ? (
           <>

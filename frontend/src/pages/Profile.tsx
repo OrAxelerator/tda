@@ -14,6 +14,7 @@ import { useAuth } from "../components/auth-context";
 import { db } from "../firebase";
 import type { UserProfile } from "../types/userProfile";
 import "./profile.css";
+import { toast } from "react-toastify";
 
 function Profile() {
   const { uid } = useParams<{ uid: string }>();
@@ -95,6 +96,10 @@ function Profile() {
   }
 
   const deleteSignedUser = async () => {
+    if (!password) {
+      toast.error("Vous devez écrire votre mot de passe dans l'input a droite du btn suprimer compte");
+      return;
+    }
     const currentUser = auth.currentUser;
     if (!currentUser) return;
 
@@ -217,6 +222,16 @@ function Profile() {
             </button>
             </div>
             ) : null} */}
+
+        <div className="profile-footer">
+          <div className="actionBtnUser">
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={handleClick}
+          >
+            Retour Home
+          </button>
         <button
           type="button"
           className="btn btn-secondary"
@@ -225,23 +240,16 @@ function Profile() {
           Déconnexion
         </button>
 
+        <button onClick={() => deleteSignedUser()}>
+          Supprimer mon compte
+        </button>
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button onClick={() => deleteSignedUser(password)}>
-          Supprimer mon compte
-        </button>
+          </div>
 
-        <div className="profile-footer">
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={handleClick}
-          >
-            Retour Home
-          </button>
           {!isOwnProfile ? (
             <button
               type="button"
@@ -251,6 +259,15 @@ function Profile() {
               Mon profil
             </button>
           ) : null}
+
+
+        </div>
+
+        <div className="profile-footer">
+
+          {/* <h2>Badges : </h2>
+          <h6>en dev...</h6> */}
+
         </div>
       </section>
     </div>
