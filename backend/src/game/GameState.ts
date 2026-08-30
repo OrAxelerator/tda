@@ -22,6 +22,8 @@ export class GameState {
 
     currentPlayerId: string | null;
 
+    winPlayers: string[]
+
     turn: number;
 
     phase: GamePhase;
@@ -38,6 +40,8 @@ export class GameState {
         this.discardPile = [];
 
         this.currentPlayerId = null;
+
+        this.winPlayers = []
 
         this.turn = 0;
 
