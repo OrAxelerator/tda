@@ -13,12 +13,15 @@ export class Player {
 
     isWinner: boolean;
 
+    isBot: boolean;
+
 
     constructor(
         id: string,
         name: string,
         isHost: boolean,
         isWinner: boolean,
+        isBot: boolean,
     ) {
         // when adding var, don't forget to reset it in startGame()
         this.id = id;
@@ -30,6 +33,8 @@ export class Player {
         this.hand = [];
 
         this.isWinner = false;
+
+        this.isBot = isBot;
     }
 
 

@@ -11,6 +11,8 @@ import { Deck } from "./game/Deck";
 import { Card } from "./game/Card";
 import type { Card as EngineCard } from "./game/Card";
 import admin from "./firebase";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
+import { randomUUID } from "crypto";
 
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -377,10 +379,12 @@ app.post("/api/createGame", async (req, res) => {
 
   try {
     console.log("avant");
-    const decoded = await admin.auth().verifyIdToken(idToken); // BROKE THE CODE ???
+    const decoded = await admin.auth().verifyIdToken(idToken); 
     console.log("apres");
     const uid = decoded.uid;
-    const numberBot = decoded.botsNumber;
+    const numberBot = Number(req.body.bots);
+    console.log("int bots : ");
+    console.log(numberBot);
 
     // create a new room doc in Firestore
     const db = admin.firestore();
@@ -390,14 +394,31 @@ app.post("/api/createGame", async (req, res) => {
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       state: null,
     });
+    
+    const snapshot = await db.collection("user").doc(uid).get();
+    let name = "HOST";
+
+    if (snapshot.exists) {
+        name = snapshot.data()?.displayName ?? "HOST";
+    }
     console.log("1");
+    console.log('Name : ', name);
 
     // initialize engine and persist initial state
     const roomDeck = availableCards.map((card) => ({ ...card }));
     const state = new GameState(new Deck(roomDeck), roomRef.id);
     // state.players.push(...players);
-    state.players.push(new Player(uid, "Host", true)); // Add the host player to the game
+    state.players.push(new Player(uid, name, true, false, false)); // Add the host player to the game
     // marche pas ????
+    
+    console.log("--- bots -----");
+    console.log(numberBot);
+    for (let i = 0; i < numberBot; i++) {
+      console.log("1 add bot");
+      const botId = randomUUID();
+      state.players.push(new Player(botId, "bot", false, false, true)); // Add the BOTS player to the game
+    }
+    console.log("--- bots -----");
     console.log("state.players : ", state.players);
 
     state.phase = "waiting";

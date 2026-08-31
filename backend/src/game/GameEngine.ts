@@ -225,6 +225,18 @@ export class GameEngine {
         }
     }
 
+    async playBotTurn(player: Player) {
+        await new Promise(resolve => setTimeout(resolve, 1000)); // attends un peu pour faire "plus humain"
+
+        // choisir la carte la plus faible
+        const weakestCard = player.hand.reduce(
+        (weakest, card) =>
+            card.value < weakest.value ? card : weakest
+        );
+        // jouer la carte
+        this.playCard(player.id, weakestCard.id);
+    }
+
     nextTurn() {
         const currentIndex = this.state.players.findIndex(
             p => p.id === this.state.currentPlayerId
@@ -237,8 +249,13 @@ export class GameEngine {
             nextIndex = (nextIndex + 1) % this.state.players.length;
         }
 
-        this.state.currentPlayerId =
-            this.state.players[nextIndex].id;
+        this.state.currentPlayerId = this.state.players[nextIndex].id;
+
+        const player = this.getPlayer(this.state.currentPlayerId!);
+
+        if (player?.isBot) {
+            this.playBotTurn(player);
+        }
 
         this.state.turn++;
     }
