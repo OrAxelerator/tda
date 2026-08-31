@@ -31,12 +31,20 @@ type ConnectedPlayer = {
   name: string;
 };
 
+type PublicPlayer = {
+  id: string;
+  name: string;
+  isHost: boolean;
+  isWinner: boolean;
+  cardCount: number;
+}
+
 type GameUpdatePayload = {
   roomId: string;
   discardCard: number[];
   deckLength: number;
   otherPlayers: RoomPlayer[];
-  yourCard: PlayerCard[];
+  yourCard: any[];
   numberOfTurn: number;
   currentPlayerId: string | null;
   phase: string;
@@ -44,6 +52,7 @@ type GameUpdatePayload = {
   state?: {
     players: RoomPlayer[];
   };
+  publicPlayer: PublicPlayer[];
 };
 
 function Game() {
@@ -61,13 +70,12 @@ function Game() {
   const [numberOfTurn, setNumberOfTurn] = useState(0);
   const [currentPlayerId, setCurrentPlayerId] = useState<string | null>(null);
   const [otherPlayers, setOtherPlayers] = useState<RoomPlayer[]>([]); //useless ?
-  const [connectedPlayers, setConnectedPlayers] = useState<ConnectedPlayer[]>(
-    [],
-  ); //useless ?
+  const [connectedPlayers, setConnectedPlayers] = useState<ConnectedPlayer[]>([],); //useless ?
+  const [publicPlayers, setPublicPlayers] = useState<PublicPlayer[]>([]);
   const [allPlayers, setAllPlayers] = useState<RoomPlayer[]>([]);
   const [isHost, setIsHost] = useState<boolean>(false);
-  const [debugFonc, setDebug] = useState("")
-  const [isWinPlayer, setIsWinPlayer] = useState<boolean>()
+  const [debugFonc, setDebug] = useState<any>()
+
 
   useEffect(() => {
     if (!user || !roomId) {
@@ -107,7 +115,8 @@ function Game() {
       setPhase(payload.phase ?? "");
       setConnectedPlayers(payload.connectedPlayers ?? []);
       setAllPlayers(payload.state?.players ?? []);
-      setDebug(payload.state)
+      setPublicPlayers(payload.publicPlayer)
+      setDebug(payload.state?.players)
 
       const currentUser = payload.state?.players?.find(
         (player) => player.id === user.uid,
@@ -201,7 +210,9 @@ function Game() {
 
     console.log("debug");
     console.log(debugFonc);
-
+    
+    console.log("P-Player");
+    console.log(publicPlayers);
 
 
 
@@ -243,7 +254,7 @@ function Game() {
                 message ????
               </p>
             ) : (
-              allPlayers.map((player, index) => (
+              publicPlayers.map((player, index) => (
                 <div
                   className={`
                 playerInfo
@@ -254,7 +265,7 @@ function Game() {
                 <h3>{player.name}
                   {index === 0 && " [HOST]"}
                 </h3>
-                <h5> {player.hand.length ? player.hand.length + " cartes restantes" : ""}  </h5> 
+                <h5> {player.cardCount ? player.cardCount + " cartes restantes" : ""}  </h5> 
                 {/* // tkt marche quand meme */}
               </div>
             )))}
@@ -329,7 +340,7 @@ function Game() {
         <LeaveRoomButton roomId={roomId} playerId={currentUser.uid} />
 
         {
-          (phase === "finished" && isHost ) ? <button onClick={startGame}> RELANCER PARTIE</button> : null
+          (phase == "finished" && isHost ) ? <button onClick={startGame}> RELANCER PARTIE</button> : null
         }
         
 
