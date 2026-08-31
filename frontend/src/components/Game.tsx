@@ -248,7 +248,7 @@ function Game() {
               `}
               key={player.id} id={player.id}> 
                 <h3>{player.name}
-                  {index === 0 && " [HOST]"}
+                  {player.isHost  && " [HOST]"}
                 </h3>
                 <h5> {player.cardCount ? player.cardCount + " cartes restantes" : ""}  </h5> 
                 {/* // tkt marche quand meme */}

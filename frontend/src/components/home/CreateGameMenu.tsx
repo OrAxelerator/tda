@@ -31,6 +31,7 @@ export default function CreateGameMenu() {
         },
         body: JSON.stringify({ uid: user.uid, bots: botsNumber }),
       });
+      console.log(botsNumber); // yes
 
       const data = await readJsonResponse(response);
 
