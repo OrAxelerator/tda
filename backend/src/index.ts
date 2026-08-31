@@ -275,22 +275,20 @@ function createGameUpdatePayload(
     roomId,
     discardCard: state.discardPile,
     deckLength: state.deck.cards.length,
-    otherPlayers: state.players
-      .filter((player) => player.id !== playerId)
+    publicPlayer: state.players
       .map((player) => ({
         id: player.id,
         name: player.name,
         isHost: player.isHost,
-        cardCount: player.hand.length,
+        // cardCount: player.hand.length,
+        cardCount: state.phase != "playing" ? null : player.hand.length,
         isWinner: player.isWinner
       })),
     yourCard: currentPlayer?.hand.map(serializeCard) ?? [],
-    numberOfTurn: state.turn,
+    numberOfTurn: state.phase != "playing" ? null : state.turn,
     currentPlayerId: state.currentPlayerId,
     phase: state.phase,
-    winPlayers: state.winPlayers,
-    connectedPlayers: getConnectedPlayers(roomId),
-    state: serializeState(state),
+    state: serializeState(state), // also delete this
   };
 }
 

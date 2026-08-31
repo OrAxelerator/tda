@@ -20,7 +20,7 @@ export class Player {
         isHost: boolean,
         isWinner: boolean,
     ) {
-
+        // when adding var, don't forget to reset it in startGame()
         this.id = id;
 
         this.name = name;

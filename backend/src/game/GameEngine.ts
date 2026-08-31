@@ -63,18 +63,18 @@ export class GameEngine {
 
         this.state.turn = 1;
 
+        this.state.players.forEach(p => {
+            p.isWinner = false;
+            p.hand = [];
+        });
+
         this.state.players = this.shuffle(this.state.players);
 
-        this.state.currentPlayerId =
-            this.state.players[0].id;
+        this.state.currentPlayerId = this.state.players[0].id;
 
 
         this.state.discardPile = [];
         this.state.deck.shuffle();
-
-        for (const player of this.state.players) {
-            player.hand = [];
-        }
 
         // get 7 cards for each player
         for (const player of this.state.players) {

@@ -26,10 +26,6 @@ type RoomPlayer = {
   cardCount?: number;
 };
 
-type ConnectedPlayer = {
-  id: string;
-  name: string;
-};
 
 type PublicPlayer = {
   id: string;
@@ -43,12 +39,10 @@ type GameUpdatePayload = {
   roomId: string;
   discardCard: number[];
   deckLength: number;
-  otherPlayers: RoomPlayer[];
   yourCard: any[];
   numberOfTurn: number;
   currentPlayerId: string | null;
   phase: string;
-  connectedPlayers: ConnectedPlayer[];
   state?: {
     players: RoomPlayer[];
   };
@@ -69,8 +63,6 @@ function Game() {
   const [deckLength, setDeckLength] = useState(0);
   const [numberOfTurn, setNumberOfTurn] = useState(0);
   const [currentPlayerId, setCurrentPlayerId] = useState<string | null>(null);
-  const [otherPlayers, setOtherPlayers] = useState<RoomPlayer[]>([]); //useless ?
-  const [connectedPlayers, setConnectedPlayers] = useState<ConnectedPlayer[]>([],); //useless ?
   const [publicPlayers, setPublicPlayers] = useState<PublicPlayer[]>([]);
   const [allPlayers, setAllPlayers] = useState<RoomPlayer[]>([]);
   const [isHost, setIsHost] = useState<boolean>(false);
@@ -109,11 +101,9 @@ function Game() {
       );
       setDiscardPileCard(payload.discardCard ?? []);
       setDeckLength(payload.deckLength ?? 0);
-      setOtherPlayers(payload.otherPlayers ?? []);
       setNumberOfTurn(payload.numberOfTurn ?? 0);
       setCurrentPlayerId(payload.currentPlayerId ?? null);
       setPhase(payload.phase ?? "");
-      setConnectedPlayers(payload.connectedPlayers ?? []);
       setAllPlayers(payload.state?.players ?? []);
       setPublicPlayers(payload.publicPlayer)
       setDebug(payload.state?.players)
@@ -202,11 +192,6 @@ function Game() {
   function debug() {
 
     console.log("------debug ---------");
-    console.log("other player");
-    console.log(otherPlayers);
-
-    console.log("connectedPlayers");
-    console.log(connectedPlayers);
 
     console.log("debug");
     console.log(debugFonc);
