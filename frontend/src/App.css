@@ -344,39 +344,186 @@
 }
 
 .Appheader {
-  background-color: rgb(194, 194, 194);
-  width: 100%;
-  height: 25dvh;
-  color:black;
+  position: relative;
+  z-index: 2;
+  width: min(96%, 1480px);
+  min-height: 22dvh;
+  margin: 1rem auto 0;
+  padding: 1rem 1.15rem;
   display: flex;
+  align-items: stretch;
+  gap: 1rem;
+  color: #f3f3f5;
+  background: rgb(40, 39, 46);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(8px);
 }
 
 .gameInfo {
-  border: 2px solid black;
-  width: 20%;
+  width: min(28%, 320px);
+  min-width: 220px;
+  padding: 0.9rem 1rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.gameInfo h4 {
+  margin: 0 0 0.7rem;
+  font-size: 0.9rem;
+  color: #efefef;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.gameInfo p {
+  margin: 0.2rem 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.gameInfo strong {
+  color: #ffffff;
+  font-weight: 700;
 }
 
 .players {
   display: flex;
-  width: 100%;
-  background-color: rgb(23, 81, 23);
+  flex: 1;
+  align-items: stretch;
   justify-content: space-evenly;
+  gap: 0.75rem;
+  padding: 0.6rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .playerInfo {
-  border: 2px solid black;
-  width: 20%;
-  border-radius: 8px;
-  margin: 29px;
-  background-color: rgb(110, 110, 222);
+  position: relative;
+  display: flex;
+  flex: 1 1 0;
+  min-width: 120px;
+  max-width: 220px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.75rem 0.7rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.06);
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.playerInfo h3,
+.playerInfo h5 {
+  margin: 0;
+  text-align: center;
+}
+
+.playerInfo h3 {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  color: #f5f5f7;
+}
+
+.playerInfo h5 {
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.playerAvatar {
+  width: 58px;
+  height: 58px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.18);
+}
+
+.playerBadges {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.playerBadge {
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.playerBadge.self {
+  background: rgba(0, 183, 255, 0.18);
+  color: #8fe3ff;
+}
+
+.playerBadge.turn {
+  background: rgba(255, 120, 120, 0.18);
+  color: #ffd1d1;
+  border-color: rgba(255, 138, 138, 0.45);
 }
 
 .selfPlayer {
-  border: 2px solid yellow;
+  border-color: rgba(0, 183, 255, 0.45);
+  background: rgba(0, 183, 255, 0.06);
+}
+
+.selfPlayer .playerAvatar {
+  border-color: rgba(0, 183, 255, 0.75);
 }
 
 .activePlayer {
-  background-color: rgb(220, 220, 140);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.activePlayer .playerBadge.turn {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.playerInfo:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 900px) {
+  .Appheader {
+    flex-direction: column;
+  }
+
+  .gameInfo {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .players {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .playerInfo {
+    min-width: 140px;
+    max-width: none;
+    flex: 1 1 140px;
+  }
 }
 
 .backgroundImgContainer {
@@ -385,28 +532,42 @@
 }
 
 .game-container {
+  position: relative;
   width: 100%;
   height: 100dvh;
   overflow: hidden;
+  background: rgb(24, 24, 28);
 }
 .gameBackground {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: 100dvh;
+  height: 100%;
   overflow: hidden;
-  position: relative;
+  z-index: 0;
 }
 
 .backgroundWrapper {
   position: absolute;
   left: 0;
+  right: 0;
   bottom: 0;
   width: 100%;
   transition: transform 0.3s ease;
-  z-index: -1;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .backgroundImg {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+.game-container {
+  position: relative;
 }

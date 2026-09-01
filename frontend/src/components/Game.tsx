@@ -138,6 +138,15 @@ function Game() {
   }
 
   const currentUser = user;
+  const currentTurnPlayer = publicPlayers.find((player) => player.id === currentPlayerId);
+
+  function getPlayerAvatar(player: PublicPlayer) {
+    if (player.id === user?.uid && user.photoURL) {
+      return user.photoURL;
+    }
+
+    return "/default.jpeg";
+  }
 
   async function startGame() {
     try {
@@ -224,12 +233,25 @@ function Game() {
       <div className="game-container">
         <header className="Appheader">
           <section className="gameInfo">
-            <h4>Infos live socket</h4>
-            <p>Socket : {socket?.connected ? "connecté" : "déconnecté"}</p>
-            <p>Phase : {phase || "inconnue"}</p>
-            <p>Tour : {numberOfTurn}</p>
-            <p>Deck : {deckLength} cartes</p>
-            <p>Joueur courant : {currentPlayerId ?? "aucun"}</p>
+            <h4>Partie</h4>
+            <p>
+              <strong>Vous :</strong> {user.displayName || user.email || "Joueur"}
+            </p>
+            <p>
+              <strong>Tour de :</strong> {currentTurnPlayer?.name || "aucun"}
+            </p>
+            <p>
+              <strong>Phase :</strong> {phase || "inconnue"}
+            </p>
+            <p>
+              <strong>Tour :</strong> {numberOfTurn}
+            </p>
+            <p>
+              <strong>Deck :</strong> {deckLength} cartes
+            </p>
+            <p>
+              <strong>Socket :</strong> {socket?.connected ? "connecté" : "déconnecté"}
+            </p>
           </section>
 
           <section className="players">
@@ -239,24 +261,41 @@ function Game() {
                 message ????
               </p>
             ) : (
-              publicPlayers.map((player, index) => (
+              publicPlayers.map((player) => (
                 <div
                   className={`
-                playerInfo
-                ${user?.uid === player.id ? "selfPlayer" : ""}
-                ${currentPlayerId === player.id ? "activePlayer" : ""}
-              `}
-              key={player.id} id={player.id}> 
-                <h3>{player.name}
-                  {player.isHost  && " [HOST]"}
-                </h3>
-                <h5> {player.cardCount ? player.cardCount + " cartes restantes" : ""}  </h5> 
-                {/* // tkt marche quand meme */}
-              </div>
-            )))}
-        </section>
-        
-      </header>
+                    playerInfo
+                    ${user?.uid === player.id ? "selfPlayer" : ""}
+                    ${currentPlayerId === player.id ? "activePlayer" : ""}
+                  `}
+                  key={player.id}
+                  id={player.id}
+                >
+                  <div className="playerBadges">
+                    {user?.uid === player.id && <span className="playerBadge self">Vous</span>}
+                    {currentPlayerId === player.id && <span className="playerBadge turn">Tour</span>}
+                  </div>
+
+                  <img
+                    src={getPlayerAvatar(player)}
+                    alt={player.name}
+                    className="playerAvatar"
+                    onError={(event) => {
+                      event.currentTarget.src = "/default.jpeg";
+                    }}
+                  />
+                  <h3>
+                    <span>{player.name}</span>
+                    {player.isHost && <span>[HOST]</span>}
+                  </h3>
+                  <h5>
+                    {player.cardCount ? `${player.cardCount} cartes restantes` : ""}
+                  </h5>
+                </div>
+              ))
+            )}
+          </section>
+        </header>
           
       {
         phase === "waiting" ? (

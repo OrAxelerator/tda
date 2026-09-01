@@ -6,31 +6,17 @@ export function LeaveRoomButton({ roomId, playerId } : { roomId:string, playerId
     const navigate = useNavigate();
 
     async function handleLeaveRoom() {
-    if (!roomId) return;
+    if (!roomId) {
+        navigate("/");
+        return;
+    }
 
     try {
-
-    console.log("--------------------------------- LEAVE ROOM ---------------------------------");
-
-    console.log(roomId);
-    console.log(playerId);
-
-        const data = await leaveRoom(roomId, playerId);
-
-        console.log(data);
-
-
-        // socket.emit("leaveRoom", {
-        //     roomId,
-        //     playerId
-        // });
-
-        navigate("/")
-
+        await leaveRoom(roomId, playerId);
     } catch (err) {
-
         console.error(err);
-
+    } finally {
+        navigate("/");
     }
 }
 
