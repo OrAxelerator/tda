@@ -252,6 +252,15 @@ function Game() {
             <p>
               <strong>Socket :</strong> {socket?.connected ? "connecté" : "déconnecté"}
             </p>
+
+            <div className="gameInfoActions">
+              <LeaveRoomButton roomId={roomId} playerId={currentUser.uid} />
+              {(phase === "finished" && isHost) ? (
+                <button className="headerActionButton secondary" onClick={startGame}>
+                  Relancer partie
+                </button>
+              ) : null}
+            </div>
           </section>
 
           <section className="players">
@@ -364,14 +373,6 @@ function Game() {
         isActive={seeDiscardPile} 
         discardPileCard={discardPileCard} 
         />
-
-
-        <LeaveRoomButton roomId={roomId} playerId={currentUser.uid} />
-
-        {
-          (phase == "finished" && isHost ) ? <button onClick={startGame}> RELANCER PARTIE</button> : null
-        }
-        
 
         <div className="backgroundImgContainer">
         

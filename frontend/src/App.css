@@ -390,6 +390,41 @@
   font-weight: 700;
 }
 
+.gameInfoActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+
+.headerActionButton,
+.gameInfoActions button {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: #f4f4f6;
+  border-radius: 10px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.headerActionButton:hover,
+.gameInfoActions button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.headerActionButton.secondary {
+  background: rgba(255, 107, 107, 0.14);
+  border-color: rgba(255, 107, 107, 0.28);
+  color: #ffd7d7;
+}
+
 .players {
   display: flex;
   flex: 1;
