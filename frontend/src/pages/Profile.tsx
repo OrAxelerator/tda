@@ -50,6 +50,7 @@ function Profile() {
         }
 
         setProfile(snapshot.data() as UserProfile);
+        console.log("Profile loaded:", snapshot.data());  
       } catch {
         setError("Impossible de charger le profil.");
       } finally {

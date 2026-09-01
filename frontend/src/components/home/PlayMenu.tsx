@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../components/auth-context";
 import { apiUrl, readJsonResponse } from "../../config";
@@ -7,7 +7,7 @@ import { apiUrl, readJsonResponse } from "../../config";
 
 export default function PlayMenu() {
 
-    const { user, logout } = useAuth();
+    const { user,    } = useAuth();
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -32,7 +32,7 @@ export default function PlayMenu() {
       },
       body: JSON.stringify({
         playerId: user.uid,
-        playerName: user?.email,
+        playerName: user?.displayName || "Joueur",
       }),
     });
 

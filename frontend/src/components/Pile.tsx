@@ -44,7 +44,13 @@ export default function Pile({ discardPileLength, isActive, discardPileCard}: Pi
 
 
     if (discardPileLength === 0) {
-        return null;
+        return (
+        <div style={{ display: "grid" }}>
+            <div className="pileContainer pile pileFull">
+                <p style={{color:"black"}}>La pile est vide, mettez la carte de votre choix</p>
+            </div>
+        </div>
+        )
     }
 
     if (isActive) {
@@ -53,7 +59,7 @@ export default function Pile({ discardPileLength, isActive, discardPileCard}: Pi
                 <div className="pileContainer pile pileFull">
                     {discardPileCard.map((cardId, index) => { // affiche toute les cartes
                         const id = String(cardId).padStart(2, "0");
-                        const cardLink = `https://tda-back.onrender.com/cards/${id}_theme1.png`;
+                        const cardLink = `/cards/${id}_theme1.png`;
                         const cardWidth = `min(clamp(60px, 8vw, 132px), calc((80vw - ${(discardPileLength - 1) * 2}px) / ${discardPileLength}))`;
 
                         const cardStyle = {
@@ -80,7 +86,7 @@ export default function Pile({ discardPileLength, isActive, discardPileCard}: Pi
 
     const topCardId = discardPileCard[discardPileCard.length - 1];
     const id = String(topCardId).padStart(2, "0");
-    const cardLink = `https://tda-back.onrender.com/cards/${id}_theme1.png`;
+    const cardLink = `/cards/${id}_theme1.png`;
 
     return (
         <div style={{ display: "grid"}}>

@@ -30,7 +30,7 @@ export default function Card({ enginePlayerHand, selectedCard, setSelectedCard }
     <>
       {enginePlayerHand.map((el, index) => {
         const id = String(el.id).padStart(2, "0");
-        const cardLink = `https://tda-back.onrender.com/cards/${id}_theme1.png`;
+        const cardLink = `/cards/${id}_theme1.png`;
         const numberOfCards = enginePlayerHand.length;
         const weight = 2.9;
 

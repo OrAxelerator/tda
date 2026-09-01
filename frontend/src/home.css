@@ -158,16 +158,19 @@ ul li
 .actions {
     position: absolute;
     display: flex;
-    bottom: 2rem;
+    bottom: 4rem;
     left: 50%;
     transform: translateX(-50%);
-    gap: 1rem;
+    gap: 1.2rem;
     z-index: 1100;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: min(90%, 760px);
 }
 
 .actionButtons {
     cursor: pointer;
-    transition: background-color 0.1s ease;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
 .actionButtons:active {
@@ -178,7 +181,20 @@ ul li
     transparent 1px,
     transparent 2px
   );
-    transform: translateY(6px);
+    transform: translateY(4px);
+}
+
+.playGameBtn,
+.createGameBtn {
+    min-width: 220px;
+    width: clamp(220px, 34vw, 340px);
+    min-height: 78px;
+    padding: 1.1rem 1.6rem;
+    border-radius: 18px;
+    font-size: clamp(1rem, 1.8vw, 1.35rem);
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    box-shadow: 0 14px 24px rgba(0, 0, 0, 0.18);
 }
 
 

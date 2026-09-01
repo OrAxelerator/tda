@@ -37,7 +37,7 @@ function Actions() {
         isOpen={activeAction === "play"}
         onOpen={handlePlayOpen}
         onClose={() => setActiveAction(null)}
-        buttonName="Play"
+        buttonName="Jouer"
         buttonClass="playGameBtn"
       >
         <PlayMenu />
@@ -48,7 +48,7 @@ function Actions() {
         isOpen={activeAction === "create"}
         onOpen={handleCreateOpen}
         onClose={() => setActiveAction(null)}
-        buttonName="Create game"
+        buttonName="Créer une partie"
         buttonClass="createGameBtn"
       >
         <CreateGameMenu />

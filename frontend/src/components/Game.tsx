@@ -355,7 +355,6 @@ function Game() {
 
               <div className="handActions">
                 <button onClick={playSelectedCards} style={{zIndex:"5"}}>PLAY</button>
-                <button onClick={takePile} style={{zIndex:"5"}}>Prendre la pile</button>
                 {
                   isHost ? <button onClick={debug} style={{zIndex:"5"}}>GET STATE ROOT</button> : null
                 }
@@ -373,6 +372,10 @@ function Game() {
         isActive={seeDiscardPile} 
         discardPileCard={discardPileCard} 
         />
+
+        <div className="pileActionBar">
+          <button className="pileTakeBtn" onClick={takePile}>Prendre la pile</button>
+        </div>
 
         <div className="backgroundImgContainer">
         
