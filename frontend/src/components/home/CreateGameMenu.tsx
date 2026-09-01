@@ -8,7 +8,7 @@ export default function CreateGameMenu() {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [botsNumber, setBotsNumber] = useState(0)
+    const [botsNumber, setBotsNumber] = useState("")
 
 
     const handleClick = async () => {

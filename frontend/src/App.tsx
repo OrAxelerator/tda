@@ -1,15 +1,20 @@
 import { type ReactNode } from "react";
+import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider } from "./components/AuthProvider";
 import { useAuth } from "./components/auth-context";
-import Login from "./pages/login";
-import SignUp from "./pages/SignUp";
-import Profile from "./pages/Profile";
-import Game from "./components/Game";
-import Home from "./components/Home";
+
+const Login = lazy(() => import("./pages/login"));
+const SignUp = lazy(() => import("./pages/SignUp"));
+
+const Profile = lazy(() => import("./pages/Profile"));
+const Home = lazy(() => import("./components/Home"));
+const Game = lazy(() => import("./components/Game"));
 import "./App.css";
+
+
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
@@ -46,7 +51,9 @@ function App() {
                   path="/login"
                   element={
                     <PublicRoute>
-                      <Login />
+                      <Suspense fallback={<div>Chargement de la page de connexion...</div>}>
+                        <Login />
+                      </Suspense>
                     </PublicRoute>
                   }
                 />
@@ -54,7 +61,9 @@ function App() {
                   path="/register"
                   element={
                     <PublicRoute>
-                      <SignUp />
+                      <Suspense fallback={<div>Chargement de la page d'inscription...</div>}>
+                        <SignUp />
+                      </Suspense>
                     </PublicRoute>
                   }
                 />
@@ -62,7 +71,9 @@ function App() {
                   path="/user"
                   element={
                     <ProtectedRoute>
-                      <Profile />
+                      <Suspense fallback={<div>Chargement du profil...</div>}>
+                        <Profile />
+                      </Suspense>
                     </ProtectedRoute>
                   }
                 />
@@ -70,7 +81,10 @@ function App() {
                   path="/user/:uid"
                   element={
                     <ProtectedRoute>
-                      <Profile />
+                      <Suspense fallback={<div>Chargement du profil...</div>}>
+                        <Profile />
+                      </Suspense>
+                      
                     </ProtectedRoute>
                   }
                 />
@@ -79,7 +93,9 @@ function App() {
                   path="/game/:roomCode"
                   element={
                     <ProtectedRoute>
-                      <Game />
+                      <Suspense fallback={<div>Chargement de la partie...</div>}>
+                        <Game />
+                      </Suspense>
                     </ProtectedRoute>
                   }
                 />

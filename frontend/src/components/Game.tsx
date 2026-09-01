@@ -12,7 +12,6 @@ import Waiting from "./Waiting";
 import Pile from "./Pile";
 
 import { API_URL, apiUrl, readJsonResponse } from "../config";
-import type { Key } from "readline";
 
 type PlayerCard = {
   id: number;
