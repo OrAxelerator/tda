@@ -85,33 +85,36 @@
 .pileActionBar {
     position: fixed;
     left: 50%;
-    top: calc(40% + 7.5rem);
+    top: calc(40% + 9.7rem);
     transform: translateX(-50%);
     z-index: 1200;
+    pointer-events: none;
 }
 
 .pileTakeBtn {
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: linear-gradient(180deg, rgba(21, 27, 39, 0.95), rgba(13, 17, 24, 0.95));
-    color: #f4f7fb;
+    pointer-events: auto;
+    border: 1px solid rgb(255, 0, 0);
+    background: rgba(200, 40, 40, 0.9);
+    color: #f9f3f2;
     font-weight: 700;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    border-radius: 999px;
-    padding: 0.85rem 1.5rem;
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+    border-radius: 12px;
+    padding: 0.7rem 1.15rem;
     cursor: pointer;
-    transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+    transition: background-color 120ms ease, transform 120ms ease, border-color 120ms ease;
+    box-shadow: none;
 }
 
 .pileTakeBtn:hover {
-    transform: translateY(-2px);
-    border-color: rgba(120, 206, 255, 0.7);
-    box-shadow: 0 16px 28px rgba(12, 22, 34, 0.32);
+    background: rgba(200, 60, 60, 0.9);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
 }
 
 .pileTakeBtn:active {
     transform: translateY(0);
+    background: rgba(147, 43, 36, 0.96);
 }
 
 .cardContainer::before {

@@ -84,28 +84,42 @@ export default function Pile({ discardPileLength, isActive, discardPileCard}: Pi
         );
     }
 
-    const topCardId = discardPileCard[discardPileCard.length - 1];
-    const id = String(topCardId).padStart(2, "0");
-    const cardLink = `/cards/${id}_theme1.png`;
+    const topCardIds = [...discardPileCard].slice(-6) // obtient les 5 dernière cartes de la pile
 
     return (
         <div style={{ display: "grid"}}>
-            <div className="pileContainer pile pilePreview">
-                <div
-                    key={`hidden-${topCardId}`}
-                    className="card pilePreviewCard pileCard3d"
-                    onMouseMove={updatePileCardTilt}
-                    onMouseLeave={resetPileCardTilt}
-                >
-                    <img className="pileHiddenCard" src={cardLink} alt={`Carte ${id}`}  />
-                </div>
-                <div
+            {/* .pilePreview useless .. */}
+            <div className="pileContainer pile pileFull"> 
+
+                 {topCardIds.map((cardId, index) => { // affiche toute les cartes
+                        const id = String(cardId).padStart(2, "0");
+                        const cardLink = `/cards/${id}_theme1.png`;
+                        const cardWidth = `min(clamp(60px, 8vw, 132px), calc((80vw - ${(discardPileLength - 1) * 2}px) / ${discardPileLength}))`;
+
+                        const cardStyle = {
+                            width: cardWidth,
+                            "--card-rand": `${((index * 37) % 100) / 100}`,
+                        } as CSSProperties;
+
+                        return (
+                            <div
+                                key={`${cardId}-${index}`}
+                                className="card pileCard3d"
+                                style={cardStyle}
+                                onMouseMove={updatePileCardTilt}
+                                onMouseLeave={resetPileCardTilt}
+                            >
+                                <img src={cardLink} alt={`Carte ${id}`} />
+                            </div>
+                        );
+                    })}
+                {/* <div
                     className="pileDeckBackWrapper pileCard3d"
                     onMouseMove={updatePileCardTilt}
                     onMouseLeave={resetPileCardTilt}
                 >
                     <img className="pileDeckBack" src={`/src/assets/deck/${getStateCardImg(discardPileLength)}.png`} alt="Dos de la defausse" />
-                </div>
+                </div> */}
             </div>
         </div>
     );

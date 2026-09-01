@@ -17,6 +17,8 @@ import type { Key } from "readline";
 type PlayerCard = {
   id: number;
   name?: string;
+  value?: number;
+  suit?: string;
 };
 
 type RoomPlayer = {
@@ -95,7 +97,8 @@ function Game() {
       const nextHand = payload.yourCard ?? [];
       const nextHandIds = new Set(nextHand.map((card) => card.id));
 
-      setPlayerHand(nextHand);
+      // setPlayerHand(nextHand); //re-affiche les cartes donc re-mélange les cartes meme si trié
+      sortCardAndDisplay(nextHand); //trie les cartes après le setPlayerHand pour que les cartes soient triées
       setSelectedCard((currentSelectedCards) =>
         currentSelectedCards.filter((cardId) => nextHandIds.has(cardId)),
       );
@@ -198,6 +201,11 @@ function Game() {
     });
   }
 
+  const sortCardAndDisplay = (hand) => {
+    const sortedHand = [...hand].sort((a, b) => a.value - b.value);
+    setPlayerHand(sortedHand);
+  }
+
   function debug() {
 
     console.log("------debug ---------");
@@ -219,6 +227,10 @@ function Game() {
         console.log("ENTER");
         playSelectedCards();
       }
+      // if (event.key === "t") {
+      //   console.log("T");
+      //  sortCard();
+      // }
     };
 
     window.addEventListener("keydown", handleKeyDown);
