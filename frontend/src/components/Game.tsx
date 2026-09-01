@@ -333,22 +333,27 @@ function Game() {
 
 
           <div className="cardContainer">
-            <div style={{ display: "", flexDirection: "column"}}>
-              <div style={{display:"flex", flexDirection: "row"}}>
-                <Card
-                  enginePlayerHand={playerHand}
-                  selectedCard={selectedCards}
-                  setSelectedCard={setSelectedCard}
-                />
+            <div className="cardActionsPanel">
+              <div className="handScroll">
+                <div className="handTrack">
+                  <Card
+                    enginePlayerHand={playerHand}
+                    selectedCard={selectedCards}
+                    setSelectedCard={setSelectedCard}
+                  />
+                </div>
               </div>
-              <button onClick={playSelectedCards} style={{zIndex:"5"}}>PLAY</button>
-              <button onClick={takePile} style={{zIndex:"5"}}>Prendre la pile</button>
-              {
-                isHost ? <button onClick={debug} style={{zIndex:"5"}}>GET STATE ROOT</button> : null
-              }
-              <button onClick={() => setSeeDiscardPile((value) => !value)} style={{zIndex:"5"}}>
-              {seeDiscardPile ? "Masquer pile" : "Afficher pile"}
-              </button>
+
+              <div className="handActions">
+                <button onClick={playSelectedCards} style={{zIndex:"5"}}>PLAY</button>
+                <button onClick={takePile} style={{zIndex:"5"}}>Prendre la pile</button>
+                {
+                  isHost ? <button onClick={debug} style={{zIndex:"5"}}>GET STATE ROOT</button> : null
+                }
+                <button onClick={() => setSeeDiscardPile((value) => !value)} style={{zIndex:"5"}}>
+                  {seeDiscardPile ? "Masquer pile" : "Afficher pile"}
+                </button>
+              </div>
             </div>
           </div>
 

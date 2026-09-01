@@ -538,6 +538,7 @@
   overflow: hidden;
   background: rgb(24, 24, 28);
 }
+
 .gameBackground {
   position: absolute;
   inset: 0;
@@ -549,10 +550,10 @@
 
 .backgroundWrapper {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   width: 100%;
+  height: 100%;
+  overflow: hidden;
   transition: transform 0.3s ease;
   z-index: 0;
   pointer-events: none;
@@ -566,8 +567,4 @@
   object-position: center bottom;
   opacity: 0.95;
   pointer-events: none;
-}
-
-.game-container {
-  position: relative;
 }
