@@ -3,7 +3,7 @@ import type { CSSProperties, Dispatch, MouseEvent, SetStateAction } from "react"
 type CardProps = {
   enginePlayerHand: Array<{ id: number; name?: string }>;
   selectedCard: number[];
-  setSelectedCard: Dispatch<SetStateAction<number[]>>;
+  setSelectedCards: Dispatch<SetStateAction<number[]>>;
 };
 
 function updateCardTilt(event: MouseEvent<HTMLElement>) {
@@ -21,7 +21,7 @@ function resetCardTilt(event: MouseEvent<HTMLElement>) {
   event.currentTarget.style.setProperty("--pointer-rotate-y", "0deg");
 }
 
-export default function Card({ enginePlayerHand, selectedCard, setSelectedCard }: CardProps) {
+export default function Card({ enginePlayerHand, selectedCard, setSelectedCards }: CardProps) {
 
 
 
@@ -77,9 +77,9 @@ export default function Card({ enginePlayerHand, selectedCard, setSelectedCard }
               className={isSelected ? "cardImg cardSelected" : "cardImg"}
               onClick={() => {
                 if (isSelected) {
-                  setSelectedCard(selectedCard.filter((id) => id !== el.id));
+                  setSelectedCards(selectedCard.filter((id) => id !== el.id));
                 } else {
-                  setSelectedCard([...selectedCard, el.id]);
+                  setSelectedCards([...selectedCard, el.id]);
                 }
               }}
             />

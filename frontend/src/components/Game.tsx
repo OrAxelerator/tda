@@ -57,7 +57,7 @@ function Game() {
 
   const [socket, setSocket] = useState<Socket | null>(null);
   const [playerHand, setPlayerHand] = useState<PlayerCard[]>([]);
-  const [selectedCards, setSelectedCard] = useState<number[]>([]);
+  const [selectedCards, setSelectedCards] = useState<number[]>([]);
   const [discardPileCard, setDiscardPileCard] = useState<number[]>([]);
   const [seeDiscardPile, setSeeDiscardPile] = useState(true);
   const [phase, setPhase] = useState("");
@@ -98,7 +98,7 @@ function Game() {
 
       // setPlayerHand(nextHand); //re-affiche les cartes donc re-mélange les cartes meme si trié
       sortCardAndDisplay(nextHand); //trie les cartes après le setPlayerHand pour que les cartes soient triées
-      setSelectedCard((currentSelectedCards) =>
+      setSelectedCards((currentSelectedCards) =>
         currentSelectedCards.filter((cardId) => nextHandIds.has(cardId)),
       );
       setDiscardPileCard(payload.discardCard ?? []);
@@ -108,7 +108,7 @@ function Game() {
       setPhase(payload.phase ?? "");
       setAllPlayers(payload.state?.players ?? []);
       setPublicPlayers(payload.publicPlayer)
-      setDebug(payload.state)
+      setDebug(nextHand)
 
       const currentUser = payload.state?.players?.find(
         (player) => player.id === user.uid,
@@ -192,10 +192,10 @@ function Game() {
     // );
     // setPlayerHand(playerHandBuff)
     setPlayerHand(prev =>
-    prev.filter(card => !selectedCards.includes(card.id))
-);
+      prev.filter(card => !selectedCards.includes(card.id))
+    );
 
-  setSelectedCard([]);
+  setSelectedCards([]);
   }
 
   function takePile() {
@@ -210,7 +210,7 @@ function Game() {
     });
   }
 
-  const sortCardAndDisplay = (hand) => {
+  const sortCardAndDisplay = (hand: PlayerCard) => {
     const sortedHand = [...hand].sort((a, b) => a.value - b.value);
     setPlayerHand(sortedHand);
   }
@@ -322,7 +322,7 @@ function Game() {
                     {player.isHost && <span>[HOST]</span>}
                   </h3>
                   <h5>
-                    {player.cardCount ? `${player.cardCount} cartes restantes` : ""}
+                    {player.cardCount ? `${player.cardCount} carte${player.cardCount > 1 ? "s" : ""} restante${player.cardCount > 1 ? "s" : ""}` : ""}
                   </h5>
                 </div>
               ))
@@ -339,15 +339,10 @@ function Game() {
           startGame={startGame}
           roomId={roomId}    
           />
-          
-        {/* <LeaveRoomButton roomId={roomId} playerId={currentUser.uid} /> */}
+
           </>
         
-        
         ) : (
-
-            
-           
       <>
 
             <div className="gameBackground">
@@ -372,7 +367,7 @@ function Game() {
                   <Card
                     enginePlayerHand={playerHand}
                     selectedCard={selectedCards}
-                    setSelectedCard={setSelectedCard}
+                    setSelectedCards={setSelectedCards}
                   />
                 </div>
               </div>
