@@ -4,7 +4,7 @@ import { useAuth } from "../../components/auth-context";
 import { apiUrl, readJsonResponse } from "../../config";
 
 export default function CreateGameMenu() {
-    const { user, logout } = useAuth();
+    const { user } = useAuth(); // pas besoin de logout ? hmm
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -77,8 +77,6 @@ export default function CreateGameMenu() {
                 className="menuInputBot"
                 max={5}
                 min={0}
-                defaultValue={0}
-                
                 />
 
             <div style={{ marginTop: "1rem" }}>

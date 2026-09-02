@@ -15,9 +15,9 @@ import { API_URL, apiUrl, readJsonResponse } from "../config";
 
 type PlayerCard = {
   id: number;
-  name?: string;
-  value?: number;
-  suit?: string;
+  name: string;
+  value: number;
+  suit: string;
 };
 
 type RoomPlayer = {
@@ -67,12 +67,17 @@ function Game() {
   const [publicPlayers, setPublicPlayers] = useState<PublicPlayer[]>([]);
   const [allPlayers, setAllPlayers] = useState<RoomPlayer[]>([]);
   const [isHost, setIsHost] = useState<boolean>(false);
-  const [debugFonc, setDebug] = useState<any>()
+  const [debug, setDebug] = useState<any>()
 
 
   useEffect(() => {
     if (!user || !roomId) {
       return;
+    }
+
+    const sortCardAndDisplay = (hand: PlayerCard[]) => {
+      const sortedHand = [...hand].sort((a, b) => a.value! - b.value!); // "!" -> je suis sur que cette valeur n'est pas undefined.
+      setPlayerHand(sortedHand);
     }
 
     const newSocket = io(API_URL, {
@@ -92,6 +97,8 @@ function Game() {
       if (!payload || payload.roomId !== roomId) {
         return;
       }
+
+  
 
       const nextHand = payload.yourCard ?? [];
       const nextHandIds = new Set(nextHand.map((card) => card.id));
@@ -210,17 +217,14 @@ function Game() {
     });
   }
 
-  const sortCardAndDisplay = (hand: PlayerCard) => {
-    const sortedHand = [...hand].sort((a, b) => a.value - b.value);
-    setPlayerHand(sortedHand);
-  }
 
-  function debug() {
+
+  function debug_log() {
 
     console.log("------debug ---------");
 
     console.log("debug");
-    console.log(debugFonc);
+    console.log(debug);
     
     console.log("P-Player");
     console.log(publicPlayers);
@@ -234,7 +238,7 @@ function Game() {
   }
 
   useEffect(() => {
-    const handleKeyDown = (event) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Enter") {
         console.log("ENTER");
         playSelectedCards();
@@ -375,7 +379,7 @@ function Game() {
               <div className="handActions">
                 <button onClick={playSelectedCards} style={{zIndex:"5"}}>PLAY</button>
                 {
-                  isHost ? <button onClick={debug} style={{zIndex:"5"}}>GET STATE ROOT</button> : null
+                  isHost ? <button onClick={debug_log} style={{zIndex:"5"}}>GET STATE ROOT</button> : null
                 }
                 <button onClick={() => setSeeDiscardPile((value) => !value)} style={{zIndex:"5"}}>
                   {seeDiscardPile ? "Masquer pile" : "Afficher pile"}

@@ -14,24 +14,23 @@ function resetPileCardTilt(event: MouseEvent<HTMLElement>) {
     event.currentTarget.style.setProperty("--pointer-rotate-x", "0deg");
     event.currentTarget.style.setProperty("--pointer-rotate-y", "0deg");
 }
+//   function getStateCardImg(deckLength: number) {
 
-  function getStateCardImg(deckLength: number) {
 
+//     if (deckLength === 1) {
+//       return "0"
+//     }
+//     if (deckLength <=  5) {
+//       return "1"
+//     }
+//     if (deckLength >= 6 && deckLength <= 10 ) {
+//       return "3"
+//     } 
+//     if (deckLength >= 11) {
+//       return "4"
+//     }
 
-    if (deckLength === 1) {
-      return "0"
-    }
-    if (deckLength <=  5) {
-      return "1"
-    }
-    if (deckLength >= 6 && deckLength <= 10 ) {
-      return "3"
-    } 
-    if (deckLength >= 11) {
-      return "4"
-    }
-
-  }
+//   }
 
 
 type PileProps = {

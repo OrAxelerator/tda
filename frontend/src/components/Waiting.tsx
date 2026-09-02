@@ -5,7 +5,7 @@ interface waitingProps {
   isHost:boolean;
   roomId:string;
   currentUser:any;
-  startGame:any;
+  startGame: () => void;
 }
 
 export default function Waiting({ currentUser, isHost, startGame, roomId} : waitingProps) {
