@@ -91,7 +91,7 @@ io.on("connection", (socket) => {
     },
   );
 
-  socket.on("playCard", ({ roomId, userId, cardId, cardIds }) => {
+  socket.on("playCard",async ({ roomId, userId, cardId, cardIds }) => {
     const engine = getEngineForRoom(roomId);
     const cards = Array.isArray(cardIds)
       ? cardIds
@@ -110,7 +110,7 @@ io.on("connection", (socket) => {
     }
 
     try {
-      engine.playCards(userId, cards);
+      await engine.playCards(userId, cards);
       emitGameUpdate(roomId);
     } catch (error: any) {
       console.warn("Coup refusé par GameEngine:", {
@@ -125,7 +125,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("takePile", ({ roomId, userId }) => {
+  socket.on("takePile", async ({ roomId, userId }) => {
     const engine = getEngineForRoom(roomId);
 
     if (!engine || !roomId || !userId) {
@@ -136,11 +136,11 @@ io.on("connection", (socket) => {
 
     try {
       engine.takePile(userId);
-
+      
       engine.state.players.forEach((player) => {
         engine.refullPlayer(player.id);
       });
-      engine.nextTurn();
+      await engine.nextTurn();
       emitGameUpdate(roomId);
     } catch (error: any) {
       console.warn("Coup refusé par GameEngine:", {
@@ -346,14 +346,6 @@ function getEngineForRoom(roomId: string | undefined) {
   return null;
 }
 
-async function start() {
-  try {
-    // Cette fonction n'est pas utilisée actuellement.
-    // Si nécessaire, réactiver la lecture et l'initialisation des cartes ici.
-  } catch (error) {
-    console.error("Failed to initialize game starter", error);
-  }
-}
 
 app.post("/api/createGame", async (req, res) => {
   console.log("");
@@ -583,7 +575,7 @@ app.post("/play", async (req, res) => {
     console.log("player ", playerId, "joue");
     console.log("ses cartes : ", cards);
 
-    game.playCards(playerId, cards);
+    await game.playCards(playerId, cards);
 
     const roomIdToUpdate = roomId ?? currentRoomId;
     if (roomIdToUpdate) {
@@ -624,7 +616,7 @@ app.post("/game/play", async (req, res) => {
   };
 
   try {
-    game.playCard(playerId, cardId);
+    await game.playCard(playerId, cardId);
 
     const roomIdToUpdate = roomId ?? currentRoomId;
     if (roomIdToUpdate) {
@@ -722,8 +714,9 @@ app.post("/rooms/:roomId/startGame", async (req, res) => {
     console.log("loaded cards : ", game.state.deck.cards.length);
     // const state = new GameState(new Deck(cardsCopy));
 
-    game.startGame();
-    game.state.phase = "playing";
+    game.state.phase = "playing"; // dd'abord pour gameUpdate est que user voit interface "playing"
+    emitGameUpdate(roomId);
+    await game.startGame();
     // game.nextTurn() // debug cause player 1 don't connect
     await updateRoomState(roomId, game.state);
     emitGameUpdate(roomId);

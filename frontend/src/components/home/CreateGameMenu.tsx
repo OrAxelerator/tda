@@ -66,6 +66,12 @@ export default function CreateGameMenu() {
                 <input
                 type="number"
                 placeholder="Nombre de bot"
+                autoFocus
+                  onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                          handleClick()
+                      }
+                  }}
                 value={botsNumber}
                 onChange={(e) => setBotsNumber(e.target.value)}
                 className="menuInputBot"

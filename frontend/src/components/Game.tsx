@@ -108,7 +108,7 @@ function Game() {
       setPhase(payload.phase ?? "");
       setAllPlayers(payload.state?.players ?? []);
       setPublicPlayers(payload.publicPlayer)
-      setDebug(payload.state?.players)
+      setDebug(payload.state)
 
       const currentUser = payload.state?.players?.find(
         (player) => player.id === user.uid,
@@ -186,6 +186,16 @@ function Game() {
       userId: currentUser.uid,
       cardIds: selectedCards,
     });
+    // rajouter dans le css de selected card "display:none" et enlever la propriété quand emitGameUpdate ou supr le html des cartes ?, enfaite le problème est que apres avoir joué pendant 1s la(les) carte est tjts affiché et change que une fois le coup du bot
+    // const playerHandBuff = playerHand.filter(
+    //     card => !(selectedCards.includes(card))
+    // );
+    // setPlayerHand(playerHandBuff)
+    setPlayerHand(prev =>
+    prev.filter(card => !selectedCards.includes(card.id))
+);
+
+  setSelectedCard([]);
   }
 
   function takePile() {
@@ -214,6 +224,9 @@ function Game() {
     
     console.log("P-Player");
     console.log(publicPlayers);
+
+    console.log("state");
+    console.log();
 
 
 
