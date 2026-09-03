@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
 import { useAuth } from "../auth-context";
@@ -29,6 +29,24 @@ function Actions() {
 
     setActiveAction("create");
   };
+
+   useEffect(() => {
+      
+    const handleKey = (event: KeyboardEvent) => { // renomer ces connecri
+      if (event.key === "&" && activeAction == null) {
+        handlePlayOpen()
+        console.log("open - 1 ");
+      } if ( event.key === "é" && activeAction == null) {
+        handleCreateOpen()
+      }
+    }
+    window.addEventListener("keydown", handleKey);
+    
+    return () => {
+      window.removeEventListener("keydown", handleKey);
+    };
+  }, [activeAction]);
+
 
   return (
     <div className="actions">

@@ -80,8 +80,8 @@ export default function CreateGameMenu() {
                 />
 
             <div style={{ marginTop: "1rem" }}>
-                <button onClick={handleClick} disabled={isLoading}>
-                    {isLoading ? "Création en cours..." : "Créer THE game"}
+                <button onClick={handleClick} disabled={isLoading} className="createGameBtnInput">
+                    {isLoading ? "Création en cours..." : "Créer une Room"}
                 </button>
             </div>
 
