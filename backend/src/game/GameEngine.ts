@@ -238,40 +238,11 @@ async playBotTurn(player: Player) {
     await new Promise(resolve => setTimeout(resolve, 1000));
     console.log("🤖 BOT : attente terminée");
 
-    // -----------------------------
-    // TOP CARD
-    // -----------------------------
-
-    // const topCardId = this.state.discardPile.at(-1);
-
-    // // console.log("🤖 topCardId:", topCardId);
-
-    // // if (topCardId === undefined) {
-    // //     console.log("❌ discardPile vide !");
-    // //     return;
-    // // }
-
-    // // console.log("🤖 récupération de la carte...");
-
-
-    
-    // // console.log("🤖 topCard:", topCard);
-    
-    // let topCard = { value: 0 } as Card;
-    
-    // if (topCardId) {
-    //     console.log("❌ getCard() a retourné undefined !");
-    //     console.log("❌ topCardId était :", topCardId);
-    //     topCard = this.getCard(topCardId).value;
-    // } else {
-    // }
-
-    // ---
     let topCard = { value: 0 } as Card;
 
     if (this.state.discardPile.length > 0) {
         const topCardId = this.state.discardPile.at(-1);
-        const card = this.getCard(topCardId);
+        const card = this.getCard(topCardId!);
 
         if (!card) {
             return;
@@ -369,7 +340,7 @@ async playBotTurn(player: Player) {
             nextIndex = (nextIndex + 1) % this.state.players.length;
         }
 
-        this.state.currentPlayerId = this.state.players[nextIndex].id;
+        this.state.currentPlayerId = this.state.players[nextIndex].id; 
 
         const player = this.getPlayer(this.state.currentPlayerId!);
 
@@ -483,9 +454,6 @@ async playBotTurn(player: Player) {
     }
 
 
-    addBots(numberOfBot: number) {
-        
-    }
 
     getPlayer(id:string) {
 
@@ -524,7 +492,7 @@ async playBotTurn(player: Player) {
     }
 
     async playCard(playerId: string, cardId: number): Promise<void> {
-        this.playCards(playerId, [cardId]);
+        await this.playCards(playerId, [cardId]);
     }
 
     getPlayers(): PublicPlayer[] {
