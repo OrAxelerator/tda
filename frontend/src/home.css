@@ -218,6 +218,17 @@ ul li
     border-color: rgba(255, 255, 255, 0.18);
 }
 
+.startGameBtn {
+    background: rgb(40, 39, 46);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #f3f3f5;
+    box-shadow: none;
+    padding: 1.1rem 1.6rem;
+    border-radius: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.12s ease, border-color 120ms ease;
+}
 
 .actionMenu {
     position: fixed;
