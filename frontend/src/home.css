@@ -206,6 +206,7 @@ ul li
     padding: 1.1rem 1.6rem;
     border-radius: 18px;
     font-weight: 800;
+    cursor: pointer;
     transition: transform 0.12s ease, border-color 120ms ease;
 }
 

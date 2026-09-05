@@ -1,5 +1,4 @@
 import { toast } from "react-toastify";
-import { LeaveRoomButton } from "./LeaveRoomButton"
 
 interface waitingProps {
   isHost:boolean;
