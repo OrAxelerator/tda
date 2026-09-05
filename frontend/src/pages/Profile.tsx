@@ -26,6 +26,7 @@ function Profile() {
   const [error, setError] = useState<string | null>(null);
 
   const isOwnProfile = !uid || uid === user?.uid;
+  console.log("isOwnProfile:", isOwnProfile);
   const wins = profile?.gamesWon ?? 0;
   const losses = Math.max((profile?.gamesPlayed ?? 0) - wins, 0);
 
@@ -43,7 +44,10 @@ function Profile() {
 
     const loadProfile = async () => {
       try {
+        console.log("avant ")
+        console.log("profileUid:", profileUid);
         const snapshot = await getDoc(doc(db, "user", profileUid));
+        console.log("Snapshot:", snapshot);
         if (!snapshot.exists()) {
           setError("Utilisateur introuvable.");
           return;
@@ -52,6 +56,7 @@ function Profile() {
         setProfile(snapshot.data() as UserProfile);
         console.log("Profile loaded:", snapshot.data());  
       } catch {
+        console.error("Erreur lors du chargement du profil :", error);
         setError("Impossible de charger le profil.");
       } finally {
         setLoading(false);

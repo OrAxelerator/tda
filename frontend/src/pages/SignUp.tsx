@@ -45,7 +45,11 @@ function SignUp() {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      await ensureUserProfile(result.user, name);
+      console.log("Google connecté :", result.user);
+      console.log("UID :", result.user.uid);
+      console.log("Email :", result.user.email);
+      console.log("ensureporifle");
+      await ensureUserProfile(result.user, result.user.displayName);
       toast.success("Compte Google créé avec succès", {
         position: "top-center",
       });

@@ -3,11 +3,13 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import type { UserProfile } from "../types/userProfile";
 
-export async function ensureUserProfile(user: User, fallbackName?: string) {
+export async function ensureUserProfile(user: User, fallbackName: string | null) {
   const profileRef = doc(db, "user", user.uid);
   const snapshot = await getDoc(profileRef);
+  
 
   if (snapshot.exists()) {
+    console.log("existe déja");
     return;
   }
 

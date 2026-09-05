@@ -4,7 +4,7 @@ import { useAuth } from "../../components/auth-context";
 import { apiUrl, readJsonResponse } from "../../config";
 
 export default function CreateGameMenu() {
-    const { user, logout } = useAuth();
+    const { user } = useAuth(); // pas besoin de logout ? hmm
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -66,18 +66,22 @@ export default function CreateGameMenu() {
                 <input
                 type="number"
                 placeholder="Nombre de bot"
+                autoFocus
+                  onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                          handleClick()
+                      }
+                  }}
                 value={botsNumber}
                 onChange={(e) => setBotsNumber(e.target.value)}
                 className="menuInputBot"
                 max={5}
                 min={0}
-                defaultValue={0}
-                
                 />
 
             <div style={{ marginTop: "1rem" }}>
-                <button onClick={handleClick} disabled={isLoading}>
-                    {isLoading ? "Création en cours..." : "Créer THE game"}
+                <button onClick={handleClick} disabled={isLoading} className="createGameBtnInput">
+                    {isLoading ? "Création en cours..." : "Créer une Room"}
                 </button>
             </div>
 

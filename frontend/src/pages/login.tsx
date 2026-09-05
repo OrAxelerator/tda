@@ -44,7 +44,7 @@ function Login() {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      await ensureUserProfile(result.user);
+      await ensureUserProfile(result.user, result.user.displayName);
       toast.success("Connexion Google réussie", {
         position: "top-center",
       });

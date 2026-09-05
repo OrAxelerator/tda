@@ -1,11 +1,11 @@
 import { toast } from "react-toastify";
-import { LeaveRoomButton } from "./LeaveRoomButton"
 
+import type { User } from "firebase/auth";
 interface waitingProps {
   isHost:boolean;
   roomId:string;
-  currentUser:any;
-  startGame:any;
+  currentUser:User;
+  startGame: () => void;
 }
 
 export default function Waiting({ currentUser, isHost, startGame, roomId} : waitingProps) {
@@ -57,13 +57,11 @@ export default function Waiting({ currentUser, isHost, startGame, roomId} : wait
         {isHost ? (
           <>
             <h5>Vous êtes l'hôte de la partie</h5>
-            <button onClick={startGame}>START GAME</button>
+            <button onClick={startGame} className="startGameBtn">START GAME</button>
           </>
         ) : (
           <h5>Vous êtes un joueur</h5>
         )}
-
-        <LeaveRoomButton roomId={roomId} playerId={currentUser.uid} />
         </>
     )
 }

@@ -50,16 +50,11 @@ export class GameEngine {
         return array;
     }
 
-    startGame() {
+    async startGame() {
 
         if(this.state.players.length < 2 || this.state.players.length > 6)
             throw new Error("Not enough players");
 
-        if (this.state.phase === "playing") {
-            throw new Error("La partie est déjà lancée");
-        }
-
-        this.state.phase = "playing";
 
         this.state.turn = 1;
 
@@ -81,6 +76,10 @@ export class GameEngine {
             for (let i = 0; i < 7; i++) {
                 this.drawCard(player.id);
             }
+        }
+
+        if (this.state.players[0].isBot) {
+            await this.playBotTurn(this.state.players[0]);
         }
 
 
@@ -159,7 +158,7 @@ export class GameEngine {
         this.state.discardPile.push(card); // Reverse pile, last element end
     }
 
-    takePile(playerId:string) {
+    async takePile(playerId:string) {
         const player = this.getPlayer(playerId);
         if (!player ) {
             throw new Error("Joueur n'existe pas.")
@@ -187,7 +186,7 @@ export class GameEngine {
             this.state.players.forEach(player => {
                 if (player.id != playerId ) {
                     if (player.hand.length <= 2) {
-
+                        this.refullPlayer(player.id);
                     }
                 }
             });
@@ -225,19 +224,111 @@ export class GameEngine {
         }
     }
 
-    async playBotTurn(player: Player) {
-        await new Promise(resolve => setTimeout(resolve, 1000)); // attends un peu pour faire "plus humain"
+async playBotTurn(player: Player) {
+    console.log("================================");
+    console.log("🤖 BOT TURN START");
+    console.log("🤖 player.id:", player.id);
+    console.log("🤖 player.name:", player.name);
+    console.log("🤖 player.hand:", player.hand);
+    console.log("🤖 currentPlayerId:", this.state.currentPlayerId);
+    console.log("🤖 turn:", this.state.turn);
+    console.log("🤖 discardPile:", this.state.discardPile);
 
-        // choisir la carte la plus faible
-        const weakestCard = player.hand.reduce(
-        (weakest, card) =>
-            card.value < weakest.value ? card : weakest
-        );
-        // jouer la carte
-        this.playCard(player.id, weakestCard.id);
+    console.log("🤖 BOT : attente 1 seconde...");
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    console.log("🤖 BOT : attente terminée");
+
+    let topCard = { value: 0 } as Card;
+
+    if (this.state.discardPile.length > 0) {
+        const topCardId = this.state.discardPile.at(-1);
+        const card = this.getCard(topCardId!);
+
+        if (!card) {
+            return;
+        }
+
+        topCard = card;
+    }
+    // ---
+
+    console.log("🤖 topCard.value:", topCard.value);
+
+    // -----------------------------
+    // CARTES JOUABLES
+    // -----------------------------
+
+    console.log("🤖 recherche des cartes jouables...");
+    console.log("🤖 main du bot:", player.hand);
+
+    const playableCards = player.hand.filter(
+        card => card.value >= topCard.value
+    );
+
+    console.log("🤖 playableCards:", playableCards);
+
+    // -----------------------------
+    // AUCUNE CARTE
+    // -----------------------------
+
+    if (playableCards.length === 0) {
+        console.log("⚠️ Aucune carte jouable !");
+        console.log("🤖 Bot va piocher...");
+
+        this.takePile(player.id);
+
+        console.log("🤖 takePile terminé");
+        console.log("🤖 main après pioche:", player.hand);
+
+        console.log("🤖 appel nextTurn depuis playBotTurn...");
+        await this.nextTurn();
+
+        console.log("🤖 nextTurn terminé");
+
+        return;
     }
 
-    nextTurn() {
+    // -----------------------------
+    // CHOIX DE LA CARTE
+    // -----------------------------
+
+    console.log("🤖 recherche de la carte la plus faible...");
+
+    const weakestCard = playableCards.reduce(
+        (weakest, card) =>
+            card.value < weakest.value ? card : weakest
+    );
+
+    console.log("🤖 weakestCard:", weakestCard);
+    console.log("🤖 weakestCard.id:", weakestCard.id);
+
+    // -----------------------------
+    // PLAY CARD
+    // -----------------------------
+
+    console.log("🤖 appel playCard...");
+    
+    await this.playCard(player.id, weakestCard.id);
+
+    console.log("🤖 playCard terminé !");
+    console.log("🤖 discardPile après playCard:", this.state.discardPile);
+    console.log("🤖 currentPlayerId après playCard:", this.state.currentPlayerId);
+
+    // -----------------------------
+    // NEXT TURN
+    // -----------------------------
+
+    console.log("🤖 appel nextTurn depuis playBotTurn...");
+
+    // await this.nextTurn();
+
+    console.log("🤖 nextTurn terminé");
+
+    console.log("🤖 BOT TURN END");
+    console.log("================================");
+}
+
+    async nextTurn() {
         const currentIndex = this.state.players.findIndex(
             p => p.id === this.state.currentPlayerId
         );
@@ -249,18 +340,18 @@ export class GameEngine {
             nextIndex = (nextIndex + 1) % this.state.players.length;
         }
 
-        this.state.currentPlayerId = this.state.players[nextIndex].id;
+        this.state.currentPlayerId = this.state.players[nextIndex].id; 
 
         const player = this.getPlayer(this.state.currentPlayerId!);
 
-        if (player?.isBot) {
-            this.playBotTurn(player);
+        if (player?.isBot) { // atteindre fin execution :
+           await this.playBotTurn(player);
         }
 
         this.state.turn++;
     }
 
-    playCards(playerId: string, cards: number[]) {
+    async playCards(playerId: string, cards: number[]) {
         if (this.state.phase !== "playing") {
             throw new Error("La partie n'est pas en cours");
         }
@@ -336,6 +427,7 @@ export class GameEngine {
         const lastDiscardCard = lastDiscardId ? this.getCard(lastDiscardId) : undefined;
 
         if (lastDiscardCard && firstValue < lastDiscardCard.value) {
+            console.log(firstValue);
             throw new Error("La carte jouée doit être supérieure ou égale à la dernière carte de la pile");
         }
 
@@ -358,13 +450,10 @@ export class GameEngine {
             }
         }
 
-        this.nextTurn();
+        await this.nextTurn();
     }
 
 
-    addBots(numberOfBot: number) {
-        
-    }
 
     getPlayer(id:string) {
 
@@ -402,8 +491,8 @@ export class GameEngine {
         return this.state.discardPile;
     }
 
-    playCard(playerId: string, cardId: number): void {
-        this.playCards(playerId, [cardId]);
+    async playCard(playerId: string, cardId: number): Promise<void> {
+        await this.playCards(playerId, [cardId]);
     }
 
     getPlayers(): PublicPlayer[] {

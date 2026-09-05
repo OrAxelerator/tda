@@ -3,16 +3,12 @@ import "../home.css"
 import Actions from "./home/Actions"
 
 import { useAuth } from "../components/auth-context";
-import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 import {  useEffect, useState } from "react";
-
-
 
 export default function Home() {
 
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
+    const { user } = useAuth();
     const [version, setVersion] = useState<string | null>(null);
 
 

@@ -15,9 +15,10 @@ import { API_URL, apiUrl, readJsonResponse } from "../config";
 
 type PlayerCard = {
   id: number;
-  name?: string;
-  value?: number;
-  suit?: string;
+  name: string;
+  value: number;
+  suit: string;
+  asset: string;
 };
 
 type RoomPlayer = {
@@ -40,7 +41,7 @@ type GameUpdatePayload = {
   roomId: string;
   discardCard: number[];
   deckLength: number;
-  yourCard: any[];
+  yourCard: PlayerCard[];
   numberOfTurn: number;
   currentPlayerId: string | null;
   phase: string;
@@ -57,7 +58,7 @@ function Game() {
 
   const [socket, setSocket] = useState<Socket | null>(null);
   const [playerHand, setPlayerHand] = useState<PlayerCard[]>([]);
-  const [selectedCards, setSelectedCard] = useState<number[]>([]);
+  const [selectedCards, setSelectedCards] = useState<number[]>([]);
   const [discardPileCard, setDiscardPileCard] = useState<number[]>([]);
   const [seeDiscardPile, setSeeDiscardPile] = useState(true);
   const [phase, setPhase] = useState("");
@@ -67,12 +68,17 @@ function Game() {
   const [publicPlayers, setPublicPlayers] = useState<PublicPlayer[]>([]);
   const [allPlayers, setAllPlayers] = useState<RoomPlayer[]>([]);
   const [isHost, setIsHost] = useState<boolean>(false);
-  const [debugFonc, setDebug] = useState<any>()
+  const [debug, setDebug] = useState<any>()
 
 
   useEffect(() => {
     if (!user || !roomId) {
       return;
+    }
+
+    const sortCardAndDisplay = (hand: PlayerCard[]) => {
+      const sortedHand = [...hand].sort((a, b) => a.value! - b.value!); // "!" -> je suis sur que cette valeur n'est pas undefined.
+      setPlayerHand(sortedHand);
     }
 
     const newSocket = io(API_URL, {
@@ -93,12 +99,14 @@ function Game() {
         return;
       }
 
+  
+
       const nextHand = payload.yourCard ?? [];
       const nextHandIds = new Set(nextHand.map((card) => card.id));
 
       // setPlayerHand(nextHand); //re-affiche les cartes donc re-mélange les cartes meme si trié
       sortCardAndDisplay(nextHand); //trie les cartes après le setPlayerHand pour que les cartes soient triées
-      setSelectedCard((currentSelectedCards) =>
+      setSelectedCards((currentSelectedCards) =>
         currentSelectedCards.filter((cardId) => nextHandIds.has(cardId)),
       );
       setDiscardPileCard(payload.discardCard ?? []);
@@ -108,7 +116,7 @@ function Game() {
       setPhase(payload.phase ?? "");
       setAllPlayers(payload.state?.players ?? []);
       setPublicPlayers(payload.publicPlayer)
-      setDebug(payload.state?.players)
+      setDebug(payload.yourCard)
 
       const currentUser = payload.state?.players?.find(
         (player) => player.id === user.uid,
@@ -186,6 +194,16 @@ function Game() {
       userId: currentUser.uid,
       cardIds: selectedCards,
     });
+    // rajouter dans le css de selected card "display:none" et enlever la propriété quand emitGameUpdate ou supr le html des cartes ?, enfaite le problème est que apres avoir joué pendant 1s la(les) carte est tjts affiché et change que une fois le coup du bot
+    // const playerHandBuff = playerHand.filter(
+    //     card => !(selectedCards.includes(card))
+    // );
+    // setPlayerHand(playerHandBuff)
+    setPlayerHand(prev =>
+      prev.filter(card => !selectedCards.includes(card.id))
+    );
+
+  setSelectedCards([]);
   }
 
   function takePile() {
@@ -200,20 +218,20 @@ function Game() {
     });
   }
 
-  const sortCardAndDisplay = (hand) => {
-    const sortedHand = [...hand].sort((a, b) => a.value - b.value);
-    setPlayerHand(sortedHand);
-  }
 
-  function debug() {
+
+  function debug_log() {
 
     console.log("------debug ---------");
 
     console.log("debug");
-    console.log(debugFonc);
+    console.log(debug);
     
     console.log("P-Player");
     console.log(publicPlayers);
+
+    console.log("state");
+    console.log();
 
 
 
@@ -221,7 +239,7 @@ function Game() {
   }
 
   useEffect(() => {
-    const handleKeyDown = (event) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Enter") {
         console.log("ENTER");
         playSelectedCards();
@@ -309,7 +327,7 @@ function Game() {
                     {player.isHost && <span>[HOST]</span>}
                   </h3>
                   <h5>
-                    {player.cardCount ? `${player.cardCount} cartes restantes` : ""}
+                    {player.cardCount ? `${player.cardCount} carte${player.cardCount > 1 ? "s" : ""} restante${player.cardCount > 1 ? "s" : ""}` : ""}
                   </h5>
                 </div>
               ))
@@ -326,15 +344,10 @@ function Game() {
           startGame={startGame}
           roomId={roomId}    
           />
-          
-        {/* <LeaveRoomButton roomId={roomId} playerId={currentUser.uid} /> */}
+
           </>
         
-        
         ) : (
-
-            
-           
       <>
 
             <div className="gameBackground">
@@ -359,7 +372,7 @@ function Game() {
                   <Card
                     enginePlayerHand={playerHand}
                     selectedCard={selectedCards}
-                    setSelectedCard={setSelectedCard}
+                    setSelectedCards={setSelectedCards}
                   />
                 </div>
               </div>
@@ -367,7 +380,7 @@ function Game() {
               <div className="handActions">
                 <button onClick={playSelectedCards} style={{zIndex:"5"}}>PLAY</button>
                 {
-                  isHost ? <button onClick={debug} style={{zIndex:"5"}}>GET STATE ROOT</button> : null
+                  isHost ? <button onClick={debug_log} style={{zIndex:"5"}}>GET STATE ROOT</button> : null
                 }
                 <button onClick={() => setSeeDiscardPile((value) => !value)} style={{zIndex:"5"}}>
                   {seeDiscardPile ? "Masquer pile" : "Afficher pile"}
