@@ -1,9 +1,10 @@
 import { toast } from "react-toastify";
 
+import type { User } from "firebase/auth";
 interface waitingProps {
   isHost:boolean;
   roomId:string;
-  currentUser:any;
+  currentUser:User;
   startGame: () => void;
 }
 
