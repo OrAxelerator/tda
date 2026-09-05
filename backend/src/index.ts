@@ -442,193 +442,27 @@ app.post("/api/createGame", async (req, res) => {
   console.log("---------- END Create Game --");
 });
 
-app.get("/api/firebaseConfig", (req, res) => {
-  const config = {
-    apiKey: process.env.FIREBASE_API_KEY,
-    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.FIREBASE_APP_ID,
-    measurementId: process.env.FIREBASE_MEASUREMENT_ID,
-  };
-  if (!config.apiKey || !config.projectId) {
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "Missing Firebase client config in environment",
-      });
-  }
-  res.json({ success: true, config });
-});
+// app.get("/api/firebaseConfig", (req, res) => {
+//   const config = {
+//     apiKey: process.env.FIREBASE_API_KEY,
+//     authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+//     projectId: process.env.FIREBASE_PROJECT_ID,
+//     storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+//     messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+//     appId: process.env.FIREBASE_APP_ID,
+//     measurementId: process.env.FIREBASE_MEASUREMENT_ID,
+//   };
+//   if (!config.apiKey || !config.projectId) {
+//     return res
+//       .status(500)
+//       .json({
+//         success: false,
+//         message: "Missing Firebase client config in environment",
+//       });
+//   }
+//   res.json({ success: true, config });
+// });
 
-app.get("/rooms/:roomId/state", (req, res) => {
-  console.log("-----------------------");
-  console.log("get state request received");
-  const { roomId } = req.params;
-  console.log("roomId : ", roomId);
-  const engine = getEngineForRoom(roomId as string | undefined);
-  console.log("engine : ", engine);
-
-  if (!engine) {
-    return res
-      .status(500)
-      .json({ success: false, message: "Game engine is not ready yet" });
-  }
-
-  res.json({ success: true, state: engine.getState() });
-});
-
-app.get("/players", (req, res) => {
-  // get list of player
-  const engine = getEngineForRoom(req.query.roomId as string | undefined);
-
-  if (!engine) {
-    return res
-      .status(500)
-      .json({ success: false, message: "Game engine is not ready yet" });
-  }
-  console.log("");
-  console.log("Return List of player in app.get(/players) ");
-  console.log("");
-  res.json({ success: true, players: engine.getPlayers() });
-});
-
-app.get("/rooms/:roomId/phase", (req, res) => {
-  // get phase of the game
-  console.log("");
-  console.log("phase -----------------");
-
-  const { roomId } = req.params;
-  console.log("get roomId = ", roomId);
-
-  const engine = getEngineForRoom(roomId);
-
-  if (!engine) {
-    console.log("⚠️ Error gameEngine NOT READY ? ");
-    console.log(engine);
-    return res
-      .status(500)
-      .json({ success: false, message: "Game engine is not ready yet" });
-  }
-  console.log("Returning phase of game", engine?.getPhase);
-  console.log("phase -----------------");
-
-  res.json({ success: true, phase: engine?.getPhase() });
-});
-
-app.get("/players/:playerId/cards", (req, res) => {
-  const roomId = req.query.roomId as string | undefined;
-  console.log(
-    "--------------------------- GET CARD PLAYER 1 ---------------------------",
-  );
-  console.log("roomId : ", roomId);
-  if (!roomId) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Missing required parameters" });
-  }
-
-  const game = getEngineForRoom(roomId);
-  if (!game) {
-    return res.status(404).json({ success: false, message: "Game not found" });
-  }
-  // if (!engine) {
-  //   return res.status(500).json({ success: false, message: "Game engine is not ready yet" });
-  // }
-  console.log("try fetch caard");
-  const { playerId } = req.params;
-  res.json({ success: true, cards: game.getPlayerCards(playerId) });
-});
-
-app.get("/discard-pile", (req, res) => {
-  const roomId = req.query.roomId as string | undefined;
-  const game = getEngineForRoom(roomId);
-
-  if (!game) {
-    return res
-      .status(500)
-      .json({ success: false, message: "Game engine is not ready yet" });
-  }
-
-  res.json({ success: true, discardPile: game.getDiscardPile() });
-});
-
-app.post("/play", async (req, res) => {
-  const roomId = (req.body as any).roomId as string | undefined;
-  const game = getEngineForRoom(roomId);
-
-  if (!game) {
-    return res.status(500).json({
-      success: false,
-      message: "Game engine is not ready yet",
-    });
-  }
-
-  try {
-    const { playerId, cards } = req.body as {
-      playerId: string;
-      cards: number[];
-      roomId?: string;
-    };
-    console.log("player ", playerId, "joue");
-    console.log("ses cartes : ", cards);
-
-    await game.playCards(playerId, cards);
-
-    const roomIdToUpdate = roomId ?? currentRoomId;
-    if (roomIdToUpdate) {
-      await updateRoomState(roomIdToUpdate, game.state);
-      emitGameUpdate(roomIdToUpdate);
-    }
-
-    res.json({
-      success: true,
-      state: game.state,
-    });
-    console.log("carte joué");
-  } catch (error: any) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-});
-
-app.post("/game/play", async (req, res) => {
-  console.log(
-    "to DELETE N???????????????????????????????????????????????????????????????",
-  );
-  const roomId = (req.body as any).roomId as string | undefined;
-  const game = getEngineForRoom(roomId);
-
-  if (!game) {
-    return res
-      .status(500)
-      .json({ success: false, message: "Game engine is not ready yet" });
-  }
-
-  const { playerId, cardId } = req.body as {
-    playerId: string;
-    cardId: number;
-    roomId?: string;
-  };
-
-  try {
-    await game.playCard(playerId, cardId);
-
-    const roomIdToUpdate = roomId ?? currentRoomId;
-    if (roomIdToUpdate) {
-      await updateRoomState(roomIdToUpdate, game.state);
-      emitGameUpdate(roomIdToUpdate);
-    }
-
-    res.json({ success: true, state: game.getStateForFrontend() });
-  } catch (error: any) {
-    res.status(400).json({ success: false, message: error.message });
-  }
-});
 
 app.post("/rooms/:roomId/joinGame", async (req, res) => {
   const { roomId } = req.params;
@@ -667,7 +501,7 @@ app.post("/rooms/:roomId/joinGame", async (req, res) => {
   }
 
   if (!existingPlayer) {
-    const newPlayer = new Player(playerId, playerName, false, false);
+    const newPlayer = new Player(playerId, playerName, false, false, false);
     game.addPlayer(newPlayer);
 
     // io.to(roomId).emit("gameState", game.state); // send INFO of room to all players in the room
