@@ -57,7 +57,7 @@ export default function PlayMenu() {
 
 
         <>
-            <h1 style={{color:"black"}}>Rejoindre une partie : </h1>
+            <h1 style={{color:"white"}}>Rejoindre une partie : </h1>
 
             <div className="playInput">
               <input

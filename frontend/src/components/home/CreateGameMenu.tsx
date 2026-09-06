@@ -60,7 +60,7 @@ export default function CreateGameMenu() {
 
 
         <>
-           <h1 style={{color:"black"}}>Créer une partie : </h1>
+           <h1 style={{color:"white"}}>Créer une partie : </h1>
 
 
                 <input

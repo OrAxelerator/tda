@@ -32,10 +32,9 @@ function Actions() {
 
    useEffect(() => {
       
-    const handleKey = (event: KeyboardEvent) => { // renomer ces connecri
+    const handleKey = (event: KeyboardEvent) => {
       if (event.key === "&" && activeAction == null) {
         handlePlayOpen()
-        console.log("open - 1 ");
       } if ( event.key === "é" && activeAction == null) {
         handleCreateOpen()
       }
