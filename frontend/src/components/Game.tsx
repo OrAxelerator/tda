@@ -18,6 +18,7 @@ type PlayerCard = {
   name: string;
   value: number;
   suit: string;
+  asset: string;
 };
 
 type RoomPlayer = {
@@ -40,7 +41,7 @@ type GameUpdatePayload = {
   roomId: string;
   discardCard: number[];
   deckLength: number;
-  yourCard: any[];
+  yourCard: PlayerCard[];
   numberOfTurn: number;
   currentPlayerId: string | null;
   phase: string;
@@ -115,7 +116,7 @@ function Game() {
       setPhase(payload.phase ?? "");
       setAllPlayers(payload.state?.players ?? []);
       setPublicPlayers(payload.publicPlayer)
-      setDebug(nextHand)
+      setDebug(payload.yourCard)
 
       const currentUser = payload.state?.players?.find(
         (player) => player.id === user.uid,

@@ -14,7 +14,7 @@ but du jeu : ne plus avoir de carte, chacun son tour on pose une carte qui doit 
 * jeu agréable a jouer
 * créer une vrai DA
 * création de compte (en se connectant avec google)
-* 
+* jouer avec des bots
 
 
 ### Stack:
@@ -25,9 +25,7 @@ Build	Vite
 Base de données temps réel	Firebase Firestore
 Authentification	Firebase Auth (anonyme ou Google)
 Hébergement	Firebase Hosting
-Style	CSS Modules ou Tailwind
-hébergement domaine : DigitalPlat - Free subdomains./DNSHE - Free subdomain registration across multiple domain suffixes, with custom nameserver support./isroot.in - Free isroot.in subdomains./pp.ua - Free pp.ua subdomains. (ou autre si mieux)
-
+Style	CSS Modules 
 
 ### Regle du jeu:
 
@@ -64,5 +62,3 @@ Voir [regle.md](./regle.md)
   - impossible de jojindre une partie commencez
   - si jouer quitte, suprime de la partie et s'est carte son "suprimer"
   - si tout les jouers de la parties quitte, la game s'arretes.
-
-

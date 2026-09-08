@@ -1,9 +1,10 @@
 import { toast } from "react-toastify";
 
+import type { User } from "firebase/auth";
 interface waitingProps {
   isHost:boolean;
   roomId:string;
-  currentUser:any;
+  currentUser:User;
   startGame: () => void;
 }
 
@@ -61,7 +62,6 @@ export default function Waiting({ currentUser, isHost, startGame, roomId} : wait
         ) : (
           <h5>Vous êtes un joueur</h5>
         )}
-
         </>
     )
 }
