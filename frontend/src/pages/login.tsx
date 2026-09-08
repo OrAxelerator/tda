@@ -2,7 +2,7 @@ import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 
 import { FirebaseError } from "firebase/app";
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { auth } from '../firebase';
+import { auth } from '../firebase-auth';
 import { toast } from "react-toastify";
 import { ensureUserProfile } from "../utils/userProfile";
 

@@ -11,7 +11,7 @@ import {
 } from "firebase/auth";
 
 import { useAuth } from "../components/auth-context";
-import { db } from "../firebase";
+import { db } from "../firebase-db";
 import type { UserProfile } from "../types/userProfile";
 import "./profile.css";
 import { toast } from "react-toastify";

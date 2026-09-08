@@ -45,7 +45,14 @@ function App() {
             <div className="auth-inner">
               <Routes>
                 <Route path="/" element={<Navigate to="/home" replace />} />
-                <Route path="/home" element={<Home />} />
+                <Route
+                  path="/home"
+                  element={
+                    <Suspense fallback={<div>Chargement de l'accueil...</div>}>
+                      <Home />
+                    </Suspense>
+                  }
+                />
                 <Route path="/profile" element={<Navigate to="/user" replace />} />
                 <Route
                   path="/login"

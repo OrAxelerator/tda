@@ -11,7 +11,7 @@ import Waiting from "./Waiting";
 // import { getDataConnect } from "firebase/data-connect";
 import Pile from "./Pile";
 
-import { API_URL, apiUrl, readJsonResponse } from "../config";
+import { SOCKET_URL, apiUrl, readJsonResponse } from "../config";
 
 type PlayerCard = {
   id: number;
@@ -80,7 +80,7 @@ function Game() {
       setPlayerHand(sortedHand);
     }
 
-    const newSocket = io(API_URL, {
+    const newSocket = io(SOCKET_URL, {
       transports: ["websocket"],
     });
 

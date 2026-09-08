@@ -1,6 +1,6 @@
 import type { User } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "../firebase";
+import { db } from "../firebase-db";
 import type { UserProfile } from "../types/userProfile";
 
 export async function ensureUserProfile(user: User, fallbackName: string | null) {
