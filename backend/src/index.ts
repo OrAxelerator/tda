@@ -31,8 +31,11 @@ if (!isRender) {
 
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:5174",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:5174",
   process.env.FRONTEND_URL,
-].filter(Boolean);
+].filter((origin): origin is string => Boolean(origin));
 
 app.use(
   cors({
@@ -160,13 +163,14 @@ io.on("connection", (socket) => {
       removeConnectedPlayer(roomId, socket.id);
       socketRooms.delete(socket.id);
       console.log("PLAYER LEFT");
-      engine = getEngineForRoom(roomId);
-      if (!engine) {
-        throw new Error("Not found gameEngine in socket:disconect");
+      const disconnectedRoomEngine = getEngineForRoom(roomId);
+      if (!disconnectedRoomEngine) {
+        console.warn(`No game engine found while disconnecting room ${roomId}`);
+        return;
       }
       console.log("FIND ENGINE");
-      if (engine.state.phase == "playing") {
-        if (engine.state.players.length <= 1) {
+      if (disconnectedRoomEngine.state.phase == "playing") {
+        if (disconnectedRoomEngine.state.players.length <= 1) {
           console.log("NOT ENOUGH PLAYER");
           roomEngines.delete(roomId);
 
@@ -345,7 +349,6 @@ function getEngineForRoom(roomId: string | undefined) {
   console.log(roomEngines);
   return null;
 }
-
 
 app.post("/api/createGame", async (req, res) => {
   console.log("");
@@ -653,6 +656,7 @@ app.post("/rooms/:roomId/joinGame", async (req, res) => {
       .json({ success: false, message: "Missing required parameters" });
   }
   const game = getEngineForRoom(roomId);
+  console.log("game l700", game);
   if (!game) {
     return res.status(404).json({ success: false, message: "Game not found" });
   }
@@ -665,9 +669,13 @@ app.post("/rooms/:roomId/joinGame", async (req, res) => {
       .status(400)
       .json({ success: false, message: "The Room is full" });
   }
+  console.log("existing player: ", existingPlayer);
+  console.log("!!!existing player: ", !existingPlayer); // false (whyy)
+
+  console.log("playersList.find(player => playerId == player.id", playersList.find(player => playerId == player.id));
 
   if (!existingPlayer) {
-    const newPlayer = new Player(playerId, playerName, false, false);
+    const newPlayer = new Player(playerId, playerName, false, false, false);
     game.addPlayer(newPlayer);
 
     // io.to(roomId).emit("gameState", game.state); // send INFO of room to all players in the room
