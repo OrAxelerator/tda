@@ -8,7 +8,7 @@ const CreateGameMenu = lazy(() => import("./CreateGameMenu"));
 const PlayMenu = lazy(() => import("./PlayMenu"));
 
 function Actions() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [activeAction, setActiveAction] = useState<
     "play" | "create" | null
   >(null);
@@ -31,21 +31,27 @@ function Actions() {
     setActiveAction("create");
   };
 
-   useEffect(() => {
-      
+  useEffect(() => {
+    if (loading) {
+      return;
+    }
+
     const handleKey = (event: KeyboardEvent) => {
       if (event.key === "&" && activeAction == null) {
-        handlePlayOpen()
-      } if ( event.key === "é" && activeAction == null) {
-        handleCreateOpen()
+        handlePlayOpen();
       }
-    }
+
+      if (event.key === "é" && activeAction == null) {
+        handleCreateOpen();
+      }
+
+    };
     window.addEventListener("keydown", handleKey);
-    
+
     return () => {
       window.removeEventListener("keydown", handleKey);
     };
-  }, [activeAction]);
+  }, [activeAction, loading, user]);
 
 
   return (
