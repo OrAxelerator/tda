@@ -208,6 +208,16 @@ function Game() {
   }
 
   function getCardFromId(cardId: number): PlayerCard | undefined {
+    if (cardId === 53 || cardId === 54) {
+      return {
+        id: cardId,
+        name: "jocker",
+        suit: "jocker",
+        value: 15,
+        asset: `${String(cardId).padStart(2, "0")}_theme1.png`,
+      };
+    }
+
     if (!Number.isInteger(cardId) || cardId < 1 || cardId > 52) {
       return undefined;
     }
@@ -301,9 +311,20 @@ function Game() {
     }
 
     const lastDiscardCard = discardCards[discardCards.length - 1];
-    if (lastDiscardCard && firstValue < lastDiscardCard.value) {
-      toast.error("La carte jouée doit être supérieure ou égale à la dernière carte de la pile");
-      return false;
+    console.log("jocker test :");
+    console.log("firsvalue:", firstValue); // 2
+    console.log("lastDiscardCard?.value : ", lastDiscardCard?.value); // 14 : pq ...
+    console.log(discardCards); /// pas la carte id = 53 (id jocekrs = 53 et 54 ..)
+
+    console.log("équa :");
+    console.log(firstValue == 2 && lastDiscardCard?.value == 15);
+    if (firstValue == 2 && lastDiscardCard?.value == 15) {
+      console.log("Jocker ");
+    }else {
+      if (lastDiscardCard && firstValue < lastDiscardCard.value) {
+        toast.error("La carte jouée doit être supérieure ou égale à la dernière carte de la pile");
+        return false;
+      }
     }
 
     return true;

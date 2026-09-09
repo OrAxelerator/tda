@@ -427,10 +427,15 @@ async playBotTurn(player: Player) {
         const lastDiscardId = this.state.discardPile[this.state.discardPile.length - 1];
         const lastDiscardCard = lastDiscardId ? this.getCard(lastDiscardId) : undefined;
 
-        if (lastDiscardCard && firstValue < lastDiscardCard.value) {
-            console.log(firstValue);
-            throw new Error("La carte jouée doit être supérieure ou égale à la dernière carte de la pile");
+        if (firstValue == 2 && lastDiscardCard?.value == 15) {
+            // pass (jocker rule)
+        }else {
+            if (lastDiscardCard && firstValue < lastDiscardCard.value  ) {
+                console.log(firstValue);
+                throw new Error("La carte jouée doit être supérieure ou égale à la dernière carte de la pile");
+            }
         }
+
 
         for (const cardId of cards) {
             this.discardCards(playerId, cardId);

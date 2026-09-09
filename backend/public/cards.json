@@ -362,6 +362,20 @@
         "suit": "Clubs",
         "value": 14,
         "asset": "52_theme1.png"
+    },
+    {
+        "id":53,
+        "name" : "Jocker 1",
+        "suit" : "jocker",
+        "value" : 15,
+        "asset": "53_theme1.png"
+    },
+    {
+        "id":54,
+        "name" : "Jocker 2",
+        "suit" : "jocker",
+        "value" : 15,
+        "asset": "54_theme1.png"
     }
     
 
