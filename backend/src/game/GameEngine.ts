@@ -52,8 +52,9 @@ export class GameEngine {
 
     async startGame() {
 
-        if(this.state.players.length < 2 || this.state.players.length > 6)
-            throw new Error("Not enough players");
+        if (this.state.players.length < 2 || this.state.players.length > 6) {
+            throw new Error("Not enough players"); 
+        }
 
 
         this.state.turn = 1;
