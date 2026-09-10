@@ -16,9 +16,10 @@ import { randomUUID } from "crypto";
 
 import { createServer } from "http";
 import { Server } from "socket.io";
+import firebase from "./firebase";
 
 const isRender = process.env.RENDER === "true";
-
+const db = firebase.firestore()
 const app = express();
 
 // charger les variables d'environnement depuis /env/.env
@@ -114,7 +115,24 @@ io.on("connection", (socket) => {
 
     try {
       await engine.playCards(userId, cards);
+
+      const wonByUser = engine.state.players.some(
+        (player) => player.id === userId && player.isWinner,
+      );
+
+      if (wonByUser) {
+        await admin
+          .firestore()
+          .collection("user")
+          .doc(userId)
+          .update({
+            gamesWon: admin.firestore.FieldValue.increment(1),
+            gamesPlayed: admin.firestore.FieldValue.increment(1),
+          });
+      }
+
       emitGameUpdate(roomId);
+
     } catch (error: any) {
       console.warn("Coup refusé par GameEngine:", {
         roomId,
@@ -488,7 +506,6 @@ app.post("/rooms/:roomId/joinGame", async (req, res) => {
       .json({ success: false, message: "Missing required parameters" });
   }
   const game = getEngineForRoom(roomId);
-  console.log("game l700", game);
   if (!game) {
     return res.status(404).json({ success: false, message: "Game not found" });
   }
@@ -501,10 +518,6 @@ app.post("/rooms/:roomId/joinGame", async (req, res) => {
       .status(400)
       .json({ success: false, message: "The Room is full" });
   }
-  console.log("existing player: ", existingPlayer);
-  console.log("!!!existing player: ", !existingPlayer); // false (whyy)
-
-  console.log("playersList.find(player => playerId == player.id", playersList.find(player => playerId == player.id));
 
   if (!existingPlayer) {
     const newPlayer = new Player(playerId, playerName, false, false, false);
@@ -516,7 +529,7 @@ app.post("/rooms/:roomId/joinGame", async (req, res) => {
 
     await updateRoomState(roomId, game.state);
     emitGameUpdate(roomId);
-    console.log("---------------");
+    console.log("---------------------------");
     return res.json({ success: true, state: game.getStateForFrontend() });
   } else {
     return res
@@ -578,7 +591,7 @@ app.post("/rooms/:roomId/leave", async (req, res) => {
   const { playerId } = req.body;
   console.log("");
   console.log("--------------------");
-  console.log(`Player ${playerId} want to leave ${roomId}`);
+  console.log(`👤 ==>🚪 - Player ${playerId} want to leave ${roomId}`);
   const engine = getEngineForRoom(roomId);
 
   if (!engine) {
@@ -586,7 +599,7 @@ app.post("/rooms/:roomId/leave", async (req, res) => {
   }
 
   engine.removePlayer(playerId);
-  console.log("Player successfully left !!");
+  console.log("👤 ==> ✅ - Player successfully left !!");
 
   await updateRoomState(roomId, engine.state);
   emitGameUpdate(roomId);
