@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react";
+import { lazy, Suspense, useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
 import { useAuth } from "../auth-context";
-import CreateGameMenu from "./CreateGameMenu";
 import ActionBtn from "./ActionMenuButton";
-import PlayMenu from "./PlayMenu";
+
+const CreateGameMenu = lazy(() => import("./CreateGameMenu"));
+const PlayMenu = lazy(() => import("./PlayMenu"));
 
 function Actions() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [activeAction, setActiveAction] = useState<
     "play" | "create" | null
   >(null);
@@ -30,22 +31,27 @@ function Actions() {
     setActiveAction("create");
   };
 
-   useEffect(() => {
-      
-    const handleKey = (event: KeyboardEvent) => { // renomer ces connecri
-      if (event.key === "&" && activeAction == null) {
-        handlePlayOpen()
-        console.log("open - 1 ");
-      } if ( event.key === "é" && activeAction == null) {
-        handleCreateOpen()
-      }
+  useEffect(() => {
+    if (loading) {
+      return;
     }
+
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "&" && activeAction == null) {
+        handlePlayOpen();
+      }
+
+      if (event.key === "é" && activeAction == null) {
+        handleCreateOpen();
+      }
+
+    };
     window.addEventListener("keydown", handleKey);
-    
+
     return () => {
       window.removeEventListener("keydown", handleKey);
     };
-  }, [activeAction]);
+  }, [activeAction, loading, user]);
 
 
   return (
@@ -58,7 +64,9 @@ function Actions() {
         buttonName="Jouer"
         buttonClass="playGameBtn"
       >
-        <PlayMenu />
+        <Suspense fallback={<p>Chargement...</p>}>
+          <PlayMenu />
+        </Suspense>
       </ActionBtn>
 
 
@@ -69,7 +77,9 @@ function Actions() {
         buttonName="Créer une partie"
         buttonClass="createGameBtn"
       >
-        <CreateGameMenu />
+        <Suspense fallback={<p>Chargement...</p>}>
+          <CreateGameMenu />
+        </Suspense>
       </ActionBtn>
 
     </div>

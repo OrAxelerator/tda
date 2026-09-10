@@ -20,9 +20,13 @@ export default function CreateGameMenu() {
     setIsLoading(true);
     setErrorMessage(null);
 
+    let step = "récupération du token Firebase";
+
     try {
       const idToken = await user.getIdToken();
 
+      step = "appel du backend";
+      console.log("[createGame] appel");
       const response = await fetch(apiUrl("/api/createGame"), {
         method: "POST",
         headers: {
@@ -31,7 +35,7 @@ export default function CreateGameMenu() {
         },
         body: JSON.stringify({ uid: user.uid, bots: botsNumber }),
       });
-      console.log(botsNumber); // yes
+      console.log("[createGame] réponse", response.status);
 
       const data = await readJsonResponse(response);
 
@@ -49,8 +53,8 @@ export default function CreateGameMenu() {
         setErrorMessage("Room créée mais aucun ID retourné.");
       }
     } catch (err: any) {
-      console.error("Erreur création room :", err);
-      setErrorMessage(err?.message ?? "Erreur inconnue lors de la création de la room.");
+      console.error(`Erreur création room pendant ${step} :`, err);
+      setErrorMessage(err?.message ?? `Erreur pendant ${step}.`);
     } finally {
       setIsLoading(false);
     }
@@ -60,7 +64,7 @@ export default function CreateGameMenu() {
 
 
         <>
-           <h1 style={{color:"black"}}>Créer une partie : </h1>
+           <h1 style={{color:"white"}}>Créer une partie : </h1>
 
 
                 <input
@@ -80,7 +84,7 @@ export default function CreateGameMenu() {
                 />
 
             <div style={{ marginTop: "1rem" }}>
-                <button onClick={handleClick} disabled={isLoading} className="createGameBtnInput">
+                <button type="button" onClick={handleClick} disabled={isLoading} className="createGameBtnInput">
                     {isLoading ? "Création en cours..." : "Créer une Room"}
                 </button>
             </div>

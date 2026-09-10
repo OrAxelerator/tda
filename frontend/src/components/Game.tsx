@@ -11,7 +11,7 @@ import Waiting from "./Waiting";
 // import { getDataConnect } from "firebase/data-connect";
 import Pile from "./Pile";
 
-import { API_URL, apiUrl, readJsonResponse } from "../config";
+import { SOCKET_URL, apiUrl, readJsonResponse } from "../config";
 
 type PlayerCard = {
   id: number;
@@ -81,7 +81,7 @@ function Game() {
       setPlayerHand(sortedHand);
     }
 
-    const newSocket = io(API_URL, {
+    const newSocket = io(SOCKET_URL, {
       transports: ["websocket"],
     });
 
@@ -116,7 +116,7 @@ function Game() {
       setPhase(payload.phase ?? "");
       setAllPlayers(payload.state?.players ?? []);
       setPublicPlayers(payload.publicPlayer)
-      setDebug(payload.yourCard)
+      setDebug(payload.discardCard)
 
       const currentUser = payload.state?.players?.find(
         (player) => player.id === user.uid,
@@ -179,8 +179,9 @@ function Game() {
     console.log(selectedCards.length);
     console.log(selectedCards);
     console.log("ALL PLAYRES : ", allPlayers);
-    if (selectedCards.length === 0) {
-      toast.warn("Sélectionne au moins une carte");
+
+    if (!isSelectedCardValid()) {
+      console.log("RATé PAS VALID");
       return;
     }
 
@@ -204,6 +205,129 @@ function Game() {
     );
 
   setSelectedCards([]);
+  }
+
+  function getCardFromId(cardId: number): PlayerCard | undefined {
+    if (cardId === 53 || cardId === 54) {
+      return {
+        id: cardId,
+        name: "jocker",
+        suit: "jocker",
+        value: 15,
+        asset: `${String(cardId).padStart(2, "0")}_theme1.png`,
+      };
+    }
+
+    if (!Number.isInteger(cardId) || cardId < 1 || cardId > 52) {
+      return undefined;
+    }
+
+    const cardIndex = cardId - 1;
+    const cardValue = (cardIndex % 13) + 2;
+    const suits = ["Spades", "Hearts", "Diamonds", "Clubs"];
+    const suit = suits[Math.floor(cardIndex / 13)];
+    const names = [
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "Jack",
+      "Queen",
+      "King",
+      "Ace",
+    ];
+
+    return {
+      id: cardId,
+      name: `${names[cardIndex % 13]} of ${suit}`,
+      suit,
+      value: cardValue,
+      asset: `${String(cardId).padStart(2, "0")}_theme1.png`,
+    };
+  }
+
+  function getDiscardCards() {
+    return discardPileCard
+      .map(getCardFromId)
+      .filter((card): card is PlayerCard => card !== undefined);
+  }
+
+  function isSelectedCardValid() {
+    if (phase !== "playing") {
+      toast.error("La partie n'est pas en cours");
+      return false;
+    }
+
+    if (currentPlayerId !== currentUser.uid) {
+      toast.error("Ce n'est pas votre tour");
+      return false;
+    }
+
+    if (!Array.isArray(selectedCards) || selectedCards.length === 0) {
+      toast.warn("Sélectionne au moins une carte");
+      return false;
+    }
+
+    if (selectedCards.length > 4) {
+      toast.error("Impossible de jouer plus de 4 cartes");
+      return false;
+    }
+
+    if (selectedCards.some((cardId) => !Number.isInteger(cardId))) {
+      toast.error("Carte invalide");
+      return false;
+    }
+
+    if (new Set(selectedCards).size !== selectedCards.length) {
+      toast.error("Impossible de jouer deux fois la même carte");
+      return false;
+    }
+
+    const selectedPlayerCards = playerHand.filter((card) =>
+      selectedCards.includes(card.id),
+    );
+
+    if (selectedPlayerCards.length !== selectedCards.length) {
+      toast.error("Le joueur ne possède pas toutes les cartes sélectionnées");
+      return false;
+    }
+
+    const discardCards = getDiscardCards();
+
+    if (discardCards.some((card) => selectedCards.includes(card.id))) {
+      toast.error("Une carte sélectionnée est déjà dans la pile");
+      return false;
+    }
+
+    const firstValue = selectedPlayerCards[0]?.value;
+    if (selectedPlayerCards.some((card) => card.value !== firstValue)) {
+      toast.error("Les cartes jouées ensemble doivent avoir la même valeur");
+      return false;
+    }
+
+    const lastDiscardCard = discardCards[discardCards.length - 1];
+    console.log("jocker test :");
+    console.log("firsvalue:", firstValue); // 2
+    console.log("lastDiscardCard?.value : ", lastDiscardCard?.value); // 14 : pq ...
+    console.log(discardCards); /// pas la carte id = 53 (id jocekrs = 53 et 54 ..)
+
+    console.log("équa :");
+    console.log(firstValue == 2 && lastDiscardCard?.value == 15);
+    if (firstValue == 2 && lastDiscardCard?.value == 15) {
+      console.log("Jocker ");
+    }else {
+      if (lastDiscardCard && firstValue < lastDiscardCard.value) {
+        toast.error("La carte jouée doit être supérieure ou égale à la dernière carte de la pile");
+        return false;
+      }
+    }
+
+    return true;
   }
 
   function takePile() {

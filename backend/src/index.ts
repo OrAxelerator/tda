@@ -16,9 +16,10 @@ import { randomUUID } from "crypto";
 
 import { createServer } from "http";
 import { Server } from "socket.io";
+import firebase from "./firebase";
 
 const isRender = process.env.RENDER === "true";
-
+const db = firebase.firestore()
 const app = express();
 
 // charger les variables d'environnement depuis /env/.env
@@ -31,8 +32,11 @@ if (!isRender) {
 
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:5174",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:5174",
   process.env.FRONTEND_URL,
-].filter(Boolean);
+].filter((origin): origin is string => Boolean(origin));
 
 app.use(
   cors({
@@ -62,6 +66,32 @@ const connectedPlayersByRoom = new Map<
 >();
 let currentRoomId: string | null = null;
 let availableCards: EngineCard[] = [];
+
+async function incrementFinishedGameStats(roomId: string) {
+  const game = getEngineForRoom(roomId);
+
+  if (!game || game.state.phase !== "finished") {
+    return;
+  }
+
+  const players = game.state.players.filter((player) => !player.isBot);
+  const winnerIds = new Set(
+    game.state.players.filter((player) => player.isWinner).map((player) => player.id),
+  );
+
+  await Promise.all(
+    players.map(async (player) => {
+      const playerRef = admin.firestore().collection("user").doc(player.id);
+
+      await playerRef.update({
+        gamesPlayed: admin.firestore.FieldValue.increment(1),
+        ...(winnerIds.has(player.id)
+          ? { gamesWon: admin.firestore.FieldValue.increment(1) }
+          : {}),
+      });
+    }),
+  );
+}
 
 io.on("connection", (socket) => {
   console.log("Socket connecté :", socket.id);
@@ -111,7 +141,13 @@ io.on("connection", (socket) => {
 
     try {
       await engine.playCards(userId, cards);
+
+      if (engine.state.phase === "finished") {
+        await incrementFinishedGameStats(roomId);
+      }
+
       emitGameUpdate(roomId);
+
     } catch (error: any) {
       console.warn("Coup refusé par GameEngine:", {
         roomId,
@@ -160,13 +196,14 @@ io.on("connection", (socket) => {
       removeConnectedPlayer(roomId, socket.id);
       socketRooms.delete(socket.id);
       console.log("PLAYER LEFT");
-      engine = getEngineForRoom(roomId);
-      if (!engine) {
-        throw new Error("Not found gameEngine in socket:disconect");
+      const disconnectedRoomEngine = getEngineForRoom(roomId);
+      if (!disconnectedRoomEngine) {
+        console.warn(`No game engine found while disconnecting room ${roomId}`);
+        return;
       }
       console.log("FIND ENGINE");
-      if (engine.state.phase == "playing") {
-        if (engine.state.players.length <= 1) {
+      if (disconnectedRoomEngine.state.phase == "playing") {
+        if (disconnectedRoomEngine.state.players.length <= 1) {
           console.log("NOT ENOUGH PLAYER");
           roomEngines.delete(roomId);
 
@@ -346,17 +383,16 @@ function getEngineForRoom(roomId: string | undefined) {
   return null;
 }
 
-
 app.post("/api/createGame", async (req, res) => {
   console.log("");
   console.log("----------- CREATE GAME ---------------");
-  console.log("-1");
+  
   if (!admin.apps.length) {
     return res
       .status(500)
       .json({ success: false, message: "Firebase admin not initialized" });
   }
-  console.log("0");
+  
   const authHeader = req.headers.authorization as string | undefined;
   if (!authHeader?.startsWith("Bearer ")) {
     return res
@@ -370,13 +406,12 @@ app.post("/api/createGame", async (req, res) => {
   const idToken = authHeader.split(" ")[1];
 
   try {
-    console.log("avant");
+  
     const decoded = await admin.auth().verifyIdToken(idToken); 
-    console.log("apres");
+  
     const uid = decoded.uid;
     const numberBot = Number(req.body.bots);
-    console.log("int bots : ");
-    console.log(numberBot);
+
 
     // create a new room doc in Firestore
     const db = admin.firestore();
@@ -393,7 +428,6 @@ app.post("/api/createGame", async (req, res) => {
     if (snapshot.exists) {
         name = snapshot.data()?.displayName ?? "HOST";
     }
-    console.log("1");
     console.log('Name : ', name);
 
     // initialize engine and persist initial state
@@ -402,31 +436,30 @@ app.post("/api/createGame", async (req, res) => {
     // state.players.push(...players);
     state.players.push(new Player(uid, name, true, false, false)); // Add the host player to the game
     // marche pas ????
-    
-    console.log("--- bots -----");
-    console.log(numberBot);
-    for (let i = 0; i < numberBot; i++) {
-      console.log("1 add bot");
-      const botId = randomUUID();
-      state.players.push(new Player(botId, "bot", false, false, true)); // Add the BOTS player to the game
+    if (numberBot > 0) {
+      console.log("---------- bots ---------");
+      console.log("Nombre de bots dans la game : ", numberBot);
+
+      for (let i = 0; i < numberBot; i++) {
+        console.log("1 add bot");
+        const botId = randomUUID();
+        state.players.push(new Player(botId, "bot", false, false, true)); // Add the BOTS player to the game
+      }
+      console.log("---------- bots ---------");
     }
-    console.log("--- bots -----");
-    console.log("state.players : ", state.players);
+    console.log("state.players.length : ", state.players.length);
 
     state.phase = "waiting";
-    console.log("2");
     const roomEngine = new GameEngine(state, roomDeck);
-    console.log("roomEngine : ", roomEngine);
     console.log("roomRef.id : ", roomRef.id);
     roomEngines.set(roomRef.id, roomEngine);
     currentRoomId = roomRef.id;
-    console.log("4");
-    await db
-      .collection("rooms")
-      .doc(roomRef.id)
-      .update({
-        state: serializeState(state),
-      });
+    // await db NOT FOR NOW ...
+    //   .collection("rooms")
+    //   .doc(roomRef.id)
+    //   .update({
+    //     state: serializeState(state),
+    //   });
 
     res.json({ success: true, roomId: roomRef.id });
   } catch (err: any) {
@@ -439,7 +472,8 @@ app.post("/api/createGame", async (req, res) => {
       });
   }
 
-  console.log("---------- END Create Game --");
+  console.log("---------- END CREATE GAME -------------");
+  console.log("");
 });
 
 // app.get("/api/firebaseConfig", (req, res) => {
@@ -510,7 +544,7 @@ app.post("/rooms/:roomId/joinGame", async (req, res) => {
 
     await updateRoomState(roomId, game.state);
     emitGameUpdate(roomId);
-    console.log("---------------");
+    console.log("---------------------------");
     return res.json({ success: true, state: game.getStateForFrontend() });
   } else {
     return res
@@ -534,6 +568,10 @@ app.post("/rooms/:roomId/startGame", async (req, res) => {
   const game = getEngineForRoom(roomId);
   if (!game) {
     return res.status(404).json({ success: false, message: "Game not found" });
+  }
+
+  if (game.state.players.length <= 1 || game.state.players.length >= 7) {
+    return res.status(400).json({ success: false, message: "Pas assez de joueur dans la partie" });
   }
 
   try {
@@ -568,7 +606,7 @@ app.post("/rooms/:roomId/leave", async (req, res) => {
   const { playerId } = req.body;
   console.log("");
   console.log("--------------------");
-  console.log(`Player ${playerId} want to leave ${roomId}`);
+  console.log(`👤 ==>🚪 - Player ${playerId} want to leave ${roomId}`);
   const engine = getEngineForRoom(roomId);
 
   if (!engine) {
@@ -576,7 +614,7 @@ app.post("/rooms/:roomId/leave", async (req, res) => {
   }
 
   engine.removePlayer(playerId);
-  console.log("Player successfully left !!");
+  console.log("👤 ==> ✅ - Player successfully left !!");
 
   await updateRoomState(roomId, engine.state);
   emitGameUpdate(roomId);

@@ -79,7 +79,7 @@ function initFirebase() {
 
   console.log(
     "Firebase Admin initialisé avec le projet :",
-    serviceAccount.projectId || serviceAccount.project_id // (dif entre fichier api local est render var env sur render)
+    serviceAccount.projectId ?? (serviceAccount as { project_id?: string }).project_id
   );
 
 

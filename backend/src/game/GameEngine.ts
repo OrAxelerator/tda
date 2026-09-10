@@ -52,8 +52,9 @@ export class GameEngine {
 
     async startGame() {
 
-        if(this.state.players.length < 2 || this.state.players.length > 6)
-            throw new Error("Not enough players");
+        if (this.state.players.length < 2 || this.state.players.length > 6) {
+            throw new Error("Not enough players"); 
+        }
 
 
         this.state.turn = 1;
@@ -426,10 +427,15 @@ async playBotTurn(player: Player) {
         const lastDiscardId = this.state.discardPile[this.state.discardPile.length - 1];
         const lastDiscardCard = lastDiscardId ? this.getCard(lastDiscardId) : undefined;
 
-        if (lastDiscardCard && firstValue < lastDiscardCard.value) {
-            console.log(firstValue);
-            throw new Error("La carte jouée doit être supérieure ou égale à la dernière carte de la pile");
+        if (firstValue == 2 && lastDiscardCard?.value == 15) {
+            // pass (jocker rule)
+        }else {
+            if (lastDiscardCard && firstValue < lastDiscardCard.value  ) {
+                console.log(firstValue);
+                throw new Error("La carte jouée doit être supérieure ou égale à la dernière carte de la pile");
+            }
         }
+
 
         for (const cardId of cards) {
             this.discardCards(playerId, cardId);

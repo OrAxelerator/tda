@@ -21,11 +21,17 @@ export default function PlayMenu() {
     return;
   }
 
+  const normalizedRoomId = roomId.trim();
+  if (!normalizedRoomId) {
+    setErrorMessage("Entre le code de la room");
+    return;
+  }
+
   setIsLoading(true);
   setErrorMessage(null);
 
   try {
-    const res = await fetch(apiUrl(`/rooms/${roomId}/joinGame`), {
+    const res = await fetch(apiUrl(`/rooms/${encodeURIComponent(normalizedRoomId)}/joinGame`), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -43,7 +49,7 @@ export default function PlayMenu() {
       throw new Error(data?.message || "Impossible de rejoindre la partie");
     }
 
-    navigate(`/game/${roomId}`);
+    navigate(`/game/${encodeURIComponent(normalizedRoomId)}`);
   } catch (err: any) {
     console.error(err);
     setErrorMessage(err?.message ?? "Erreur inconnue lors de la connexion à la room.");
@@ -57,7 +63,7 @@ export default function PlayMenu() {
 
 
         <>
-            <h1 style={{color:"black"}}>Rejoindre une partie : </h1>
+            <h1 style={{color:"white"}}>Rejoindre une partie : </h1>
 
             <div className="playInput">
               <input
