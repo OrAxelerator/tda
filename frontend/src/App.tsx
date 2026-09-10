@@ -106,6 +106,8 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route path="/michel" element={<img src="/src/assets/michel.png"></img>} />
+
                 <Route path="*" element={<Navigate to="/home" replace />} />
               </Routes>
               <ToastContainer />

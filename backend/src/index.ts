@@ -67,6 +67,32 @@ const connectedPlayersByRoom = new Map<
 let currentRoomId: string | null = null;
 let availableCards: EngineCard[] = [];
 
+async function incrementFinishedGameStats(roomId: string) {
+  const game = getEngineForRoom(roomId);
+
+  if (!game || game.state.phase !== "finished") {
+    return;
+  }
+
+  const players = game.state.players.filter((player) => !player.isBot);
+  const winnerIds = new Set(
+    game.state.players.filter((player) => player.isWinner).map((player) => player.id),
+  );
+
+  await Promise.all(
+    players.map(async (player) => {
+      const playerRef = admin.firestore().collection("user").doc(player.id);
+
+      await playerRef.update({
+        gamesPlayed: admin.firestore.FieldValue.increment(1),
+        ...(winnerIds.has(player.id)
+          ? { gamesWon: admin.firestore.FieldValue.increment(1) }
+          : {}),
+      });
+    }),
+  );
+}
+
 io.on("connection", (socket) => {
   console.log("Socket connecté :", socket.id);
 
@@ -116,19 +142,8 @@ io.on("connection", (socket) => {
     try {
       await engine.playCards(userId, cards);
 
-      const wonByUser = engine.state.players.some(
-        (player) => player.id === userId && player.isWinner,
-      );
-
-      if (wonByUser) {
-        await admin
-          .firestore()
-          .collection("user")
-          .doc(userId)
-          .update({
-            gamesWon: admin.firestore.FieldValue.increment(1),
-            gamesPlayed: admin.firestore.FieldValue.increment(1),
-          });
+      if (engine.state.phase === "finished") {
+        await incrementFinishedGameStats(roomId);
       }
 
       emitGameUpdate(roomId);
