@@ -18,6 +18,8 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import firebase from "./firebase";
 
+import { handleAchievementEvent } from "./achievements/achievementService";
+
 const isRender = process.env.RENDER === "true";
 const db = firebase.firestore()
 const app = express();
@@ -79,9 +81,11 @@ async function incrementFinishedGameStats(roomId: string) {
     game.state.players.filter((player) => player.isWinner).map((player) => player.id),
   );
 
+
+  
   await Promise.all(
     players.map(async (player) => {
-      const playerRef = admin.firestore().collection("user").doc(player.id);
+      const playerRef = admin.firestore().collection("users").doc(player.id);
 
       await playerRef.update({
         gamesPlayed: admin.firestore.FieldValue.increment(1),
@@ -89,6 +93,10 @@ async function incrementFinishedGameStats(roomId: string) {
           ? { gamesWon: admin.firestore.FieldValue.increment(1) }
           : {}),
       });
+
+      if (winnerIds.has(player.id)) {
+        await handleAchievementEvent({ type: "GAME_WON", userId: player.id });
+      }
     }),
   );
 }
@@ -422,7 +430,7 @@ app.post("/api/createGame", async (req, res) => {
       state: null,
     });
     
-    const snapshot = await db.collection("user").doc(uid).get();
+    const snapshot = await db.collection("users").doc(uid).get();
     let name = "HOST";
 
     if (snapshot.exists) {

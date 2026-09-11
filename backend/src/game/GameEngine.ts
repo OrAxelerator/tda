@@ -2,6 +2,7 @@ import { GameState } from "./GameState";
 import { Card } from "./Card";
 import { Player } from "./Player";
 import { Deck } from "./Deck";
+import { handleAchievementEvent } from "../achievements/achievementService";
 
 export type PublicPlayer = Pick<Player, "id" | "name">;
 
@@ -163,7 +164,6 @@ export class GameEngine {
         const player = this.getPlayer(playerId);
         if (!player ) {
             throw new Error("Joueur n'existe pas.")
-            return;
         }
         if (player.isWinner) {
             throw new Error("Vous avez gagnez pq prendre la pile ..")
@@ -181,6 +181,11 @@ export class GameEngine {
                     throw new Error("Null card from discard pile ..");
                 }
                 player.addCard(card);
+            });
+            await handleAchievementEvent({
+                type: "CARDS_PLAYED",
+                userId: playerId,
+                amount: this.state.discardPile.length
             });
             this.state.discardPile = [] // vide totalement la discard pile
 
@@ -439,6 +444,13 @@ async playBotTurn(player: Player) {
 
         for (const cardId of cards) {
             this.discardCards(playerId, cardId);
+        }
+
+        if (cards.includes(53) && cards.includes(54)) {
+            await handleAchievementEvent({
+                type: "JOKERS_PLAYED",
+                userId: playerId,
+            });
         }
 
         if (player.hand.length === 0) {
