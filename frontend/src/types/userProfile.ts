@@ -6,4 +6,6 @@ export interface UserProfile {
   gamesWon: number;
   profileBanner: string;
   profileImageUrl: string | null;
+  achievements: string[],
+  role: string[],
 }

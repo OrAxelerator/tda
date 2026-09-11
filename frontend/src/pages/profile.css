@@ -118,3 +118,29 @@
   gap: 15px;
   justify-content: space-around;
 }
+
+.profile-achivement {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 1rem;
+  padding: 1.5rem 0;
+}
+.container-role {
+  margin-left: auto;
+}
+
+.profile-role {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 5px;
+  
+}
+
+.achivement {
+  padding: 1rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: grid;
+  gap: 0.35rem;
+}

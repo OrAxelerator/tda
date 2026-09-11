@@ -15,6 +15,7 @@ import { db } from "../firebase-db";
 import type { UserProfile } from "../types/userProfile";
 import "./profile.css";
 import { toast } from "react-toastify";
+import { map } from "firebase/firestore/pipelines";
 
 function Profile() {
   const { uid } = useParams<{ uid: string }>();
@@ -28,7 +29,7 @@ function Profile() {
   const isOwnProfile = !uid || uid === user?.uid;
   console.log("isOwnProfile:", isOwnProfile);
   const wins = profile?.gamesWon ?? 0;
-  const losses = Math.max((profile?.gamesPlayed ?? 0) - wins, 0);
+  const achivements = profile?.achievements.length ?? 0;
 
   const auth = getAuth();
   console.log(auth);
@@ -46,7 +47,7 @@ function Profile() {
       try {
         console.log("avant ")
         console.log("profileUid:", profileUid);
-        const snapshot = await getDoc(doc(db, "user", profileUid));
+        const snapshot = await getDoc(doc(db, "users", profileUid));
         console.log("Snapshot:", snapshot);
         if (!snapshot.exists()) {
           setError("Utilisateur introuvable.");
@@ -68,6 +69,19 @@ function Profile() {
 
   function handleClick() {
     navigate("/home");
+  }
+
+  function getAchivements(name: string) {
+    const list = {
+      "1V" : "A gagnez 1 partie de tda !",
+      "2surJ":"A poser un 2 sur un jocker",
+      "d15" : "C'est pris une défausse de +15 cartes",
+      "10V" : "A gagner plus de 10 partie !",
+      "???" : "Gros michel 🍌",
+      "2J": "Jouer une main avec 2 jocker",
+    }
+
+    return list[name];
   }
 
   function getBanner() {
@@ -97,6 +111,13 @@ function Profile() {
         <h1>Profil</h1>
         <p>{error}</p>
         <button onClick={handleClick}>Retour</button>
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={() => logout()}
+        >
+          Déconnexion
+        </button>
       </div>
     );
   }
@@ -131,7 +152,7 @@ function Profile() {
           console.log(db);
           console.log("------");
           // 1. Supprime les données Firestore
-          await deleteDoc(doc(db, "user", currentUser.uid));
+          await deleteDoc(doc(db, "users", currentUser.uid));
           
           console.log("Document Firestore supprimé");
 
@@ -155,14 +176,14 @@ function Profile() {
 
 
         // 1. Supprime les données Firestore
-        // await deleteDoc(doc(db, "user", "3UH5PLQ4YcR6fkUbe1Y1C9844WJ2")) // MARCHE !!
+        // await deleteDoc(doc(db, "users", "3UH5PLQ4YcR6fkUbe1Y1C9844WJ2")) // MARCHE !!
 
         console.log("tests passé");
           console.log("-------");
           console.log(typeof  currentUser.uid);
           console.log(db);
           console.log("------");
-        await deleteDoc(doc(db, "user", currentUser.uid)); //
+        await deleteDoc(doc(db, "users", currentUser.uid)); //
         
         
         await deleteUser(currentUser);
@@ -194,6 +215,16 @@ function Profile() {
           <div className="profile-title">
             <h1>{getDisplayName()}</h1>
           </div>
+
+          <div className="container-role">
+            {
+              profile?.role.map((el, index) => 
+              <div key={index} className="profile-role">
+                <p>{el}</p>
+              </div>
+              )
+            }
+          </div>
         </div>
 
         <div className="profile-stats">
@@ -202,8 +233,8 @@ function Profile() {
             <strong>{wins}</strong>
           </article>
           <article className="profile-stat">
-            <span>Défaites</span>
-            <strong>{losses}</strong>
+            <span>Succès</span>
+            <strong>{achivements}</strong>
           </article>
           <article className="profile-stat">
             <span>Parties jouées</span>
@@ -270,6 +301,19 @@ function Profile() {
         </div>
 
         <div className="profile-footer">
+
+          <div className="profile-achivement">
+          {
+            profile?.achievements.map((el, index) => {
+              return (
+                <article key={index} className="achivement">
+                  <p>{getAchivements(el)}</p>  
+                   
+                </article>
+              )
+            })
+          }
+          </div>
 
           {/* <h2>Badges : </h2>
           <h6>en dev...</h6> */}
