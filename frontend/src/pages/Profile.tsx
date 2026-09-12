@@ -15,7 +15,6 @@ import { db } from "../firebase-db";
 import type { UserProfile } from "../types/userProfile";
 import "./profile.css";
 import { toast } from "react-toastify";
-import { map } from "firebase/firestore/pipelines";
 
 function Profile() {
   const { uid } = useParams<{ uid: string }>();
@@ -71,17 +70,17 @@ function Profile() {
     navigate("/home");
   }
 
-  function getAchivements(name: string) {
-    const list = {
-      "1V" : "A gagnez 1 partie de tda !",
-      "2surJ":"A poser un 2 sur un jocker",
-      "d15" : "C'est pris une défausse de +15 cartes",
-      "10V" : "A gagner plus de 10 partie !",
-      "???" : "Gros michel 🍌",
+  function getAchivements(name: string): string {
+    const list: Record<string, string> = {
+      "1V": "A gagné 1 partie de tda !",
+      "2surJ": "A posé un 2 sur un jocker",
+      d15: "C'est pris une défausse de +15 cartes",
+      "10V": "A gagné plus de 10 parties !",
+      "???": "Gros michel 🍌",
       "2J": "Jouer une main avec 2 jocker",
-    }
+    };
 
-    return list[name];
+    return list[name] ?? "Succès inconnu";
   }
 
   function getBanner() {

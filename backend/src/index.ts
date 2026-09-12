@@ -329,7 +329,8 @@ function createGameUpdatePayload(
         isHost: player.isHost,
         // cardCount: player.hand.length,
         cardCount: state.phase != "playing" ? null : player.hand.length,
-        isWinner: player.isWinner
+        isWinner: player.isWinner,
+        isBot: player.isBot
       })),
     yourCard: currentPlayer?.hand.map(serializeCard) ?? [],
     numberOfTurn: state.phase != "playing" ? null : state.turn,

@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { io, type Socket } from "socket.io-client";
 import { toast } from "react-toastify";
 import Card from "./Card";
-import { LeaveRoomButton } from "./LeaveRoomButton";
+import GameHeader from "./GameHeader";
 import { useAuth } from "../components/auth-context";
 import "../App.css";
 import "../game.css";
@@ -35,6 +35,7 @@ type PublicPlayer = {
   isHost: boolean;
   isWinner: boolean;
   cardCount: number;
+  isBot: boolean;
 }
 
 type GameUpdatePayload = {
@@ -151,6 +152,9 @@ function Game() {
   const currentTurnPlayer = publicPlayers.find((player) => player.id === currentPlayerId);
 
   function getPlayerAvatar(player: PublicPlayer) {
+    if (player.isBot) {
+      return "/robot.png"
+    }
     if (player.id === user?.uid && user.photoURL) {
       return user.photoURL;
     }
@@ -384,80 +388,22 @@ function Game() {
   return (
     <>
       <div className="game-container">
-        <header className="Appheader">
-          <section className="gameInfo">
-            <h4>Partie</h4>
-            <p>
-              <strong>Vous :</strong> {user.displayName || user.email || "Joueur"}
-            </p>
-            <p>
-              <strong>Tour de :</strong> {currentTurnPlayer?.name || "aucun"}
-            </p>
-            <p>
-              <strong>Phase :</strong> {phase || "inconnue"}
-            </p>
-            <p>
-              <strong>Tour :</strong> {numberOfTurn}
-            </p>
-            <p>
-              <strong>Deck :</strong> {deckLength} cartes
-            </p>
-            <p>
-              <strong>Socket :</strong> {socket?.connected ? "connecté" : "déconnecté"}
-            </p>
-
-            <div className="gameInfoActions">
-              <LeaveRoomButton roomId={roomId} playerId={currentUser.uid} />
-              {(phase === "finished" && isHost) ? (
-                <button className="headerActionButton secondary" onClick={startGame}>
-                  Relancer partie
-                </button>
-              ) : null}
-            </div>
-          </section>
-
-          <section className="players">
-            {allPlayers.length === 0 ? (
-              <p>
-                il n'y a pas de player dans la room donc comment tu vois ce
-                message ????
-              </p>
-            ) : (
-              publicPlayers.map((player) => (
-                <div
-                  className={`
-                    playerInfo
-                    ${user?.uid === player.id ? "selfPlayer" : ""}
-                    ${currentPlayerId === player.id ? "activePlayer" : ""}
-                  `}
-                  key={player.id}
-                  id={player.id}
-                >
-                  <div className="playerBadges">
-                    {user?.uid === player.id && <span className="playerBadge self">Vous</span>}
-                    {currentPlayerId === player.id && <span className="playerBadge turn">Tour</span>}
-                  </div>
-
-                  <img
-                    src={getPlayerAvatar(player)}
-                    alt={player.name}
-                    className="playerAvatar"
-                    onError={(event) => {
-                      event.currentTarget.src = "/default.jpeg";
-                    }}
-                  />
-                  <h3>
-                    <span>{player.name}</span>
-                    {player.isHost && <span>[HOST]</span>}
-                  </h3>
-                  <h5>
-                    {player.cardCount ? `${player.cardCount} carte${player.cardCount > 1 ? "s" : ""} restante${player.cardCount > 1 ? "s" : ""}` : ""}
-                  </h5>
-                </div>
-              ))
-            )}
-          </section>
-        </header>
+        <GameHeader
+          user={currentUser}
+          currentTurnPlayer={currentTurnPlayer}
+          phase={phase}
+          numberOfTurn={numberOfTurn}
+          deckLength={deckLength}
+          socketConnected={Boolean(socket?.connected)}
+          roomId={roomId}
+          currentUserUid={currentUser.uid}
+          isHost={isHost}
+          startGame={startGame}
+          allPlayers={allPlayers}
+          publicPlayers={publicPlayers}
+          currentPlayerId={currentPlayerId}
+          getPlayerAvatar={getPlayerAvatar}
+        />
           
       {
         phase === "waiting" ? (
