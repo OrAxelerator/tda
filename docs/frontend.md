@@ -1,39 +1,33 @@
-# Frontend docs
+# Repères frontend
 
+Le client se trouve dans `frontend/src/`. Il utilise React, TypeScript, React Router et Socket.IO Client.
 
-### App.tsx:
+## Routes
+ 
+- `/home` : accueil et accès aux actions de partie.
+- `/login` et `/register` : connexion et création de compte.
+- `/user` et `/user/:uid` : profil, routes protégées.
+- `/game/:roomCode` : partie, route protégée.
+- `/` redirige vers `/home` ; les chemins inconnus redirigent vers `/home`.
 
-Avec ``<Router>`` selon url return un composant différents.
+`AuthProvider` partage l’état d’authentification. `ProtectedRoute` renvoie les visiteurs non connectés vers `/login`; `PublicRoute` renvoie les utilisateurs connectés vers `/user`.
 
-"/" : essaye d'aller sur la route "/user" et est protégé par ``<ProtectedRoute>``
-"/login" : tout est dans le nom
-"/registrer" : pareil
+## Composants principaux
 
-"/game/<roomCode>" : se connecte a une room, pour l'instant pas de système room privé/publique
+- `components/Home.tsx` : accueil et création ou accès aux parties.
+- `components/Game.tsx` : écran de jeu et échanges temps réel.
+- `components/Waiting.tsx` : salle d’attente.
+- `components/Card.tsx` et `components/Pile.tsx` : affichage des cartes et de la pile.
+- `pages/Profile.tsx`, `pages/login.tsx`, `pages/SignUp.tsx` : profil et authentification.
+- `config.ts` : construction des URL HTTP et URL Socket.IO.
+- `firebase-app.ts` : initialisation Firebase côté navigateur.
 
-"/home" : page home pour trouver/lancer game, se connecter, aller au parametres
+## Communication avec le backend
 
+En développement, les appels HTTP utilisent l’origine courante et Socket.IO se connecte à `http://localhost:3000`. En production, `VITE_API_URL` donne l’URL du backend et sert aussi d’hôte Socket.IO.
 
-### Game.tsx ou <Game />
+Les événements Socket.IO utilisés pour le jeu incluent `joinRoom`, `playCard`, `takePile`, `gameUpdate` et `gameError`. Les endpoints HTTP et leurs paramètres sont définis dans `backend/src/index.ts`.
 
-Ne prends aucune donnée en entré, on s'y connect depuis Profile.tsx
+## Commandes
 
-#### useState de Game
-- inputValue : utilisez pour recuprer input et fetch une certaine page du backend, **Debug, plus utile**
-- playerHand : Stock les cartes du jouers, au début stock rien tant que la partie n'as pas commencé.
-- selectedCards : Enregistre les cartes selectionnés par le joueur, envoyé dans ``<Card>`` pour l'affichage.
-- "," : sert uniquement a refresh les donnés affiché des hooks, il suffit de faire : ``refresh((x) => x + 1)``.
-- discardPileCard : enregistre les cartes dans la pile.
-- seeDisCardPile : cache l'entièreté de la pile, il faudrait faire en sorte que affiche tout ou les 2 dernière
-- user : truc compliqué avec firebase
-- phase : le status de la partie : "wait" | "playing"
-- ListUesr : la liste des joueurs connecté a la partie
-- isHost : true : est le host de la partie, affiche plus de contenu comme les paramètres, exclure des gens ect ..
-
-
-
-
-
-
-
-
+Depuis `frontend/` : `npm run dev` lance Vite, `npm run build` produit la version de production, `npm run preview` la sert localement et `npm run lint` lance ESLint.
