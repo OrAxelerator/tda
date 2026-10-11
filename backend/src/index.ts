@@ -13,6 +13,7 @@ import type { Card as EngineCard } from "./game/Card";
 import admin from "./firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { randomUUID } from "crypto";
+import { MAX_BOTS, parseBotCount } from "./validation";
 
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -419,7 +420,14 @@ app.post("/api/createGame", async (req, res) => {
     const decoded = await admin.auth().verifyIdToken(idToken); 
   
     const uid = decoded.uid;
-    const numberBot = Number(req.body.bots);
+    const numberBot = parseBotCount(req.body.bots);
+
+    if (numberBot === null) {
+      return res.status(400).json({
+        success: false,
+        message: `Nombre de bots invalide (entier de 0 à ${MAX_BOTS})`,
+      });
+    }
 
 
     // create a new room doc in Firestore

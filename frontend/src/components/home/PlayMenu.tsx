@@ -50,9 +50,9 @@ export default function PlayMenu() {
     }
 
     navigate(`/game/${encodeURIComponent(normalizedRoomId)}`);
-  } catch (err: any) {
+  } catch (err) {
     console.error(err);
-    setErrorMessage(err?.message ?? "Erreur inconnue lors de la connexion à la room.");
+    setErrorMessage(err instanceof Error ? err.message : "Erreur inconnue lors de la connexion à la room.");
   } finally {
     setIsLoading(false);
   }

@@ -52,9 +52,9 @@ export default function CreateGameMenu() {
       } else {
         setErrorMessage("Room créée mais aucun ID retourné.");
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error(`Erreur création room pendant ${step} :`, err);
-      setErrorMessage(err?.message ?? `Erreur pendant ${step}.`);
+      setErrorMessage(err instanceof Error ? err.message : `Erreur pendant ${step}.`);
     } finally {
       setIsLoading(false);
     }

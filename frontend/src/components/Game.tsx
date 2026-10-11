@@ -69,7 +69,7 @@ function Game() {
   const [publicPlayers, setPublicPlayers] = useState<PublicPlayer[]>([]);
   const [allPlayers, setAllPlayers] = useState<RoomPlayer[]>([]);
   const [isHost, setIsHost] = useState<boolean>(false);
-  const [debug, setDebug] = useState<any>()
+  const [debug, setDebug] = useState<unknown>()
 
 
   useEffect(() => {
@@ -143,6 +143,25 @@ function Game() {
       newSocket.disconnect();
     };
   }, [roomId, user]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Enter") {
+        console.log("ENTER");
+        playSelectedCards();
+      }
+      // if (event.key === "t") {
+      //   console.log("T");
+      //  sortCard();
+      // }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedCards]);
 
   if (!user) {
     return <p>Connexion requise.</p>;
@@ -365,25 +384,6 @@ function Game() {
 
     console.log("----------");
   }
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Enter") {
-        console.log("ENTER");
-        playSelectedCards();
-      }
-      // if (event.key === "t") {
-      //   console.log("T");
-      //  sortCard();
-      // }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [selectedCards]);
 
   return (
     <>

@@ -37,8 +37,6 @@ function Profile() {
     const profileUid = uid ?? user?.uid;
 
     if (!profileUid) {
-      setError("Aucun profil disponible.");
-      setLoading(false);
       return;
     }
 
@@ -55,8 +53,8 @@ function Profile() {
 
         setProfile(snapshot.data() as UserProfile);
         console.log("Profile loaded:", snapshot.data());  
-      } catch {
-        console.error("Erreur lors du chargement du profil :", error);
+      } catch (err) {
+        console.error("Erreur lors du chargement du profil :", err);
         setError("Impossible de charger le profil.");
       } finally {
         setLoading(false);
@@ -98,6 +96,16 @@ function Profile() {
 
   function getDisplayName() {
     return profile?.displayName ?? "Joueur";
+  }
+
+  if (!uid && !user?.uid) {
+    return (
+      <div>
+        <h1>Profil</h1>
+        <p>Aucun profil disponible.</p>
+        <button onClick={handleClick}>Retour</button>
+      </div>
+    );
   }
 
   if (loading) {
