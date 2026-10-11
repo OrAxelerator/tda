@@ -22,9 +22,16 @@ function ActionBtn({
   const [shouldRender, setShouldRender] = useState(isOpen);
   const [isVisible, setIsVisible] = useState(false);
 
+  // Ajustement de l'état pendant le rendu (au lieu d'un setState dans un effet)
+  if (isOpen && !shouldRender) {
+    setShouldRender(true);
+  }
+  if (!isOpen && isVisible) {
+    setIsVisible(false);
+  }
+
   useEffect(() => {
     if (isOpen) {
-      setShouldRender(true);
       const frame = window.requestAnimationFrame(() => {
         setIsVisible(true);
       });
@@ -32,20 +39,12 @@ function ActionBtn({
       return () => window.cancelAnimationFrame(frame);
     }
 
-    setIsVisible(false);
     const timer = window.setTimeout(() => {
       setShouldRender(false);
     }, 280);
 
     return () => window.clearTimeout(timer);
   }, [isOpen]);
-
-  useEffect(() => {
-    if (!shouldRender) {
-      setIsVisible(false);
-      return;
-    }
-  }, [shouldRender]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

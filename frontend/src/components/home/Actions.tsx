@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, useEffect } from "react";
+import { lazy, Suspense, useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 
 import { useAuth } from "../auth-context";
@@ -13,23 +13,23 @@ function Actions() {
     "play" | "create" | null
   >(null);
 
-  const handlePlayOpen = () => {
+  const handlePlayOpen = useCallback(() => {
     if (!user) {
       toast.error("Tu dois être connecté pour rejoindre une partie.");
       return;
     }
 
     setActiveAction("play");
-  };
+  }, [user]);
 
-    const handleCreateOpen = () => {
+  const handleCreateOpen = useCallback(() => {
     if (!user) {
       toast.error("Tu dois être connecté pour créer une partie.");
       return;
     }
 
     setActiveAction("create");
-  };
+  }, [user]);
 
   useEffect(() => {
     if (loading) {
@@ -51,7 +51,7 @@ function Actions() {
     return () => {
       window.removeEventListener("keydown", handleKey);
     };
-  }, [activeAction, loading, user]);
+  }, [activeAction, loading, handlePlayOpen, handleCreateOpen]);
 
 
   return (
