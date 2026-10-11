@@ -3,3 +3,4 @@ backend/env/.env
 backend/env/env
 .DS_Store
 
+node_modules/
