@@ -82,10 +82,11 @@ Légende priorité : 🔴 critique (sécurité) · 🟠 bug probable · 🟡 det
 - **Où** : `frontend/src/components/Game.tsx`, ligne ~135 (`setSocket(newSocket)` dans le `useEffect` de connexion).
 - **Problème** : règle `react-hooks/set-state-in-effect` (erreur de lint). Corriger demande de revoir la façon dont le socket est stocké (ref, ou création hors effet).
 
-### 🟠 15. Lint : dépendance manquante dans l'effet clavier
+### ✅ 15. Lint : dépendance manquante dans l'effet clavier (corrigé)
 - **Où** : `frontend/src/components/Game.tsx`, effet `keydown` qui appelle `playSelectedCards`.
 - **Problème** : `playSelectedCards` n'est pas dans les dépendances. Ajouter la fonction telle quelle ferait réenregistrer le listener à chaque rendu. Risque de closure périmée : la touche Entrée peut utiliser une ancienne valeur de `playerHand` ou de `selectedCards`.
 - **Piste** : mémoïser `playSelectedCards` avec `useCallback` et lister ses dépendances réelles.
+- **Correction** : `isSelectedCardValid` et `playSelectedCards` sont en `useCallback` avec leurs dépendances réelles, placés avant le `return` conditionnel. L'effet clavier écoute `playSelectedCards`. `getCardFromId` est sorti du composant (fonction pure). Les `console.log` de débogage de ces fonctions ont été retirés.
 
 ### 🟡 16. Dépendance `socket.io` inutile côté frontend
 - **Où** : `frontend/package.json`.

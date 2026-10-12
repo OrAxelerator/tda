@@ -120,7 +120,7 @@ function GameHeader({
                 alt={player.name}
                 className="playerAvatar"
                 onError={(event) => {
-                  event.currentTarget.src = player.isBot ? "/robot.png" : "/default.jpeg";
+                  event.currentTarget.src = player.isBot ? "/robot.png" : "/profil.jpeg";
                 }}
               />
               <h3>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { io, type Socket } from "socket.io-client";
 import { toast } from "react-toastify";
@@ -51,6 +51,50 @@ type GameUpdatePayload = {
   };
   publicPlayer: PublicPlayer[];
 };
+
+function getCardFromId(cardId: number): PlayerCard | undefined {
+  if (cardId === 53 || cardId === 54) {
+    return {
+      id: cardId,
+      name: "jocker",
+      suit: "jocker",
+      value: 15,
+      asset: `${String(cardId).padStart(2, "0")}_theme1.png`,
+    };
+  }
+
+  if (!Number.isInteger(cardId) || cardId < 1 || cardId > 52) {
+    return undefined;
+  }
+
+  const cardIndex = cardId - 1;
+  const cardValue = (cardIndex % 13) + 2;
+  const suits = ["Spades", "Hearts", "Diamonds", "Clubs"];
+  const suit = suits[Math.floor(cardIndex / 13)];
+  const names = [
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "Jack",
+    "Queen",
+    "King",
+    "Ace",
+  ];
+
+  return {
+    id: cardId,
+    name: `${names[cardIndex % 13]} of ${suit}`,
+    suit,
+    value: cardValue,
+    asset: `${String(cardId).padStart(2, "0")}_theme1.png`,
+  };
+}
 
 function Game() {
   const { user } = useAuth();
@@ -144,149 +188,14 @@ function Game() {
     };
   }, [roomId, user]);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Enter") {
-        console.log("ENTER");
-        playSelectedCards();
-      }
-      // if (event.key === "t") {
-      //   console.log("T");
-      //  sortCard();
-      // }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [selectedCards]);
-
-  if (!user) {
-    return <p>Connexion requise.</p>;
-  }
-
-  const currentUser = user;
-  const currentTurnPlayer = publicPlayers.find((player) => player.id === currentPlayerId);
-
-  function getPlayerAvatar(player: PublicPlayer) {
-    if (player.isBot) {
-      return "/robot.png"
-    }
-    if (player.id === user?.uid && user.photoURL) {
-      return user.photoURL;
-    }
-
-    return "/default.jpeg";
-  }
-
-  async function startGame() {
-    try {
-      const res = await fetch(apiUrl(`/rooms/${roomId}/startGame`), {
-        method: "POST",
-      });
-      const data = await readJsonResponse(res);
-
-      if (!res.ok || !data?.success) {
-        toast.error(data.message || "Impossible de lancer la partie");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Erreur pendant le lancement de la partie");
-    }
-  }
-
-  function playSelectedCards() {
-    console.log("play card : ");
-    console.log(selectedCards.length);
-    console.log(selectedCards);
-    console.log("ALL PLAYRES : ", allPlayers);
-
-    if (!isSelectedCardValid()) {
-      console.log("RATé PAS VALID");
-      return;
-    }
-
-    if (!socket?.connected) {
-      toast.error("Socket non connecté");
-      return;
-    }
-
-    socket.emit("playCard", {
-      roomId,
-      userId: currentUser.uid,
-      cardIds: selectedCards,
-    });
-    // rajouter dans le css de selected card "display:none" et enlever la propriété quand emitGameUpdate ou supr le html des cartes ?, enfaite le problème est que apres avoir joué pendant 1s la(les) carte est tjts affiché et change que une fois le coup du bot
-    // const playerHandBuff = playerHand.filter(
-    //     card => !(selectedCards.includes(card))
-    // );
-    // setPlayerHand(playerHandBuff)
-    setPlayerHand(prev =>
-      prev.filter(card => !selectedCards.includes(card.id))
-    );
-
-  setSelectedCards([]);
-  }
-
-  function getCardFromId(cardId: number): PlayerCard | undefined {
-    if (cardId === 53 || cardId === 54) {
-      return {
-        id: cardId,
-        name: "jocker",
-        suit: "jocker",
-        value: 15,
-        asset: `${String(cardId).padStart(2, "0")}_theme1.png`,
-      };
-    }
-
-    if (!Number.isInteger(cardId) || cardId < 1 || cardId > 52) {
-      return undefined;
-    }
-
-    const cardIndex = cardId - 1;
-    const cardValue = (cardIndex % 13) + 2;
-    const suits = ["Spades", "Hearts", "Diamonds", "Clubs"];
-    const suit = suits[Math.floor(cardIndex / 13)];
-    const names = [
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10",
-      "Jack",
-      "Queen",
-      "King",
-      "Ace",
-    ];
-
-    return {
-      id: cardId,
-      name: `${names[cardIndex % 13]} of ${suit}`,
-      suit,
-      value: cardValue,
-      asset: `${String(cardId).padStart(2, "0")}_theme1.png`,
-    };
-  }
-
-  function getDiscardCards() {
-    return discardPileCard
-      .map(getCardFromId)
-      .filter((card): card is PlayerCard => card !== undefined);
-  }
-
-  function isSelectedCardValid() {
+  
+  const isSelectedCardValid = useCallback(() => {
     if (phase !== "playing") {
       toast.error("La partie n'est pas en cours");
       return false;
     }
 
-    if (currentPlayerId !== currentUser.uid) {
+    if (currentPlayerId !== user?.uid) {
       toast.error("Ce n'est pas votre tour");
       return false;
     }
@@ -320,7 +229,11 @@ function Game() {
       return false;
     }
 
-    const discardCards = getDiscardCards();
+
+
+    const discardCards = discardPileCard
+      .map(getCardFromId)
+      .filter((card): card is PlayerCard => card !== undefined);
 
     if (discardCards.some((card) => selectedCards.includes(card.id))) {
       toast.error("Une carte sélectionnée est déjà dans la pile");
@@ -334,15 +247,9 @@ function Game() {
     }
 
     const lastDiscardCard = discardCards[discardCards.length - 1];
-    console.log("jocker test :");
-    console.log("firsvalue:", firstValue); // 2
-    console.log("lastDiscardCard?.value : ", lastDiscardCard?.value); // 14 : pq ...
-    console.log(discardCards); /// pas la carte id = 53 (id jocekrs = 53 et 54 ..)
 
-    console.log("équa :");
-    console.log(firstValue == 2 && lastDiscardCard?.value == 15);
     if (firstValue == 2 && lastDiscardCard?.value == 15) {
-      console.log("Jocker ");
+      // Un 2 posé sur un joker est toujours autorisé
     }else {
       if (lastDiscardCard && firstValue < lastDiscardCard.value) {
         toast.error("La carte jouée doit être supérieure ou égale à la dernière carte de la pile");
@@ -351,7 +258,93 @@ function Game() {
     }
 
     return true;
+  }, [phase, currentPlayerId, user, selectedCards, playerHand, discardPileCard]);
+
+  const playSelectedCards = useCallback(() => {
+
+    if (!user) {
+      return;
+    }
+
+    if (!isSelectedCardValid()) {
+      return;
+    }
+
+    if (!socket?.connected) {
+      toast.error("Socket non connecté");
+      return;
+    }
+
+    socket.emit("playCard", {
+      roomId,
+      userId: user.uid,
+      cardIds: selectedCards,
+    });
+    // rajouter dans le css de selected card "display:none" et enlever la propriété quand emitGameUpdate ou supr le html des cartes ?, enfaite le problème est que apres avoir joué pendant 1s la(les) carte est tjts affiché et change que une fois le coup du bot
+    // const playerHandBuff = playerHand.filter(
+    //     card => !(selectedCards.includes(card))
+    // );
+    // setPlayerHand(playerHandBuff)
+    setPlayerHand(prev =>
+      prev.filter(card => !selectedCards.includes(card.id))
+    );
+
+  setSelectedCards([]);
+  }, [isSelectedCardValid, roomId, selectedCards, socket, user]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Enter") {
+        playSelectedCards();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [playSelectedCards]);
+
+
+
+  if (!user) {
+    return <p>Connexion requise.</p>;
   }
+
+  const currentUser = user;
+  const currentTurnPlayer = publicPlayers.find((player) => player.id === currentPlayerId);
+
+  function getPlayerAvatar(player: PublicPlayer) {
+    if (player.isBot) {
+      return "/robot.png"
+    }
+    if (player.id === user?.uid && user.photoURL) {
+      return user.photoURL;
+    }
+
+    return "/profil.jpeg";
+  }
+
+  async function startGame() {
+    try {
+      const res = await fetch(apiUrl(`/rooms/${roomId}/startGame`), {
+        method: "POST",
+      });
+      const data = await readJsonResponse(res);
+
+      if (!res.ok || !data?.success) {
+        toast.error(data.message || "Impossible de lancer la partie");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Erreur pendant le lancement de la partie");
+    }
+  }
+
+
+
+
 
   function takePile() {
     if (!socket?.connected) {
@@ -428,7 +421,7 @@ function Game() {
               transform: `translateY(${numberOfTurn * 14}px)`
             }}
             >
-              <img src="/mc.jpeg" className="backgroundImg" />
+              <img src="/background.jpeg" className="backgroundImg" />
             </div>
 
 

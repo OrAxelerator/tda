@@ -50,7 +50,6 @@ app.use(
 app.use(express.json());
 app.use(express.static(path.join(process.cwd(), "public")));
 
-let engine: GameEngine | null = null;
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -67,7 +66,6 @@ const connectedPlayersByRoom = new Map<
   string,
   Map<string, { id: string; name: string; socketId: string }>
 >();
-let currentRoomId: string | null = null;
 let availableCards: EngineCard[] = [];
 
 async function incrementFinishedGameStats(roomId: string) {
@@ -370,10 +368,8 @@ async function updateRoomState(roomId: string, state: GameState) {
 
 function getEngineForRoom(roomId: string | undefined) {
   if (!roomId) {
-    console.warn(
-      "No roomId provided, returning current engine [getEngineForRoom]",
-    );
-    return engine;
+    console.warn("No roomId provided [getEngineForRoom]");
+    return null;
   }
 
   if (roomEngines.has(roomId)) {
@@ -381,9 +377,6 @@ function getEngineForRoom(roomId: string | undefined) {
     return roomEngines.get(roomId) ?? null;
   }
 
-  if (roomId === currentRoomId) {
-    return engine;
-  }
   console.warn(`No engine found for roomId ${roomId} [getEngineForRoom]`);
   console.log(roomEngines);
   return null;
@@ -466,7 +459,6 @@ app.post("/api/createGame", async (req, res) => {
     const roomEngine = new GameEngine(state, roomDeck);
     console.log("roomRef.id : ", roomRef.id);
     roomEngines.set(roomRef.id, roomEngine);
-    currentRoomId = roomRef.id;
     // await db NOT FOR NOW ...
     //   .collection("rooms")
     //   .doc(roomRef.id)

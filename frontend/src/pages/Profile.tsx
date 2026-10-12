@@ -84,14 +84,14 @@ function Profile() {
   function getBanner() {
     const banner = profile?.profileBanner;
     if (!banner || banner === "default") {
-      return "/default.jpeg";
+      return "/default_banner.jpeg";
     }
 
     return banner;
   }
 
   function getProfileImage() {
-    return profile?.profileImageUrl || "/default.jpeg";
+    return profile?.profileImageUrl || "/profil.jpeg";
   }
 
   function getDisplayName() {
