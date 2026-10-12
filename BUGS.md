@@ -23,7 +23,7 @@ Légende priorité : 🔴 critique (sécurité) · 🟠 bug probable · 🟡 det
 - **Problème** : une valeur comme `NaN` ou `10000` était acceptée. Risque de déni de service (création massive de bots).
 - **Correction** : `parseBotCount` accepte un entier de 0 à 5 (absent = 0), sinon la route répond `400`.
 
-### 🟠 4. `createGame` utilise un deck global potentiellement vide
+### ✅ 4. `createGame` utilise un deck global potentiellement vide (corrigé)
 - **Où** : `backend/src/index.ts`, variable globale `availableCards`, utilisée dans `createGame` (`availableCards.map(...)`).
 - **Problème** : `availableCards` n'est rempli qu'au premier `startGame`. Une room créée après le boot du serveur, avant tout démarrage, reçoit un deck vide. `startGame` le remplace ensuite, donc le bug est masqué, mais la logique est fausse.
 - **Piste** : charger `backend/public/cards.json` une seule fois au démarrage et l'utiliser partout.
@@ -33,10 +33,10 @@ Légende priorité : 🔴 critique (sécurité) · 🟠 bug probable · 🟡 det
 - **Problème** : un joueur déconnecté reste dans `state.players`. Le tour peut rester bloqué sur lui. Le cas `players.length <= 1` supprime la partie, mais rien d'autre n'est géré.
 - **Piste** : décider du comportement voulu (bot de remplacement, passage automatique du tour, ou fin de partie) et l'implémenter.
 
-### 🟡 6. Pioche dupliquée au `takePile`
+### ✅ 6. Pioche dupliquée au `takePile` (corrigé)
 - **Où** : `backend/src/game/GameEngine.ts` (`takePile`, qui recharge les joueurs à 1-2 cartes) et `backend/src/index.ts` (handler `takePile`, qui appelle `refullPlayer` sur tous les joueurs).
 - **Problème** : le recomplètement est fait deux fois. Le résultat est correct, mais c'est redondant.
-- **Piste** : ne garder qu'un seul endroit (de préférence le moteur).
+- **Correction** : le recomplètement est uniquement dans le moteur, qui inclut désormais le preneur (règle de `regle.md`). Le handler et `playBotTurn` attendent `takePile` avec `await`.
 
 ### 🟠 7. `playCards` n'est probablement pas atomique
 - **Où** : `backend/src/game/GameEngine.ts`, méthode `playCards`.

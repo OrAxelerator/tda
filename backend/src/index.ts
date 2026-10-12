@@ -180,11 +180,7 @@ io.on("connection", (socket) => {
     }
 
     try {
-      engine.takePile(userId);
-      
-      engine.state.players.forEach((player) => {
-        engine.refullPlayer(player.id);
-      });
+      await engine.takePile(userId);
       await engine.nextTurn();
       emitGameUpdate(roomId);
     } catch (error: any) {
@@ -592,11 +588,7 @@ app.post("/rooms/:roomId/startGame", async (req, res) => {
   }
 
   try {
-    const cardsPath = path.join(process.cwd(), "public", "cards.json");
-    const raw = await readFile(cardsPath, "utf8");
-    const cards = JSON.parse(raw) as EngineCard[];
-    const cardsCopy = cards.map((card) => ({ ...card }));
-    availableCards = cardsCopy.map((card) => ({ ...card }));
+    const cardsCopy = availableCards.map((card) => ({ ...card }));
     game.state.deck = new Deck(cardsCopy);
     game.setCards(cardsCopy);
 
@@ -641,7 +633,17 @@ app.post("/rooms/:roomId/leave", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
+async function loadCards(): Promise<EngineCard[]> {
+  const cardsPath = path.join(process.cwd(), "public", "cards.json");
+  const raw = await readFile(cardsPath, "utf8");
+  return JSON.parse(raw) as EngineCard[];
+}
+
 async function bootstrap() {
+  // Les cartes sont chargées avant d'écouter, pour qu'aucune room ne soit créée avec un deck vide
+  availableCards = await loadCards();
+  console.log("cards loaded at boot : ", availableCards.length);
+
   httpServer.listen(PORT, () => {
     console.log("Backend lancé sur http://localhost:3000");
   });

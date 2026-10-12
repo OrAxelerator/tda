@@ -190,10 +190,8 @@ export class GameEngine {
             this.state.discardPile = [] // vide totalement la discard pile
 
             this.state.players.forEach(player => {
-                if (player.id != playerId ) {
-                    if (player.hand.length <= 2) {
-                        this.refullPlayer(player.id);
-                    }
+                if (player.hand.length <= 2) {
+                    this.refullPlayer(player.id);
                 }
             });
 
@@ -281,7 +279,7 @@ async playBotTurn(player: Player) {
         console.log("⚠️ Aucune carte jouable !");
         console.log("🤖 Bot va piocher...");
 
-        this.takePile(player.id);
+        await this.takePile(player.id);
 
         console.log("🤖 takePile terminé");
         console.log("🤖 main après pioche:", player.hand);
