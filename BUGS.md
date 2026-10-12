@@ -29,7 +29,7 @@ Légende priorité : 🔴 critique (sécurité) · 🟠 bug probable · 🟡 det
 - **Problème** : `availableCards` n'est rempli qu'au premier `startGame`. Une room créée après le boot du serveur, avant tout démarrage, reçoit un deck vide. `startGame` le remplace ensuite, donc le bug est masqué, mais la logique est fausse.
 - **Piste** : charger `backend/public/cards.json` une seule fois au démarrage et l'utiliser partout.
 
-### ✅. Déconnexion : le joueur reste dans la partie (corrigé)
+### ✅ 5. Déconnexion : le joueur reste dans la partie (corrigé)
 - **Où** : `backend/src/index.ts`, handler `disconnect`.
 - **Problème** : un joueur déconnecté reste dans `state.players`. Le tour peut rester bloqué sur lui. Le cas `players.length <= 1` supprime la partie, mais rien d'autre n'est géré.
 - **Piste** : décider du comportement voulu (bot de remplacement, passage automatique du tour, ou fin de partie) et l'implémenter.

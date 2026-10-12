@@ -338,13 +338,9 @@ function removeConnectedPlayer(roomId: string, socketId: string) {
   }
 }
 
-function createGameUpdatePayload(
-  roomId: string,
-  game: GameEngine,
-  playerId?: string,
-) {
+// Partie commune à tous les joueurs (calculée une seule fois par emitGameUpdate)
+function createGameUpdatePayload(roomId: string, game: GameEngine) {
   const state = game.getState();
-  const currentPlayer = playerId ? game.getPlayer(playerId) : undefined;
 
   return {
     roomId,
@@ -360,7 +356,6 @@ function createGameUpdatePayload(
         isWinner: player.isWinner,
         isBot: player.isBot
       })),
-    yourCard: currentPlayer?.hand.map(serializeCard) ?? [],
     numberOfTurn: state.phase != "playing" ? null : state.turn,
     currentPlayerId: state.currentPlayerId,
     phase: state.phase,
@@ -374,19 +369,22 @@ function emitGameUpdate(roomId: string) {
     return;
   }
 
+  // Partie commune : calculée une seule fois pour toute la room
+  const basePayload = createGameUpdatePayload(roomId, game);
+
   const sockets = io.sockets.adapter.rooms.get(roomId);
 
   if (!sockets || sockets.size === 0) {
-    io.to(roomId).emit("gameUpdate", createGameUpdatePayload(roomId, game));
+    io.to(roomId).emit("gameUpdate", { ...basePayload, yourCard: [] });
     return;
   }
 
+  // Seule la main change d'un socket à l'autre
   for (const socketId of sockets) {
     const connectedPlayer = connectedPlayersByRoom.get(roomId)?.get(socketId);
-    io.to(socketId).emit(
-      "gameUpdate",
-      createGameUpdatePayload(roomId, game, connectedPlayer?.id),
-    );
+    const hand =
+      game.getPlayer(connectedPlayer?.id ?? "")?.hand.map(serializeCard) ?? [];
+    io.to(socketId).emit("gameUpdate", { ...basePayload, yourCard: hand });
   }
 }
 
