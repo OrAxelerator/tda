@@ -57,9 +57,10 @@ Légende priorité : 🔴 critique (sécurité) · 🟠 bug probable · 🟡 det
   - `getEngineForRoom` a un fallback sur ce singleton.
 - **Piste** : supprimer ce code, et faire de la Map `roomEngines` la seule source.
 
-### 🟡 10. Payload recalculé par socket
+### ✅ 10. Payload recalculé par socket (corrigé)
 - **Où** : `backend/src/index.ts`, `emitGameUpdate` appelle `createGameUpdatePayload` pour chaque socket.
 - **Piste** : calculer la partie publique une fois, puis ajouter seulement `yourCard` par socket.
+- **Correction** : `emitGameUpdate` calcule la partie commune une seule fois, puis ajoute `yourCard` (la main du joueur connecté) pour chaque socket.
 
 ### 🟡 11. Validation de `roomId` absente
 - **Où** : `backend/src/index.ts`, routes REST et événements socket.

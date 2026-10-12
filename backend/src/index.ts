@@ -338,6 +338,18 @@ function removeConnectedPlayer(roomId: string, socketId: string) {
   }
 }
 
+// Supprime la room côté serveur : moteur, joueurs connectés et sockets associés
+function deleteRoom(roomId: string) {
+  roomEngines.delete(roomId);
+  connectedPlayersByRoom.delete(roomId);
+
+  for (const [socketId, socketRoomId] of socketRooms) {
+    if (socketRoomId === roomId) {
+      socketRooms.delete(socketId);
+    }
+  }
+}
+
 // Partie commune à tous les joueurs (calculée une seule fois par emitGameUpdate)
 function createGameUpdatePayload(roomId: string, game: GameEngine) {
   const state = game.getState();
@@ -666,20 +678,30 @@ app.post("/rooms/:roomId/leave", async (req, res) => {
     return res.status(404).json({ success: false, message: "Game not found" });
   }
 
+  let replacementBot: Player | null = null;
   if (engine.state.phase === "playing") {
     // En pleine partie, un bot prend la place du joueur qui part
-    const bot = engine.replaceWithBot(playerId);
-    if (bot && engine.state.currentPlayerId === bot.id) {
-      try {
-        await engine.playBotTurn(bot);
-      } catch (error: any) {
-        console.error("Tour du bot remplaçant en erreur:", error.message);
-      }
-    }
+    replacementBot = engine.replaceWithBot(playerId);
   } else {
     engine.removePlayer(playerId);
   }
   console.log("👤 ==> ✅ - Player successfully left !!");
+
+  // Plus aucun humain : la partie n'a plus de raison d'exister
+  if (engine.state.players.every((player) => player.isBot)) {
+    deleteRoom(roomId);
+    console.log(`🗑️ Room ${roomId} supprimée : plus aucun joueur humain`);
+    console.log("--------------------");
+    return res.json({ success: true, deleted: true });
+  }
+
+  if (replacementBot && engine.state.currentPlayerId === replacementBot.id) {
+    try {
+      await engine.playBotTurn(replacementBot);
+    } catch (error: any) {
+      console.error("Tour du bot remplaçant en erreur:", error.message);
+    }
+  }
 
   await updateRoomState(roomId, engine.state);
   emitGameUpdate(roomId);
