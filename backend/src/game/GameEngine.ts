@@ -3,6 +3,7 @@ import { Card } from "./Card";
 import { Player } from "./Player";
 import { Deck } from "./Deck";
 import { handleAchievementEvent } from "../achievements/achievementService";
+import { randomUUID } from "crypto";
 
 export type PublicPlayer = Pick<Player, "id" | "name">;
 
@@ -95,6 +96,33 @@ export class GameEngine {
 
     }
 
+
+    // Remplace un joueur humain par un bot, à la même place et avec la même main
+    replaceWithBot(playerId: string): Player | null {
+        const index = this.state.players.findIndex(player => player.id === playerId);
+        if (index === -1) {
+            return null;
+        }
+
+        const leaver = this.state.players[index];
+        const bot = new Player(randomUUID(), "Bot", false, leaver.isWinner, true);
+        bot.hand = leaver.hand;
+        this.state.players[index] = bot;
+
+        if (this.state.currentPlayerId === playerId) {
+            this.state.currentPlayerId = bot.id;
+        }
+
+        // Le host part : on donne le rôle au premier humain restant
+        if (leaver.isHost) {
+            const newHost = this.state.players.find(player => !player.isBot);
+            if (newHost) {
+                newHost.isHost = true;
+            }
+        }
+
+        return bot;
+    }
 
     removePlayer(playerId:string) {
 

@@ -668,7 +668,19 @@ app.post("/rooms/:roomId/leave", async (req, res) => {
     return res.status(404).json({ success: false, message: "Game not found" });
   }
 
-  engine.removePlayer(playerId);
+  if (engine.state.phase === "playing") {
+    // En pleine partie, un bot prend la place du joueur qui part
+    const bot = engine.replaceWithBot(playerId);
+    if (bot && engine.state.currentPlayerId === bot.id) {
+      try {
+        await engine.playBotTurn(bot);
+      } catch (error: any) {
+        console.error("Tour du bot remplaçant en erreur:", error.message);
+      }
+    }
+  } else {
+    engine.removePlayer(playerId);
+  }
   console.log("👤 ==> ✅ - Player successfully left !!");
 
   await updateRoomState(roomId, engine.state);
