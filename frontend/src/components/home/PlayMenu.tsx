@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../components/auth-context";
+import { getAuthHeaders } from "../../api/authHeaders";
 import { apiUrl, readJsonResponse } from "../../config";
 
 
@@ -35,9 +36,9 @@ export default function PlayMenu() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...(await getAuthHeaders()),
       },
       body: JSON.stringify({
-        playerId: user.uid,
         playerName: user?.displayName || "Joueur",
       }),
     });

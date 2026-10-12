@@ -12,6 +12,7 @@ import Waiting from "./Waiting";
 import Pile from "./Pile";
 
 import { SOCKET_URL, apiUrl, readJsonResponse } from "../config";
+import { getAuthHeaders, getAuthToken } from "../api/authHeaders";
 
 type PlayerCard = {
   id: number;
@@ -128,6 +129,10 @@ function Game() {
 
     const newSocket = io(SOCKET_URL, {
       transports: ["websocket"],
+      // Token relu à chaque connexion : un token Firebase expire au bout d'1 h
+      auth: async (cb) => {
+        cb({ token: await getAuthToken() });
+      },
     });
 
     newSocket.on("connect", () => {
@@ -330,6 +335,7 @@ function Game() {
     try {
       const res = await fetch(apiUrl(`/rooms/${roomId}/startGame`), {
         method: "POST",
+        headers: await getAuthHeaders(),
       });
       const data = await readJsonResponse(res);
 
@@ -389,7 +395,6 @@ function Game() {
           deckLength={deckLength}
           socketConnected={Boolean(socket?.connected)}
           roomId={roomId}
-          currentUserUid={currentUser.uid}
           isHost={isHost}
           startGame={startGame}
           allPlayers={allPlayers}

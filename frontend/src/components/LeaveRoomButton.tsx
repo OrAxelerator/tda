@@ -1,8 +1,8 @@
 import { leaveRoom } from '../api/room';
 import { useNavigate } from "react-router-dom";
 
-export function LeaveRoomButton({ roomId, playerId } : { roomId:string, playerId: string } )  { // : {string, string} todo
-    
+export function LeaveRoomButton({ roomId } : { roomId:string } )  {
+
     const navigate = useNavigate();
 
     async function handleLeaveRoom() {
@@ -12,7 +12,7 @@ export function LeaveRoomButton({ roomId, playerId } : { roomId:string, playerId
     }
 
     try {
-        await leaveRoom(roomId, playerId);
+        await leaveRoom(roomId);
     } catch (err) {
         console.error(err);
     } finally {

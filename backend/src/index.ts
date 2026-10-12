@@ -60,6 +60,37 @@ const io = new Server(httpServer, {
   },
 });
 
+// Authentification Socket.IO : l'identité vient du token Firebase, jamais du payload
+io.use(async (socket, next) => {
+  const token = socket.handshake.auth?.token;
+  if (!token || typeof token !== "string") {
+    return next(new Error("Token manquant"));
+  }
+
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    socket.data.uid = decoded.uid;
+    next();
+  } catch {
+    next(new Error("Token invalide"));
+  }
+});
+
+// Identité REST : renvoie l'uid du token Bearer, ou null si absent / invalide
+async function getUidFromRequest(req: express.Request): Promise<string | null> {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith("Bearer ")) {
+    return null;
+  }
+
+  try {
+    const decoded = await admin.auth().verifyIdToken(authHeader.split(" ")[1]);
+    return decoded.uid;
+  } catch {
+    return null;
+  }
+}
+
 const roomEngines = new Map<string, GameEngine>();
 const socketRooms = new Map<string, string>();
 const connectedPlayersByRoom = new Map<
@@ -111,8 +142,8 @@ io.on("connection", (socket) => {
         | { roomId: string; playerId?: string; playerName?: string },
     ) => {
       const roomId = typeof payload === "string" ? payload : payload.roomId;
-      const playerId =
-        typeof payload === "string" ? undefined : payload.playerId;
+      // playerId du payload ignoré : l'identité est celle du token
+      const playerId: string = socket.data.uid;
       const playerName =
         typeof payload === "string" ? undefined : payload.playerName;
 
@@ -128,7 +159,8 @@ io.on("connection", (socket) => {
     },
   );
 
-  socket.on("playCard",async ({ roomId, userId, cardId, cardIds }) => {
+  socket.on("playCard",async ({ roomId, cardId, cardIds }) => {
+    const userId: string = socket.data.uid;
     const engine = getEngineForRoom(roomId);
     const cards = Array.isArray(cardIds)
       ? cardIds
@@ -168,7 +200,8 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("takePile", async ({ roomId, userId }) => {
+  socket.on("takePile", async ({ roomId }) => {
+    const userId: string = socket.data.uid;
     const engine = getEngineForRoom(roomId);
 
     if (!engine || !roomId || !userId) {
@@ -505,10 +538,13 @@ app.post("/api/createGame", async (req, res) => {
 
 app.post("/rooms/:roomId/joinGame", async (req, res) => {
   const { roomId } = req.params;
-  const { playerId, playerName } = req.body as {
-    playerId: string;
-    playerName: string;
-  };
+  const { playerName } = req.body as { playerName: string };
+  const playerId = await getUidFromRequest(req);
+  if (!playerId) {
+    return res
+      .status(401)
+      .json({ success: false, message: "Missing or invalid Authorization header" });
+  }
   console.log("");
   console.log("------------------------------------------");
   console.log(
@@ -520,7 +556,7 @@ app.post("/rooms/:roomId/joinGame", async (req, res) => {
     playerName,
   );
 
-  if (!roomId || !playerId || !playerName) {
+  if (!roomId || !playerName) {
     return res
       .status(400)
       .json({ success: false, message: "Missing required parameters" });
@@ -570,9 +606,22 @@ app.post("/rooms/:roomId/startGame", async (req, res) => {
       .json({ success: false, message: "Missing required parameters" });
   }
 
+  const uid = await getUidFromRequest(req);
+  if (!uid) {
+    return res
+      .status(401)
+      .json({ success: false, message: "Missing or invalid Authorization header" });
+  }
+
   const game = getEngineForRoom(roomId);
   if (!game) {
     return res.status(404).json({ success: false, message: "Game not found" });
+  }
+
+  if (!game.getPlayer(uid)?.isHost) {
+    return res
+      .status(403)
+      .json({ success: false, message: "Seul l'hôte peut lancer la partie" });
   }
 
   if (game.state.players.length <= 1 || game.state.players.length >= 7) {
@@ -604,7 +653,12 @@ app.post("/rooms/:roomId/startGame", async (req, res) => {
 
 app.post("/rooms/:roomId/leave", async (req, res) => {
   const { roomId } = req.params;
-  const { playerId } = req.body;
+  const playerId = await getUidFromRequest(req);
+  if (!playerId) {
+    return res
+      .status(401)
+      .json({ success: false, message: "Missing or invalid Authorization header" });
+  }
   console.log("");
   console.log("--------------------");
   console.log(`👤 ==>🚪 - Player ${playerId} want to leave ${roomId}`);

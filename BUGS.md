@@ -8,10 +8,11 @@ Légende priorité : 🔴 critique (sécurité) · 🟠 bug probable · 🟡 det
 
 ## Serveur (`backend/`)
 
-### 🔴 1. Aucune authentification sur les actions de jeu
+### ✅ 1. Aucune authentification sur les actions de jeu (corrigé)
 - **Où** : `backend/src/index.ts` — événements `joinRoom`, `playCard`, `takePile` ; routes `POST /rooms/:roomId/startGame` et `POST /rooms/:roomId/leave`.
 - **Problème** : le `userId` / `playerId` est lu depuis le payload, sans vérification. Quelqu'un qui connaît l'uid d'un autre joueur peut jouer ou quitter à sa place. Les uids sont visibles dans `gameUpdate`.
 - **Piste** : vérifier le token Firebase à la connexion Socket.IO (`io.use`) et utiliser `decoded.uid`. Faire de même sur les routes REST (`Authorization: Bearer`).
+- **Correction** : middleware `io.use` qui vérifie le token Firebase et stocke `socket.data.uid`. `joinRoom`, `playCard` et `takePile` utilisent cet uid, le `userId` du payload est ignoré. `joinGame`, `leave` et `startGame` exigent `Authorization: Bearer` (401 sans token), et `startGame` est réservé à l'hôte (403). Le front envoie le token (connexion Socket.IO et REST).
 
 ### 🔴 2. Les mains de tous les joueurs sont envoyées à chaque client (!a garder pour le dev)
 - **Où** : `backend/src/index.ts`, `createGameUpdatePayload` → `state: serializeState(state)`.

@@ -31,7 +31,6 @@ type GameHeaderProps = {
   deckLength: number;
   socketConnected: boolean;
   roomId: string;
-  currentUserUid: string;
   isHost: boolean;
   startGame: () => void;
   allPlayers: RoomPlayer[];
@@ -48,7 +47,6 @@ function GameHeader({
   deckLength,
   socketConnected,
   roomId,
-  currentUserUid,
   isHost,
   startGame,
   allPlayers,
@@ -80,7 +78,7 @@ function GameHeader({
         </p>
 
         <div className="gameInfoActions">
-          <LeaveRoomButton roomId={roomId} playerId={currentUserUid} />
+          <LeaveRoomButton roomId={roomId} />
           {phase === "finished" && isHost ? (
             <button className="headerActionButton secondary" onClick={startGame}>
               Relancer partie
