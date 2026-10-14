@@ -1,0 +1,83 @@
+@import "https://www.nerdfonts.com/assets/css/webfont.css";
+
+.rules-page {
+  min-height: 100dvh;
+  padding: 2rem 1rem;
+  background: url("/default_banner.jpeg") center bottom / cover no-repeat fixed;
+}
+
+.rules-container {
+  width: min(100%, 820px);
+  margin: 0 auto;
+  padding: 1.5rem 2rem 2rem;
+  border-radius: 24px;
+  background: rgba(16, 19, 31, 0.9);
+  color: #f5f2ea;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  text-align: left;
+  line-height: 1.6;
+}
+
+.rules-container h1 {
+  margin: 1rem 0 0.5rem;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+}
+
+.rules-container h2 {
+  margin: 2rem 0 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 1.4rem;
+}
+
+.rules-container h3 {
+  margin: 1.25rem 0 0.25rem;
+  font-size: 1.05rem;
+  color: rgb(126, 225, 255);
+}
+
+.rules-container p,
+.rules-container li {
+  margin: 0.4rem 0;
+  color: rgba(245, 242, 234, 0.85);
+}
+
+.rules-container ul {
+  padding-left: 1.2rem;
+}
+
+.rules-container ul li {
+  list-style-type: disc;
+}
+
+.rules-note {
+  padding: 0.6rem 0.9rem;
+  border-left: 3px solid rgba(255, 200, 80, 0.7);
+  background: rgba(255, 200, 80, 0.08);
+  border-radius: 0 8px 8px 0;
+}
+
+.rules-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rules-back:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 600px) {
+  .rules-container {
+    padding: 1.25rem 1rem 1.5rem;
+  }
+}
