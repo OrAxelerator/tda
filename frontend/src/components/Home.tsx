@@ -23,7 +23,7 @@ export default function Home() {
 
       const data = await response.json();
 
-      setVersion(data["0"]["sha"]);
+      setVersion(String(data["0"]["sha"]).slice(0, 7));
     } catch (error) {
       console.error("Erreur fetch last commit :", error);
     }
@@ -56,10 +56,10 @@ export default function Home() {
                         </button>
                     </li> */}
                     <li>
-                        <button>
-                            <i className="header-icon nf nf-fa-star" aria-hidden="true"></i>
-                            <span className="sr-only">Credit</span>
-                        </button>
+                        <Link to="/regles" title="Règles du jeu">
+                            <i className="header-icon nf nf-fa-book" aria-hidden="true"></i>
+                            <span className="sr-only">Règles du jeu</span>
+                        </Link>
                     </li>
                     <li>
                         <a href="https://github.com/OrAxelerator/tda" target="_blank">
@@ -72,41 +72,32 @@ export default function Home() {
             </header>
 
 
-            <button onClick={async () => {
+            <p className="homeWarning">
+                ⚠️ Le jeu n'est pas encore terminé : certaines fonctionnalités peuvent
+                évoluer ou ne pas fonctionner comme prévu.
+            </p>
 
-            }}> TEST</button>
-
-            <div style={{ maxWidth: "900px", margin: "0 auto", textAlign: "center", padding: "20px" }}>
-  <h3 style={{ margin: "0 auto", marginBottom: "20px" }}>
-    ⚠️ LE JEU N'EST PAS ENCORE TOTALEMENT TERMINÉ
-  </h3>
-
-  <p style={{ margin: "0 auto", marginBottom: "25px", lineHeight: "1.6" }}>
-    Le jeu est actuellement disponible en ligne, mais certaines fonctionnalités
-    sont encore en cours de développement et peuvent être amenées à évoluer,
-    être modifiées ou ne pas fonctionner comme prévu.
-  </p>
-
-  <h3 style={{ margin: "0 auto", marginBottom: "15px" }}>
-    📜 Conditions générales
-  </h3>
-
-  <p style={{ margin: "0 auto", marginBottom: "25px", lineHeight: "1.6" }}>
-    Merci de ne pas créer de compte avec un nom, un profil ou tout autre contenu
-    inapproprié. Les adresses e-mail collectées lors de l'utilisation du jeu
-    ne sont en aucun cas vendues ou transmises à des services tiers à des fins
-    commerciales.
-  </p>
-
-  <h4 style={{ margin: "0 auto", marginBottom: "10px" }}>
-    Site maintenu par OrAxelerator
-  </h4>
-
-  <p style={{ margin: "0 auto", marginBottom: "10px" }}>
-    📧 Contact : tda.game.support@gmail.com
-  </p>
-  <p>versions : {version}</p>
-</div>
+            <details className="homeInfo">
+                <summary>
+                    <i className="nf nf-fa-info_circle" aria-hidden="true"></i>
+                    Infos & conditions
+                </summary>
+                <div className="homeInfoContent">
+                    <h4>📜 Conditions générales</h4>
+                    <p>
+                        Merci de ne pas créer de compte avec un nom, un profil ou tout autre contenu
+                        inapproprié. Les adresses e-mail collectées lors de l'utilisation du jeu
+                        ne sont en aucun cas vendues ou transmises à des services tiers à des fins
+                        commerciales.
+                    </p>
+                    <p>Site maintenu par OrAxelerator</p>
+                    <p>
+                        📧 Contact :{" "}
+                        <a href="mailto:tda.game.support@gmail.com">tda.game.support@gmail.com</a>
+                    </p>
+                    {version ? <p className="homeVersion">Version : {version}</p> : null}
+                </div>
+            </details>
 
             <Actions />
             

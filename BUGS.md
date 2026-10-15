@@ -8,10 +8,11 @@ Légende priorité : 🔴 critique (sécurité) · 🟠 bug probable · 🟡 det
 
 ## Serveur (`backend/`)
 
-### 🔴 1. Aucune authentification sur les actions de jeu
+### ✅ 1. Aucune authentification sur les actions de jeu (corrigé)
 - **Où** : `backend/src/index.ts` — événements `joinRoom`, `playCard`, `takePile` ; routes `POST /rooms/:roomId/startGame` et `POST /rooms/:roomId/leave`.
 - **Problème** : le `userId` / `playerId` est lu depuis le payload, sans vérification. Quelqu'un qui connaît l'uid d'un autre joueur peut jouer ou quitter à sa place. Les uids sont visibles dans `gameUpdate`.
 - **Piste** : vérifier le token Firebase à la connexion Socket.IO (`io.use`) et utiliser `decoded.uid`. Faire de même sur les routes REST (`Authorization: Bearer`).
+- **Correction** : middleware `io.use` qui vérifie le token Firebase et stocke `socket.data.uid`. `joinRoom`, `playCard` et `takePile` utilisent cet uid, le `userId` du payload est ignoré. `joinGame`, `leave` et `startGame` exigent `Authorization: Bearer` (401 sans token), et `startGame` est réservé à l'hôte (403). Le front envoie le token (connexion Socket.IO et REST).
 
 ### 🔴 2. Les mains de tous les joueurs sont envoyées à chaque client (!a garder pour le dev)
 - **Où** : `backend/src/index.ts`, `createGameUpdatePayload` → `state: serializeState(state)`.
@@ -23,20 +24,20 @@ Légende priorité : 🔴 critique (sécurité) · 🟠 bug probable · 🟡 det
 - **Problème** : une valeur comme `NaN` ou `10000` était acceptée. Risque de déni de service (création massive de bots).
 - **Correction** : `parseBotCount` accepte un entier de 0 à 5 (absent = 0), sinon la route répond `400`.
 
-### 🟠 4. `createGame` utilise un deck global potentiellement vide
+### ✅ 4. `createGame` utilise un deck global potentiellement vide (corrigé)
 - **Où** : `backend/src/index.ts`, variable globale `availableCards`, utilisée dans `createGame` (`availableCards.map(...)`).
 - **Problème** : `availableCards` n'est rempli qu'au premier `startGame`. Une room créée après le boot du serveur, avant tout démarrage, reçoit un deck vide. `startGame` le remplace ensuite, donc le bug est masqué, mais la logique est fausse.
 - **Piste** : charger `backend/public/cards.json` une seule fois au démarrage et l'utiliser partout.
 
-### 🟠 5. Déconnexion : le joueur reste dans la partie
+### ✅ 5. Déconnexion : le joueur reste dans la partie (corrigé)
 - **Où** : `backend/src/index.ts`, handler `disconnect`.
 - **Problème** : un joueur déconnecté reste dans `state.players`. Le tour peut rester bloqué sur lui. Le cas `players.length <= 1` supprime la partie, mais rien d'autre n'est géré.
 - **Piste** : décider du comportement voulu (bot de remplacement, passage automatique du tour, ou fin de partie) et l'implémenter.
 
-### 🟡 6. Pioche dupliquée au `takePile`
+### ✅ 6. Pioche dupliquée au `takePile` (corrigé)
 - **Où** : `backend/src/game/GameEngine.ts` (`takePile`, qui recharge les joueurs à 1-2 cartes) et `backend/src/index.ts` (handler `takePile`, qui appelle `refullPlayer` sur tous les joueurs).
 - **Problème** : le recomplètement est fait deux fois. Le résultat est correct, mais c'est redondant.
-- **Piste** : ne garder qu'un seul endroit (de préférence le moteur).
+- **Correction** : le recomplètement est uniquement dans le moteur, qui inclut désormais le preneur (règle de `regle.md`). Le handler et `playBotTurn` attendent `takePile` avec `await`.
 
 ### 🟠 7. `playCards` n'est probablement pas atomique
 - **Où** : `backend/src/game/GameEngine.ts`, méthode `playCards`.
@@ -56,9 +57,10 @@ Légende priorité : 🔴 critique (sécurité) · 🟠 bug probable · 🟡 det
   - `getEngineForRoom` a un fallback sur ce singleton.
 - **Piste** : supprimer ce code, et faire de la Map `roomEngines` la seule source.
 
-### 🟡 10. Payload recalculé par socket
+### ✅ 10. Payload recalculé par socket (corrigé)
 - **Où** : `backend/src/index.ts`, `emitGameUpdate` appelle `createGameUpdatePayload` pour chaque socket.
 - **Piste** : calculer la partie publique une fois, puis ajouter seulement `yourCard` par socket.
+- **Correction** : `emitGameUpdate` calcule la partie commune une seule fois, puis ajoute `yourCard` (la main du joueur connecté) pour chaque socket.
 
 ### 🟡 11. Validation de `roomId` absente
 - **Où** : `backend/src/index.ts`, routes REST et événements socket.
@@ -82,10 +84,11 @@ Légende priorité : 🔴 critique (sécurité) · 🟠 bug probable · 🟡 det
 - **Où** : `frontend/src/components/Game.tsx`, ligne ~135 (`setSocket(newSocket)` dans le `useEffect` de connexion).
 - **Problème** : règle `react-hooks/set-state-in-effect` (erreur de lint). Corriger demande de revoir la façon dont le socket est stocké (ref, ou création hors effet).
 
-### 🟠 15. Lint : dépendance manquante dans l'effet clavier
+### ✅ 15. Lint : dépendance manquante dans l'effet clavier (corrigé)
 - **Où** : `frontend/src/components/Game.tsx`, effet `keydown` qui appelle `playSelectedCards`.
 - **Problème** : `playSelectedCards` n'est pas dans les dépendances. Ajouter la fonction telle quelle ferait réenregistrer le listener à chaque rendu. Risque de closure périmée : la touche Entrée peut utiliser une ancienne valeur de `playerHand` ou de `selectedCards`.
 - **Piste** : mémoïser `playSelectedCards` avec `useCallback` et lister ses dépendances réelles.
+- **Correction** : `isSelectedCardValid` et `playSelectedCards` sont en `useCallback` avec leurs dépendances réelles, placés avant le `return` conditionnel. L'effet clavier écoute `playSelectedCards`. `getCardFromId` est sorti du composant (fonction pure). Les `console.log` de débogage de ces fonctions ont été retirés.
 
 ### 🟡 16. Dépendance `socket.io` inutile côté frontend
 - **Où** : `frontend/package.json`.

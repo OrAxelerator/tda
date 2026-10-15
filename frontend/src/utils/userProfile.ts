@@ -3,17 +3,8 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase-db";
 import type { UserProfile } from "../types/userProfile";
 
-export async function ensureUserProfile(user: User, fallbackName: string | null) {
-  const profileRef = doc(db, "user", user.uid);
-  const snapshot = await getDoc(profileRef);
-  
-
-  if (snapshot.exists()) {
-    console.log("existe déja");
-    return;
-  }
-
-  const userProfile: UserProfile = {
+function getUserProfile(user: User, fallbackName: string | null): UserProfile {
+  return {
     uid: user.uid,
     displayName: user.displayName ?? fallbackName ?? user.email?.split("@")[0] ?? "Joueur",
     cardStyle: "default",
@@ -21,7 +12,23 @@ export async function ensureUserProfile(user: User, fallbackName: string | null)
     gamesWon: 0,
     profileBanner: "",
     profileImageUrl: user.photoURL ?? null,
+    achievements: [],
+    role: []
   };
+}
 
-  await setDoc(profileRef, userProfile);
+export async function createUserProfile(user: User, fallbackName: string | null) {
+  const profileRef = doc(db, "users", user.uid);
+  await setDoc(profileRef, getUserProfile(user, fallbackName));
+}
+
+export async function ensureUserProfile(user: User, fallbackName: string | null) {
+  const profileRef = doc(db, "users", user.uid);
+  const snapshot = await getDoc(profileRef);
+
+  if (snapshot.exists()) {
+    return;
+  }
+
+  await createUserProfile(user, fallbackName);
 }

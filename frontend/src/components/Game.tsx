@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { io, type Socket } from "socket.io-client";
 import { toast } from "react-toastify";
 import Card from "./Card";
-import { LeaveRoomButton } from "./LeaveRoomButton";
+import GameHeader from "./GameHeader";
 import { useAuth } from "../components/auth-context";
 import "../App.css";
 import "../game.css";
@@ -12,6 +12,7 @@ import Waiting from "./Waiting";
 import Pile from "./Pile";
 
 import { SOCKET_URL, apiUrl, readJsonResponse } from "../config";
+import { getAuthHeaders, getAuthToken } from "../api/authHeaders";
 
 type PlayerCard = {
   id: number;
@@ -35,6 +36,7 @@ type PublicPlayer = {
   isHost: boolean;
   isWinner: boolean;
   cardCount: number;
+  isBot: boolean;
 }
 
 type GameUpdatePayload = {
@@ -50,6 +52,50 @@ type GameUpdatePayload = {
   };
   publicPlayer: PublicPlayer[];
 };
+
+function getCardFromId(cardId: number): PlayerCard | undefined {
+  if (cardId === 53 || cardId === 54) {
+    return {
+      id: cardId,
+      name: "jocker",
+      suit: "jocker",
+      value: 15,
+      asset: `${String(cardId).padStart(2, "0")}_theme1.png`,
+    };
+  }
+
+  if (!Number.isInteger(cardId) || cardId < 1 || cardId > 52) {
+    return undefined;
+  }
+
+  const cardIndex = cardId - 1;
+  const cardValue = (cardIndex % 13) + 2;
+  const suits = ["Spades", "Hearts", "Diamonds", "Clubs"];
+  const suit = suits[Math.floor(cardIndex / 13)];
+  const names = [
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "Jack",
+    "Queen",
+    "King",
+    "Ace",
+  ];
+
+  return {
+    id: cardId,
+    name: `${names[cardIndex % 13]} of ${suit}`,
+    suit,
+    value: cardValue,
+    asset: `${String(cardId).padStart(2, "0")}_theme1.png`,
+  };
+}
 
 function Game() {
   const { user } = useAuth();
@@ -83,6 +129,10 @@ function Game() {
 
     const newSocket = io(SOCKET_URL, {
       transports: ["websocket"],
+      // Token relu à chaque connexion : un token Firebase expire au bout d'1 h
+      auth: async (cb) => {
+        cb({ token: await getAuthToken() });
+      },
     });
 
     newSocket.on("connect", () => {
@@ -143,146 +193,14 @@ function Game() {
     };
   }, [roomId, user]);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Enter") {
-        console.log("ENTER");
-        playSelectedCards();
-      }
-      // if (event.key === "t") {
-      //   console.log("T");
-      //  sortCard();
-      // }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [selectedCards]);
-
-  if (!user) {
-    return <p>Connexion requise.</p>;
-  }
-
-  const currentUser = user;
-  const currentTurnPlayer = publicPlayers.find((player) => player.id === currentPlayerId);
-
-  function getPlayerAvatar(player: PublicPlayer) {
-    if (player.id === user?.uid && user.photoURL) {
-      return user.photoURL;
-    }
-
-    return "/default.jpeg";
-  }
-
-  async function startGame() {
-    try {
-      const res = await fetch(apiUrl(`/rooms/${roomId}/startGame`), {
-        method: "POST",
-      });
-      const data = await readJsonResponse(res);
-
-      if (!res.ok || !data?.success) {
-        toast.error(data.message || "Impossible de lancer la partie");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Erreur pendant le lancement de la partie");
-    }
-  }
-
-  function playSelectedCards() {
-    console.log("play card : ");
-    console.log(selectedCards.length);
-    console.log(selectedCards);
-    console.log("ALL PLAYRES : ", allPlayers);
-
-    if (!isSelectedCardValid()) {
-      console.log("RATé PAS VALID");
-      return;
-    }
-
-    if (!socket?.connected) {
-      toast.error("Socket non connecté");
-      return;
-    }
-
-    socket.emit("playCard", {
-      roomId,
-      userId: currentUser.uid,
-      cardIds: selectedCards,
-    });
-    // rajouter dans le css de selected card "display:none" et enlever la propriété quand emitGameUpdate ou supr le html des cartes ?, enfaite le problème est que apres avoir joué pendant 1s la(les) carte est tjts affiché et change que une fois le coup du bot
-    // const playerHandBuff = playerHand.filter(
-    //     card => !(selectedCards.includes(card))
-    // );
-    // setPlayerHand(playerHandBuff)
-    setPlayerHand(prev =>
-      prev.filter(card => !selectedCards.includes(card.id))
-    );
-
-  setSelectedCards([]);
-  }
-
-  function getCardFromId(cardId: number): PlayerCard | undefined {
-    if (cardId === 53 || cardId === 54) {
-      return {
-        id: cardId,
-        name: "jocker",
-        suit: "jocker",
-        value: 15,
-        asset: `${String(cardId).padStart(2, "0")}_theme1.png`,
-      };
-    }
-
-    if (!Number.isInteger(cardId) || cardId < 1 || cardId > 52) {
-      return undefined;
-    }
-
-    const cardIndex = cardId - 1;
-    const cardValue = (cardIndex % 13) + 2;
-    const suits = ["Spades", "Hearts", "Diamonds", "Clubs"];
-    const suit = suits[Math.floor(cardIndex / 13)];
-    const names = [
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10",
-      "Jack",
-      "Queen",
-      "King",
-      "Ace",
-    ];
-
-    return {
-      id: cardId,
-      name: `${names[cardIndex % 13]} of ${suit}`,
-      suit,
-      value: cardValue,
-      asset: `${String(cardId).padStart(2, "0")}_theme1.png`,
-    };
-  }
-
-  function getDiscardCards() {
-    return discardPileCard
-      .map(getCardFromId)
-      .filter((card): card is PlayerCard => card !== undefined);
-  }
-
-  function isSelectedCardValid() {
+  
+  const isSelectedCardValid = useCallback(() => {
     if (phase !== "playing") {
       toast.error("La partie n'est pas en cours");
       return false;
     }
 
-    if (currentPlayerId !== currentUser.uid) {
+    if (currentPlayerId !== user?.uid) {
       toast.error("Ce n'est pas votre tour");
       return false;
     }
@@ -316,7 +234,11 @@ function Game() {
       return false;
     }
 
-    const discardCards = getDiscardCards();
+
+
+    const discardCards = discardPileCard
+      .map(getCardFromId)
+      .filter((card): card is PlayerCard => card !== undefined);
 
     if (discardCards.some((card) => selectedCards.includes(card.id))) {
       toast.error("Une carte sélectionnée est déjà dans la pile");
@@ -330,15 +252,9 @@ function Game() {
     }
 
     const lastDiscardCard = discardCards[discardCards.length - 1];
-    console.log("jocker test :");
-    console.log("firsvalue:", firstValue); // 2
-    console.log("lastDiscardCard?.value : ", lastDiscardCard?.value); // 14 : pq ...
-    console.log(discardCards); /// pas la carte id = 53 (id jocekrs = 53 et 54 ..)
 
-    console.log("équa :");
-    console.log(firstValue == 2 && lastDiscardCard?.value == 15);
     if (firstValue == 2 && lastDiscardCard?.value == 15) {
-      console.log("Jocker ");
+      // Un 2 posé sur un joker est toujours autorisé
     }else {
       if (lastDiscardCard && firstValue < lastDiscardCard.value) {
         toast.error("La carte jouée doit être supérieure ou égale à la dernière carte de la pile");
@@ -347,7 +263,94 @@ function Game() {
     }
 
     return true;
+  }, [phase, currentPlayerId, user, selectedCards, playerHand, discardPileCard]);
+
+  const playSelectedCards = useCallback(() => {
+
+    if (!user) {
+      return;
+    }
+
+    if (!isSelectedCardValid()) {
+      return;
+    }
+
+    if (!socket?.connected) {
+      toast.error("Socket non connecté");
+      return;
+    }
+
+    socket.emit("playCard", {
+      roomId,
+      userId: user.uid,
+      cardIds: selectedCards,
+    });
+    // rajouter dans le css de selected card "display:none" et enlever la propriété quand emitGameUpdate ou supr le html des cartes ?, enfaite le problème est que apres avoir joué pendant 1s la(les) carte est tjts affiché et change que une fois le coup du bot
+    // const playerHandBuff = playerHand.filter(
+    //     card => !(selectedCards.includes(card))
+    // );
+    // setPlayerHand(playerHandBuff)
+    setPlayerHand(prev =>
+      prev.filter(card => !selectedCards.includes(card.id))
+    );
+
+  setSelectedCards([]);
+  }, [isSelectedCardValid, roomId, selectedCards, socket, user]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Enter") {
+        playSelectedCards();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [playSelectedCards]);
+
+
+
+  if (!user) {
+    return <p>Connexion requise.</p>;
   }
+
+  const currentUser = user;
+  const currentTurnPlayer = publicPlayers.find((player) => player.id === currentPlayerId);
+
+  function getPlayerAvatar(player: PublicPlayer) {
+    if (player.isBot) {
+      return "/robot.png"
+    }
+    if (player.id === user?.uid && user.photoURL) {
+      return user.photoURL;
+    }
+
+    return "/profil.jpeg";
+  }
+
+  async function startGame() {
+    try {
+      const res = await fetch(apiUrl(`/rooms/${roomId}/startGame`), {
+        method: "POST",
+        headers: await getAuthHeaders(),
+      });
+      const data = await readJsonResponse(res);
+
+      if (!res.ok || !data?.success) {
+        toast.error(data.message || "Impossible de lancer la partie");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Erreur pendant le lancement de la partie");
+    }
+  }
+
+
+
+
 
   function takePile() {
     if (!socket?.connected) {
@@ -384,80 +387,21 @@ function Game() {
   return (
     <>
       <div className="game-container">
-        <header className="Appheader">
-          <section className="gameInfo">
-            <h4>Partie</h4>
-            <p>
-              <strong>Vous :</strong> {user.displayName || user.email || "Joueur"}
-            </p>
-            <p>
-              <strong>Tour de :</strong> {currentTurnPlayer?.name || "aucun"}
-            </p>
-            <p>
-              <strong>Phase :</strong> {phase || "inconnue"}
-            </p>
-            <p>
-              <strong>Tour :</strong> {numberOfTurn}
-            </p>
-            <p>
-              <strong>Deck :</strong> {deckLength} cartes
-            </p>
-            <p>
-              <strong>Socket :</strong> {socket?.connected ? "connecté" : "déconnecté"}
-            </p>
-
-            <div className="gameInfoActions">
-              <LeaveRoomButton roomId={roomId} playerId={currentUser.uid} />
-              {(phase === "finished" && isHost) ? (
-                <button className="headerActionButton secondary" onClick={startGame}>
-                  Relancer partie
-                </button>
-              ) : null}
-            </div>
-          </section>
-
-          <section className="players">
-            {allPlayers.length === 0 ? (
-              <p>
-                il n'y a pas de player dans la room donc comment tu vois ce
-                message ????
-              </p>
-            ) : (
-              publicPlayers.map((player) => (
-                <div
-                  className={`
-                    playerInfo
-                    ${user?.uid === player.id ? "selfPlayer" : ""}
-                    ${currentPlayerId === player.id ? "activePlayer" : ""}
-                  `}
-                  key={player.id}
-                  id={player.id}
-                >
-                  <div className="playerBadges">
-                    {user?.uid === player.id && <span className="playerBadge self">Vous</span>}
-                    {currentPlayerId === player.id && <span className="playerBadge turn">Tour</span>}
-                  </div>
-
-                  <img
-                    src={getPlayerAvatar(player)}
-                    alt={player.name}
-                    className="playerAvatar"
-                    onError={(event) => {
-                      event.currentTarget.src = "/default.jpeg";
-                    }}
-                  />
-                  <h3>
-                    <span>{player.name}</span>
-                    {player.isHost && <span>[HOST]</span>}
-                  </h3>
-                  <h5>
-                    {player.cardCount ? `${player.cardCount} carte${player.cardCount > 1 ? "s" : ""} restante${player.cardCount > 1 ? "s" : ""}` : ""}
-                  </h5>
-                </div>
-              ))
-            )}
-          </section>
-        </header>
+        <GameHeader
+          user={currentUser}
+          currentTurnPlayer={currentTurnPlayer}
+          phase={phase}
+          numberOfTurn={numberOfTurn}
+          deckLength={deckLength}
+          socketConnected={Boolean(socket?.connected)}
+          roomId={roomId}
+          isHost={isHost}
+          startGame={startGame}
+          allPlayers={allPlayers}
+          publicPlayers={publicPlayers}
+          currentPlayerId={currentPlayerId}
+          getPlayerAvatar={getPlayerAvatar}
+        />
           
       {
         phase === "waiting" ? (
@@ -482,7 +426,7 @@ function Game() {
               transform: `translateY(${numberOfTurn * 14}px)`
             }}
             >
-              <img src="/mc.jpeg" className="backgroundImg" />
+              <img src="/background.jpeg" className="backgroundImg" />
             </div>
 
 

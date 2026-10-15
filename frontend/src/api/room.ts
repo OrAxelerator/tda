@@ -1,16 +1,15 @@
 import { apiUrl, readJsonResponse } from "../config";
+import { getAuthHeaders } from "./authHeaders";
 
-export async function leaveRoom(roomId: string, playerId: string) {
+export async function leaveRoom(roomId: string) {
     const res = await fetch(
         apiUrl(`/rooms/${roomId}/leave`),
         {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                ...(await getAuthHeaders()),
             },
-            body: JSON.stringify({
-                playerId
-            })
         }
     );
 

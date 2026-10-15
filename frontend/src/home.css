@@ -364,3 +364,74 @@ ul li
         transform: rotate(0deg) scale(1);
     }
 }
+
+.homeWarning {
+    width: min(90%, 640px);
+    margin: 0.5rem auto 0;
+    padding: 0.6rem 1rem;
+    border-radius: 12px;
+    background: rgba(255, 200, 80, 0.12);
+    border: 1px solid rgba(255, 200, 80, 0.35);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+/* CGU + version repliées dans un coin */
+.homeInfo {
+    position: absolute;
+    left: 1rem;
+    bottom: 1rem;
+    z-index: 1150;
+    max-width: min(90vw, 420px);
+    font-size: 0.85rem;
+    color: rgba(252, 251, 255, 0.75);
+}
+
+.homeInfo summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    list-style: none;
+    opacity: 0.7;
+    transition: opacity 0.15s ease;
+}
+
+.homeInfo summary::-webkit-details-marker {
+    display: none;
+}
+
+.homeInfo summary:hover,
+.homeInfo[open] summary {
+    opacity: 1;
+}
+
+.homeInfoContent {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 0.5rem);
+    width: min(90vw, 420px);
+    padding: 1rem;
+    border-radius: 14px;
+    background: rgb(40, 39, 46);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    text-align: left;
+    line-height: 1.5;
+}
+
+.homeInfoContent h4 {
+    margin: 0 0 0.5rem;
+}
+
+.homeInfoContent p {
+    margin: 0 0 0.5rem;
+}
+
+.homeInfoContent a {
+    color: rgb(126, 225, 255);
+}
+
+.homeVersion {
+    font-family: var(--mono, monospace);
+    opacity: 0.6;
+}

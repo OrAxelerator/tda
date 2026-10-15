@@ -12,6 +12,7 @@ const SignUp = lazy(() => import("./pages/SignUp"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Home = lazy(() => import("./components/Home"));
 const Game = lazy(() => import("./components/Game"));
+const Rules = lazy(() => import("./pages/Rules"));
 import "./App.css";
 
 
@@ -50,6 +51,14 @@ function App() {
                   element={
                     <Suspense fallback={<div>Chargement de l'accueil...</div>}>
                       <Home />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/regles"
+                  element={
+                    <Suspense fallback={<div>Chargement des règles...</div>}>
+                      <Rules />
                     </Suspense>
                   }
                 />

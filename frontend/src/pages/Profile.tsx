@@ -1,25 +1,19 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { doc, getDoc, deleteDoc } from "firebase/firestore";
-import {
-  getAuth,
-  deleteUser,
-  GoogleAuthProvider,
-  reauthenticateWithPopup,
-  EmailAuthProvider,
-  reauthenticateWithCredential,
-} from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
 import { useAuth } from "../components/auth-context";
 import { db } from "../firebase-db";
 import type { UserProfile } from "../types/userProfile";
+import { ACHIEVEMENTS } from "../data/achievements";
+import DeleteAccountModal from "./DeleteAccountModal";
 import "./profile.css";
-import { toast } from "react-toastify";
 
 function Profile() {
   const { uid } = useParams<{ uid: string }>();
   const { user, logout } = useAuth();
-  const [password, setPassword] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showLocked, setShowLocked] = useState(false);
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -28,10 +22,15 @@ function Profile() {
   const isOwnProfile = !uid || uid === user?.uid;
   console.log("isOwnProfile:", isOwnProfile);
   const wins = profile?.gamesWon ?? 0;
-  const losses = Math.max((profile?.gamesPlayed ?? 0) - wins, 0);
-
-  const auth = getAuth();
-  console.log(auth);
+  // Les anciens docs users n'ont pas forcément ces champs
+  const unlockedAchievements = profile?.achievements ?? [];
+  const roles = profile?.role ?? [];
+  const totalAchievements = Object.keys(ACHIEVEMENTS).length;
+  // Façon Steam : on affiche les succès débloqués, les autres restent masqués
+  const unlockedIds = unlockedAchievements.filter((id, index, list) => list.indexOf(id) === index);
+  const lockedIds = Object.keys(ACHIEVEMENTS).filter((id) => !unlockedIds.includes(id));
+  const unlockedInCatalog = unlockedIds.filter((id) => id in ACHIEVEMENTS).length;
+  const progress = totalAchievements ? Math.round((unlockedInCatalog / totalAchievements) * 100) : 0;
 
   useEffect(() => {
     const profileUid = uid ?? user?.uid;
@@ -44,7 +43,7 @@ function Profile() {
       try {
         console.log("avant ")
         console.log("profileUid:", profileUid);
-        const snapshot = await getDoc(doc(db, "user", profileUid));
+        const snapshot = await getDoc(doc(db, "users", profileUid));
         console.log("Snapshot:", snapshot);
         if (!snapshot.exists()) {
           setError("Utilisateur introuvable.");
@@ -71,14 +70,14 @@ function Profile() {
   function getBanner() {
     const banner = profile?.profileBanner;
     if (!banner || banner === "default") {
-      return "/default.jpeg";
+      return "/default_banner.jpeg";
     }
 
     return banner;
   }
 
   function getProfileImage() {
-    return profile?.profileImageUrl || "/default.jpeg";
+    return profile?.profileImageUrl || "/profil.jpeg";
   }
 
   function getDisplayName() {
@@ -105,82 +104,16 @@ function Profile() {
         <h1>Profil</h1>
         <p>{error}</p>
         <button onClick={handleClick}>Retour</button>
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={() => logout()}
+        >
+          Déconnexion
+        </button>
       </div>
     );
   }
-
-  const deleteSignedUser = async () => {
-    if (!password) {
-      toast.error("Vous devez écrire votre mot de passe dans l'input a droite du btn suprimer compte");
-      return;
-    }
-    const currentUser = auth.currentUser;
-    if (!currentUser) return;
-
-    const providerId = currentUser.providerData[0]?.providerId;
-
-    try {
-      if (providerId === "password") {
-        console.log("Réauthentification Email");
-
-        try {
-          if (!currentUser.email) return;
-          // Création des credentials
-          const credential = EmailAuthProvider.credential(
-            currentUser.email,
-            password,
-          );
-
-          // Réauthentification
-          await reauthenticateWithCredential(currentUser, credential);
-
-          console.log("-------");
-          console.log(currentUser.uid);
-          console.log(db);
-          console.log("------");
-          // 1. Supprime les données Firestore
-          await deleteDoc(doc(db, "user", currentUser.uid));
-          
-          console.log("Document Firestore supprimé");
-
-          // Suppression
-          await deleteUser(currentUser);
-          navigate("/home"); // doesn't work ... go to login page instead why
-
-          console.log("Compte supprimé");
-        } catch (error) {
-          console.error("Erreur suppression :", error);
-        }
-      }
-
-      if (providerId === "google.com") {
-        console.log("Réauthentification Google");
-
-        const provider = new GoogleAuthProvider();
-
-        
-        await reauthenticateWithPopup(currentUser, provider);
-
-
-        // 1. Supprime les données Firestore
-        // await deleteDoc(doc(db, "user", "3UH5PLQ4YcR6fkUbe1Y1C9844WJ2")) // MARCHE !!
-
-        console.log("tests passé");
-          console.log("-------");
-          console.log(typeof  currentUser.uid);
-          console.log(db);
-          console.log("------");
-        await deleteDoc(doc(db, "user", currentUser.uid)); //
-        
-        
-        await deleteUser(currentUser);
-      }
-
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
 
   return (
     <div className="profile-page">
@@ -202,6 +135,16 @@ function Profile() {
           <div className="profile-title">
             <h1>{getDisplayName()}</h1>
           </div>
+
+          <div className="container-role">
+            {
+              roles.map((el, index) => 
+              <div key={index} className="profile-role">
+                <p>{el}</p>
+              </div>
+              )
+            }
+          </div>
         </div>
 
         <div className="profile-stats">
@@ -210,8 +153,10 @@ function Profile() {
             <strong>{wins}</strong>
           </article>
           <article className="profile-stat">
-            <span>Défaites</span>
-            <strong>{losses}</strong>
+            <span>Succès</span>
+            <strong>
+              {unlockedInCatalog} / {totalAchievements}
+            </strong>
           </article>
           <article className="profile-stat">
             <span>Parties jouées</span>
@@ -238,52 +183,117 @@ function Profile() {
             ) : null} */}
 
         <div className="profile-footer">
-          <div className="actionBtnUser">
           <button
             type="button"
-            className="btn btn-primary"
+            className="profile-btn profile-btn-ghost"
             onClick={handleClick}
           >
-            Retour Home
+            <i className="nf nf-fa-arrow_left" aria-hidden="true"></i>
+            Retour
           </button>
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={() => logout()}
-        >
-          Déconnexion
-        </button>
 
-        <button onClick={() => deleteSignedUser()}>
-          Supprimer mon compte
-        </button>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-          </div>
-
-          {!isOwnProfile ? (
+          {isOwnProfile ? (
+            <div className="profile-footer-group">
+              <button
+                type="button"
+                className="profile-btn profile-btn-secondary"
+                onClick={() => logout()}
+              >
+                <i className="nf nf-fa-sign_out" aria-hidden="true"></i>
+                Déconnexion
+              </button>
+              <button
+                type="button"
+                className="profile-btn profile-btn-danger"
+                onClick={() => setShowDeleteModal(true)}
+              >
+                <i className="nf nf-fa-trash" aria-hidden="true"></i>
+                Supprimer mon compte
+              </button>
+            </div>
+          ) : (
             <button
               type="button"
-              className="btn btn-secondary"
+              className="profile-btn profile-btn-secondary"
               onClick={() => navigate("/user")}
             >
+              <i className="nf nf-fa-user" aria-hidden="true"></i>
               Mon profil
             </button>
+          )}
+        </div>
+
+        <section className="profile-achievements">
+          <div className="achievements-header">
+            <h2>Succès</h2>
+            <span>{unlockedInCatalog} / {totalAchievements} débloqués ({progress}%)</span>
+          </div>
+          <div className="achievements-progress" aria-hidden="true">
+            <div style={{ width: `${progress}%` }} />
+          </div>
+
+          {unlockedIds.length === 0 ? (
+            <p className="achievements-empty">Aucun succès débloqué pour le moment.</p>
+          ) : (
+            <div className="profile-achivement">
+              {unlockedIds.map((id) => {
+                const info = ACHIEVEMENTS[id];
+                return (
+                  <article key={id} className="achivement isUnlocked">
+                    <div className="achivement-icon" aria-hidden="true">
+                      <i className={`nf ${info?.icon ?? "nf-fa-question"}`}></i>
+                    </div>
+                    <div className="achivement-text">
+                      <strong>{info?.name ?? id}</strong>
+                      <p>{info?.description ?? "Succès inconnu"}</p>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+
+          {lockedIds.length > 0 ? (
+            <>
+              <button
+                type="button"
+                className="achievements-toggle"
+                onClick={() => setShowLocked((value) => !value)}
+                aria-expanded={showLocked}
+              >
+                <i className="nf nf-fa-lock" aria-hidden="true"></i>
+                {showLocked
+                  ? "Masquer les succès verrouillés"
+                  : `${lockedIds.length} succès verrouillé${lockedIds.length > 1 ? "s" : ""} restant${lockedIds.length > 1 ? "s" : ""}`}
+                <i
+                  className={`nf ${showLocked ? "nf-fa-chevron_up" : "nf-fa-chevron_down"}`}
+                  aria-hidden="true"
+                ></i>
+              </button>
+
+              {showLocked ? (
+                <div className="profile-achivement">
+                  {lockedIds.map((id) => (
+                    <article key={id} className="achivement isLocked">
+                      <div className="achivement-icon" aria-hidden="true">
+                        <i className="nf nf-fa-lock"></i>
+                      </div>
+                      <div className="achivement-text">
+                        <strong>{ACHIEVEMENTS[id].name}</strong>
+                        <p>{ACHIEVEMENTS[id].description}</p>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : null}
+            </>
           ) : null}
-
-
-        </div>
-
-        <div className="profile-footer">
-
-          {/* <h2>Badges : </h2>
-          <h6>en dev...</h6> */}
-
-        </div>
+        </section>
       </section>
+
+      {showDeleteModal ? (
+        <DeleteAccountModal onClose={() => setShowDeleteModal(false)} />
+      ) : null}
     </div>
   );
 }

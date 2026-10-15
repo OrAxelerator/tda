@@ -2,6 +2,8 @@ import { GameState } from "./GameState";
 import { Card } from "./Card";
 import { Player } from "./Player";
 import { Deck } from "./Deck";
+import { handleAchievementEvent } from "../achievements/achievementService";
+import { randomUUID } from "crypto";
 
 export type PublicPlayer = Pick<Player, "id" | "name">;
 
@@ -95,6 +97,33 @@ export class GameEngine {
     }
 
 
+    // Remplace un joueur humain par un bot, à la même place et avec la même main
+    replaceWithBot(playerId: string): Player | null {
+        const index = this.state.players.findIndex(player => player.id === playerId);
+        if (index === -1) {
+            return null;
+        }
+
+        const leaver = this.state.players[index];
+        const bot = new Player(randomUUID(), "Bot", false, leaver.isWinner, true);
+        bot.hand = leaver.hand;
+        this.state.players[index] = bot;
+
+        if (this.state.currentPlayerId === playerId) {
+            this.state.currentPlayerId = bot.id;
+        }
+
+        // Le host part : on donne le rôle au premier humain restant
+        if (leaver.isHost) {
+            const newHost = this.state.players.find(player => !player.isBot);
+            if (newHost) {
+                newHost.isHost = true;
+            }
+        }
+
+        return bot;
+    }
+
     removePlayer(playerId:string) {
 
         const removedIndex = this.state.players.findIndex(
@@ -163,7 +192,6 @@ export class GameEngine {
         const player = this.getPlayer(playerId);
         if (!player ) {
             throw new Error("Joueur n'existe pas.")
-            return;
         }
         if (player.isWinner) {
             throw new Error("Vous avez gagnez pq prendre la pile ..")
@@ -182,13 +210,16 @@ export class GameEngine {
                 }
                 player.addCard(card);
             });
+            await handleAchievementEvent({
+                type: "CARDS_PLAYED",
+                userId: playerId,
+                amount: this.state.discardPile.length
+            });
             this.state.discardPile = [] // vide totalement la discard pile
 
             this.state.players.forEach(player => {
-                if (player.id != playerId ) {
-                    if (player.hand.length <= 2) {
-                        this.refullPlayer(player.id);
-                    }
+                if (player.hand.length <= 2) {
+                    this.refullPlayer(player.id);
                 }
             });
 
@@ -276,7 +307,7 @@ async playBotTurn(player: Player) {
         console.log("⚠️ Aucune carte jouable !");
         console.log("🤖 Bot va piocher...");
 
-        this.takePile(player.id);
+        await this.takePile(player.id);
 
         console.log("🤖 takePile terminé");
         console.log("🤖 main après pioche:", player.hand);
@@ -439,6 +470,13 @@ async playBotTurn(player: Player) {
 
         for (const cardId of cards) {
             this.discardCards(playerId, cardId);
+        }
+
+        if (cards.includes(53) && cards.includes(54)) {
+            await handleAchievementEvent({
+                type: "JOKERS_PLAYED",
+                userId: playerId,
+            });
         }
 
         if (player.hand.length === 0) {

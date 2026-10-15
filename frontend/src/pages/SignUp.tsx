@@ -4,7 +4,7 @@ import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithPopup } f
 import { FirebaseError } from "firebase/app";
 import { auth } from "../firebase-auth";
 import { toast } from "react-toastify";
-import { ensureUserProfile } from "../utils/userProfile";
+import { createUserProfile } from "../utils/userProfile";
 
 function SignUp() {
   const [authMethod, setAuthMethod] = useState<"email" | "google" | null>(null);
@@ -21,7 +21,7 @@ function SignUp() {
 
     try {
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
-      await ensureUserProfile(user, name);
+      await createUserProfile(user, name);
       toast.success("Compte créé avec succès", {
         position: "top-center",
       });
@@ -49,7 +49,7 @@ function SignUp() {
       console.log("UID :", result.user.uid);
       console.log("Email :", result.user.email);
       console.log("ensureporifle");
-      await ensureUserProfile(result.user, result.user.displayName);
+      await createUserProfile(result.user, result.user.displayName);
       toast.success("Compte Google créé avec succès", {
         position: "top-center",
       });

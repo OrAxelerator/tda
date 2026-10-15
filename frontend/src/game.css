@@ -345,31 +345,72 @@
 
 
 
+.waiting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.roomIdLabel {
+  margin: 0;
+  opacity: 0.75;
+}
+
 .roomIdContainer {
   display: flex;
   margin: 0 auto;
   width: fit-content;
-  justify-content: center;
-  align-items: center;
-  background-color: #665566;
+  max-width: 100%;
+  padding: 0;
+  align-items: stretch;
+  background-color: rgb(40, 39, 46);
+  color: #f3f3f5;
+  font: inherit;
   font-weight: bold;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease;
+}
 
-  border-radius: 2px;
-  cursor:pointer;
+.roomIdContainer:hover {
+  transform: translateY(-1px);
+  border-color: rgba(88, 199, 255, 0.6);
+}
+
+.roomIdContainer:focus-visible {
+  outline: 2px solid rgb(126, 255, 255);
+  outline-offset: 2px;
+}
+
+.roomIdContainer.isCopied {
+  border-color: rgba(80, 200, 120, 0.6);
+}
+
+.roomIdContainer.isCopied .icon {
+  background-color: rgba(80, 200, 120, 0.25);
+  color: rgb(120, 230, 150);
 }
 
 .icon {
-  background-color: #556655;
-  height: 50px;
-  width: 35px;
+  background-color: rgba(88, 199, 255, 0.18);
+  color: rgb(126, 225, 255);
+  min-height: 50px;
+  width: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  border-radius: 2px 0px 0px 2px;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .roomdId {
-  padding-left: 1ch;
-  padding-right: 1ch;
+  display: flex;
+  align-items: center;
+  padding: 0 1.5ch;
+  font-family: var(--mono, monospace);
+  letter-spacing: 0.05em;
+  overflow-wrap: anywhere;
 }
