@@ -1,19 +1,5 @@
-import type { CSSProperties, MouseEvent } from "react";
+import type { CSSProperties } from "react";
 
-function updatePileCardTilt(event: MouseEvent<HTMLElement>) {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width - 0.5;
-    const y = (event.clientY - rect.top) / rect.height - 0.5;
-    const bottomBoost = y > 0 ? 1.85 : 1;
-
-    event.currentTarget.style.setProperty("--pointer-rotate-x", `${y * -18 * bottomBoost}deg`);
-    event.currentTarget.style.setProperty("--pointer-rotate-y", `${x * 18}deg`);
-}
-
-function resetPileCardTilt(event: MouseEvent<HTMLElement>) {
-    event.currentTarget.style.setProperty("--pointer-rotate-x", "0deg");
-    event.currentTarget.style.setProperty("--pointer-rotate-y", "0deg");
-}
 //   function getStateCardImg(deckLength: number) {
 
 
@@ -69,10 +55,8 @@ export default function Pile({ discardPileLength, isActive, discardPileCard}: Pi
                         return (
                             <div
                                 key={`${cardId}-${index}`}
-                                className="card pileCard3d"
+                                className="card pileCardZoom"
                                 style={cardStyle}
-                                onMouseMove={updatePileCardTilt}
-                                onMouseLeave={resetPileCardTilt}
                             >
                                 <img src={cardLink} alt={`Carte ${id}`} />
                             </div>
@@ -103,19 +87,15 @@ export default function Pile({ discardPileLength, isActive, discardPileCard}: Pi
                         return (
                             <div
                                 key={`${cardId}-${index}`}
-                                className="card pileCard3d"
+                                className="card pileCardZoom"
                                 style={cardStyle}
-                                onMouseMove={updatePileCardTilt}
-                                onMouseLeave={resetPileCardTilt}
                             >
                                 <img src={cardLink} alt={`Carte ${id}`} />
                             </div>
                         );
                     })}
                 {/* <div
-                    className="pileDeckBackWrapper pileCard3d"
-                    onMouseMove={updatePileCardTilt}
-                    onMouseLeave={resetPileCardTilt}
+                    className="pileDeckBackWrapper pileCardZoom"
                 >
                     <img className="pileDeckBack" src={`/src/assets/deck/${getStateCardImg(discardPileLength)}.png`} alt="Dos de la defausse" />
                 </div> */}

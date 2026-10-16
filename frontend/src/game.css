@@ -217,37 +217,16 @@
     object-fit: contain;
 }
 
-.pileCard3d {
-    --pointer-rotate-x: 0deg;
-    --pointer-rotate-y: 0deg;
-    perspective: 900px;
-    transform-style: preserve-3d;
-}
-
-.pileCard3d img {
+.pileCardZoom img {
     border-radius: 6px;
-    transform:
-        rotateX(var(--pointer-rotate-x, 0deg))
-        rotateY(var(--pointer-rotate-y, 0deg))
-        translateZ(0);
-    transform-style: preserve-3d;
     transition:
-        transform 95ms ease,
-        filter 95ms ease,
-        box-shadow 95ms ease;
-    will-change: transform;
+        transform 120ms ease,
+        box-shadow 120ms ease;
 }
 
-.pileCard3d:hover img {
-    filter: saturate(1.12) contrast(1.04);
-    box-shadow:
-        0 10px 18px rgba(0, 0, 0, 0.34),
-        0 0 16px rgba(72, 202, 255, 0.3);
-    transform:
-        rotateX(var(--pointer-rotate-x, 0deg))
-        rotateY(var(--pointer-rotate-y, 0deg))
-        translateZ(24px)
-        scale(1.04);
+.pileCardZoom:hover img {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    transform: scale(1.08);
 }
 
 
